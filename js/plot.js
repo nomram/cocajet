@@ -57,7 +57,7 @@ export class Plot {
     this.draw = () => {};
     this.hover = null;
     this._ro = new ResizeObserver(() => { this._size(); this.draw(); });
-    this._ro.observe(canvas.parentElement || canvas);
+    this._ro.observe(canvas.parentElement || canvas); if (canvas.parentElement) this._ro.observe(canvas);
     window.addEventListener('themechange', () => this.draw());
     this._size();
   }
@@ -66,7 +66,7 @@ export class Plot {
   redraw() { this.draw(); }
 
   _size() {
-    const c = this.c, w = Math.max(200, (c.parentElement ? c.parentElement.clientWidth : c.clientWidth) || 400);
+    const c = this.c, w = Math.max(200, c.clientWidth || (c.parentElement ? c.parentElement.clientWidth : 0) || 400);
     const h = this.o.height || Math.round(w / this.o.aspect);
     const dpr = Math.min(2.5, window.devicePixelRatio || 1);
     c.style.height = h + 'px';
@@ -106,8 +106,8 @@ export class Plot {
 
   axes() {
     const { ctx, o, col, m } = this;
-    const xt = o.xlog ? logTicks(o.xmin, o.xmax) : (o.xticks || niceTicks(o.xmin, o.xmax, Math.max(3, Math.floor(this.iw / 90))));
-    const yt = o.ylog ? logTicks(o.ymin, o.ymax) : (o.yticks || niceTicks(o.ymin, o.ymax, Math.max(3, Math.floor(this.ih / 50))));
+    const xt = o.xlog ? logTicks(o.xmin, o.xmax) : (o.xticks || niceTicks(Math.min(o.xmin, o.xmax), Math.max(o.xmin, o.xmax), Math.max(3, Math.floor(this.iw / 90))));
+    const yt = o.ylog ? logTicks(o.ymin, o.ymax) : (o.yticks || niceTicks(Math.min(o.ymin, o.ymax), Math.max(o.ymin, o.ymax), Math.max(3, Math.floor(this.ih / 50))));
     ctx.lineWidth = 1; ctx.textBaseline = 'middle';
     if (o.grid) {
       ctx.strokeStyle = col.grid; ctx.beginPath();
@@ -267,8 +267,8 @@ export class Plot {
     return this;
   }
 
-  colorbar(pal, vmin, vmax, label = '') {
-    const { ctx, m } = this, w = 10, x = m.l + this.iw - w - 8, y = m.t + 10, hh = Math.min(120, this.ih - 20);
+  colorbar(pal, vmin, vmax, label = '', left = false) {
+    const { ctx, m } = this, w = 10, x = left ? m.l + 36 : m.l + this.iw - w - 8, y = m.t + 10, hh = Math.min(120, this.ih - 20);
     const g = ctx.createLinearGradient(0, y + hh, 0, y);
     for (let i = 0; i <= 10; i++) { const [r, gg, b] = palette(pal, i / 10); g.addColorStop(i / 10, `rgb(${r | 0},${gg | 0},${b | 0})`); }
     ctx.save(); ctx.fillStyle = g; ctx.fillRect(x, y, w, hh); ctx.strokeStyle = this.col.grid2; ctx.strokeRect(x + .5, y + .5, w, hh);

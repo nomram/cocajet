@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jet Engines for Dummies — Build a Coke-Can Turbojet</title>
+<meta name="description" content="An interactive, from-scratch guide to jet engines: air, thermodynamics, blades and turbines, then a complete 3D, STL-downloadable homemade turbojet you can rotate, cut open and run in your browser.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter" style="max-width:1100px">
+
+<section class="hero">
+  <div class="hero-text">
+    <div>
+      <span class="eyebrow">An interactive guide · 13 chapters · 14 STL parts</span>
+      <h1>Jet engines<br>for <span>dummies</span></h1>
+    </div>
+    <div>
+      <p class="lede" style="font-size:1.1rem">Start with a breath of air. Finish with a working turbojet built around a <strong>Coke can</strong>. Every idea comes with a plot or widget you can play with, and every part exists as a real 3D model you can spin, cut open, download and run.</p>
+      <div class="btn-row" style="margin-top:12px">
+        <a class="btn fire" href="01-air.html">Start with the air →</a>
+        <a class="btn" href="06-build.html">Jump to the 3D build</a>
+        <a class="btn" href="07-run.html">Run the simulator</a>
+      </div>
+    </div>
+  </div>
+  <div id="hero-viewer"></div>
+</section>
+<p style="font-size:.85rem;color:var(--muted);margin:-18px 0 22px">↑ That engine is running right now, in slow motion. The glow is its real temperature. Drag to rotate, hover a part, try <em>Cutaway</em>.</p>
+
+<div class="safety-strip"><b>Read this:</b> a real micro-turbine spins at ~115 000 rpm and burns fuel at 800 °C. This guide teaches the physics and a design; it does not replace experience, supervision and a proper test cell. <a href="safety.html">Safety first →</a></div>
+
+<div data-widget="design-stats"></div>
+
+<h2 id="idea">The whole idea in four words</h2>
+<p class="prose lede" style="font-size:1.1rem">A jet engine is an <strong>advanced hair-dryer with a flame in it</strong>. It does four things, over and over, without stopping:</p>
+<div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))">
+  <div class="card"><span class="num">1 · SUCK</span><h3>Take in air</h3><p>A bellmouth gathers a big, slow stream of ordinary air: ~78% nitrogen, ~21% oxygen.</p></div>
+  <div class="card"><span class="num">2 · SQUEEZE</span><h3>Compress it</h3><p>A spinning wheel throws the air outward, packing it to twice atmospheric pressure. Squeezing heats it by ~90 °C.</p></div>
+  <div class="card"><span class="num">3 · BANG</span><h3>Burn fuel in it</h3><p>Fuel burns continuously inside a can. The heat makes the gas want to expand. Only ¼ of the air is used to burn; the rest cools the flame.</p></div>
+  <div class="card"><span class="num">4 · BLOW</span><h3>Let it escape</h3><p>The hot gas spins a turbine (which drives the compressor), then rushes out the back. <em>Action, reaction:</em> the engine is pushed forward.</p></div>
+</div>
+<p class="prose">That is the <strong>Brayton cycle</strong>. Everything in this guide is a closer look at one of those four steps, and at the physics (Newton, gas laws, aerodynamics, chemistry, materials) that makes each step work.</p>
+
+<h2 id="path">Your path through the guide</h2>
+<div class="cards" id="path-cards"></div>
+
+<h2 id="how">How this guide works</h2>
+<div class="wgrid even">
+  <div class="callout"><span class="ct">Layer by layer</span>We never dump the whole engine on you. Chapters 1–4 give you the science. Chapter 5 shows the finished machine on one page. Chapter 6 then rebuilds it <em>one component at a time</em> in 3D, each new layer sitting on the last, each with the physics, the numbers and the cheap way to make it.</div>
+  <div class="callout fire"><span class="ct">Everything is live</span>The sliders are not decoration. The same small physics model drives the cycle calculators, the compressor map, the thrust numbers and the 3D simulator, so every number in this guide agrees with every other.</div>
+</div>
+<div class="callout violet"><span class="ct">What is “the Coke-can jet motor”?</span>
+<p>Hobbyists have long built tiny gas turbines out of scrap parts. One famous trick is using a <strong>soda can as the flame tube</strong>: the thin aluminium sheet is easy to cut and drill, and the cooling air that streams through its holes keeps it alive long enough to learn from. Our design (call it <strong>CJ-1</strong>) uses exactly that idea inside a proper machined structure: an <em>annular</em> flame tube made from a Coke can wrapped around a central shaft tunnel. The honest catch: aluminium melts at 660 °C, so the can is a <em>consumable teaching liner</em>. Chapter 9 shows what to swap it for.</p></div>
+
+<h2 id="tools">Tools you will meet</h2>
+<div class="cards">
+  <a class="card" href="06-build.html"><span class="num">3D</span><h3>Layer-by-layer builder</h3><p>Scroll, and the engine assembles itself part by part. Explode it, slice it, x-ray it.</p></a>
+  <a class="card" href="07-run.html"><span class="num">SIM</span><h3>Running engine simulator</h3><p>Start it, throttle up, watch the air, flame and glowing metal. Cause a surge on purpose.</p></a>
+  <a class="card" href="models.html"><span class="num">STL</span><h3>Download the parts</h3><p>14 watertight STL files + the full assembly + a one-click ZIP.</p></a>
+  <a class="card" href="reference.html"><span class="num">REF</span><h3>Formulas &amp; glossary</h3><p>Every equation in one place, plus sources and further reading.</p></a>
+</div>
+
+</article>
+</main>
+</div>
+<script type="module">
+import { PAGES } from './js/site.js';
+const desc = {
+  '01-air.html': ['What air is, why it burns, why it pushes', ['chemistry', 'gas', 'ISA']],
+  '02-forces.html': ['Newton’s third law turned into numbers', ['thrust', 'momentum', 'efficiency']],
+  '03-thermo.html': ['Squeeze it, heat it, let it expand', ['gas laws', 'Brayton']],
+  '04-blades.html': ['Lift, angle of attack, fans, wind & steam turbines', ['airfoil', 'Euler', 'Betz']],
+  '05-engine.html': ['Every station, every number', ['cycle', 'power balance']],
+  '06-build.html': ['Ten steps, ten 3D layers', ['3D', 'STL', 'DIY']],
+  '07-run.html': ['Start, run, break, learn', ['simulator']],
+  '08-improve.html': ['Cheap upgrades ranked by thrust per dollar', ['bearings', 'balance', 'turbofan']],
+  '09-materials.html': ['Why the can melts and what doesn’t', ['alloys', 'creep']],
+  'models.html': ['3D gallery and downloads', ['STL']],
+  'reference.html': ['Formulas, glossary, sources', ['reference']],
+  'safety.html': ['Energy, fire, noise and a checklist', ['safety']],
+};
+const box = document.getElementById('path-cards');
+for (const p of PAGES) {
+  if (p.file === 'index.html' || !desc[p.file]) continue;
+  const [d, tags] = desc[p.file];
+  const a = document.createElement('a');
+  a.className = 'card'; a.href = p.file;
+  a.innerHTML = `<span class="num">${p.n === '!' ? 'SAFETY' : /\d/.test(p.n) ? 'CHAPTER ' + p.n : p.group.toUpperCase()}</span><h3>${p.title}</h3><p>${d}</p><div class="tags">${tags.map(t => `<span class="chip">${t}</span>`).join('')}</div>`;
+  box.appendChild(a);
+}
+// hero viewer: lazily start so the page paints first
+const mount = document.getElementById('hero-viewer');
+mount.className = 'viewer';
+const io = new IntersectionObserver(async ([e]) => {
+  if (!e.isIntersecting) return; io.disconnect();
+  try {
+    const [{ EngineViewer }, { EngineSim }] = await Promise.all([import('./js/viewer3d.js'), import('./js/engine-sim.js')]);
+    const v = new EngineViewer(mount, { tools: ['explode', 'cut', 'xray', 'heat'], autoRotate: true, flow: true, caption: 'CJ-1 · running at partial power · hover a part' });
+    await v.load();
+    const sim = new EngineSim(); v.attachSim(sim);
+    sim.start(); for (let i = 0; i < 700; i++) sim.step(0.05);
+    sim.setThrottle(0.7); for (let i = 0; i < 900; i++) sim.step(0.05);
+    let t = 0; setInterval(() => { t += 0.1; sim.setThrottle(0.62 + 0.3 * Math.sin(t * 0.25)); }, 100);
+    v.setView('iso', false);
+  } catch (err) { console.error(err); mount.innerHTML = '<div class="vloading">3D needs WebGL — your browser blocked it. The rest of the guide still works.</div>'; }
+}, { rootMargin: '200px' });
+io.observe(mount);
+</script>
+</body>
+</html>

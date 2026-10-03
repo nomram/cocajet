@@ -22,7 +22,7 @@ export const T_REF = 288.15;
 
 /* --- fuels ---------------------------------------------------------------- */
 export const FUELS = {
-  propane:  { name: 'Propane (LPG)', LHV: 46.35e6, AFR: 15.7, rho: 493 },
+  propane:  { name: 'Propane (LPG)', LHV: 46.35e6, AFR: 15.6, rho: 493 },
   kerosene: { name: 'Kerosene / Jet-A', LHV: 43.2e6, AFR: 14.7, rho: 800 },
   methane:  { name: 'Natural gas', LHV: 50.0e6, AFR: 17.2, rho: 0.72 },
 };
@@ -126,20 +126,22 @@ export function compressor(p, N, m, T01, P01) {
   const incidence = beta1 - p.beta1b;                            // + at low flow
   const MW1 = W1 / Math.sqrt(g * R_AIR * T1);
 
+  // exit blockage grows with the number of blades (0.6 mm thick); 0.92 for the reference 7+7 wheel
+  const blk = 0.92 * Math.max(0.5, 1 - (p.Zfull + p.Zsplit) * 0.6e-3 / (Math.PI * p.D2 * Math.cos(p.beta2 * Math.PI / 180))) / 0.945;
   // exit: iterate density / flow coefficient / outlet pressure
   let PR = 1.5, Cm2 = 0, Ctheta2 = 0, dHE = 0, T02 = T01, rho2 = rho01;
   for (let it = 0; it < 6; it++) {
     rho2 = 0.88 * (P01 * PR) / (R_AIR * T02);
-    Cm2 = m / (rho2 * Math.PI * p.D2 * p.b2 * 0.92);
+    Cm2 = m / (rho2 * Math.PI * p.D2 * p.b2 * blk);
     Ctheta2 = sigma * U2 - Cm2 * tanB2;
     dHE = U2 * Ctheta2;                                          // Euler work
-    const losses = lossBreakdown(p, { U2, W1, Cm2, Ctheta2, incidence, MW1, dHE });
+    const losses = lossBreakdown(p, { U2, W1, Cm2, Ctheta2, incidence, MW1, dHE, Zeff });
     const dHin = Math.max(1, dHE + losses.disk);
     const dHs = Math.max(0, dHE - losses.sum);
     T02 = T01 + dHin / cp;
     PR = Math.pow(1 + dHs / (cp * T01), g / (g - 1));
   }
-  const losses = lossBreakdown(p, { U2, W1, Cm2, Ctheta2, incidence, MW1, dHE });
+  const losses = lossBreakdown(p, { U2, W1, Cm2, Ctheta2, incidence, MW1, dHE, Zeff });
   const dHin = Math.max(1, dHE + losses.disk);
   const dHs = Math.max(0, dHE - losses.sum);
   PR = Math.pow(1 + dHs / (cp * T01), g / (g - 1));
@@ -160,14 +162,16 @@ function lossBreakdown(p, s) {
   const kI = inc > 0 ? 0.9 : 0.35;
   const dInc = kI * 0.5 * Math.pow(s.W1 * Math.sin(incRad - (-3 * Math.PI / 180)), 2);
   const W2 = Math.hypot(s.Cm2, s.U2 - s.Ctheta2);
-  const dFric = 0.085 * 0.5 * Math.pow(0.5 * (s.W1 + W2), 2);
+  const zr = (s.Zeff || 11.9) / 11.9;                                        // 11.9 = effective count of the reference wheel
+  const dFric = 0.076 * zr * 0.5 * Math.pow(0.5 * (s.W1 + W2), 2);   // more blades = more wetted area
+  const dLoad = 0.0062 * s.U2 * s.U2 * Math.pow(1 / zr, 2.2);                 // too few blades = high loading, flow separates
   const C2 = Math.hypot(s.Cm2, s.Ctheta2);
   const dDiff = (1 - p.etaDiff) * 0.5 * C2 * C2;
   const dClear = 0.65 * s.dHE * (p.clearance / p.b2);
   const dChoke = 0.5 * s.W1 * s.W1 * 90 * Math.pow(Math.max(0, s.MW1 - 0.90), 2);
   const disk = 0.020 * s.U2 * s.U2;                               // windage, adds to input work
-  const sum = dInc + dFric + dDiff + dClear + dChoke + 0.5 * disk;
-  return { inc: dInc, fric: dFric, diff: dDiff, clear: dClear, choke: dChoke, disk, sum };
+  const sum = dInc + dFric + dLoad + dDiff + dClear + dChoke + 0.5 * disk;
+  return { inc: dInc, fric: dFric, load: dLoad, diff: dDiff, clear: dClear, choke: dChoke, disk, sum };
 }
 
 /* Find the surge-side and choke-side flow limits for a speed (for maps & solver) */

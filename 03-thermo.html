@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3 · Pressure, heat &amp; the Brayton cycle — Jet Engines for Dummies</title>
+<meta name="description" content="The gas laws, adiabatic compression, and the Brayton cycle: the curved-rectangle P-V diagram that explains every jet engine, with interactive P-V and T-s diagrams.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter">
+
+<span class="eyebrow">Chapter 3 · The science</span>
+<h1>Pressure, heat &amp; the Brayton cycle</h1>
+<div class="meta"><span>~35 min</span><span>3 big widgets</span><span>the most important chapter in the guide</span></div>
+<p class="lede">What happens to a gas when you squeeze it, heat it, and let it expand? Answer that and you understand every jet engine ever built. The answer is a nearly rectangular loop on a graph.</p>
+
+<h2 id="laws" data-short="The gas laws">The gas laws: three observations, one equation</h2>
+<p>Seventeenth-century experimenters squeezed and heated trapped air and found three simple rules:</p>
+<ul>
+<li><strong>Boyle (1662):</strong> at constant temperature, squeeze the volume to half and the pressure doubles: $P\,V=\text{const}$.</li>
+<li><strong>Charles (1787):</strong> at constant pressure, heat it and the volume grows in proportion to the (absolute) temperature: $V/T=\text{const}$.</li>
+<li><strong>Gay-Lussac (1809):</strong> at constant volume, heating raises pressure in proportion to temperature: $P/T=\text{const}$.</li>
+</ul>
+<p>Glue them together and you get the <strong>ideal gas law</strong>. Per kilogram of gas it reads:</p>
+<div class="eq">$$P\,v = R\,T\qquad\text{or}\qquad P=\rho R T,\qquad R_{\text{air}}=287\ \text{J/(kg K)}$$</div>
+<p>where $v=1/\rho$ is the specific volume (m³ per kg). The molecules-in-a-box picture of chapter 1 explains why: pressure is molecular impacts per area ($\propto$ number density × energy), temperature is molecular energy. <em>Absolute</em> temperature (kelvin = °C + 273.15) matters: zero kelvin is where the molecules stop.</p>
+<details class="deep"><summary>Derivation from the molecules-in-a-box picture</summary><div>
+<p>A molecule of mass $m$ bouncing between two walls $L$ apart at speed $u_x$ hits a wall $u_x/2L$ times per second and transfers $2mu_x$ each time. A box holds $N$ molecules, and on average a third of the energy is in each direction, $\overline{u_x^2}=\tfrac13\overline{u^2}$. Force on a wall is therefore $\tfrac{N m \overline{u^2}}{3L}$ and pressure (force / $L^2$) is</p>
+<div class="eq">$$P=\frac{N m\,\overline{u^2}}{3V}=\frac{2}{3}\frac{N}{V}\cdot\tfrac12 m\overline{u^2}$$</div>
+<p>Temperature is <em>defined</em> through the average kinetic energy: $\tfrac12 m\overline{u^2}=\tfrac32 k_BT$. Substitute: $PV=Nk_BT$, which is the gas law ($Nk_B=mR$ for a mass $m$ of gas).</p>
+</div></details>
+<p>Sixty seconds on the P–V diagram: pressure up, volume across. Pick a process; the shaded area is the <strong>work</strong>:</p>
+<div data-widget="gas-laws"></div>
+
+<h2 id="energy" data-short="Heat, work, energy">Heat, work and the first law</h2>
+<p>Energy is conserved. A gas can gain energy as <strong>heat $Q$</strong> (from a flame) or as <strong>work $W$</strong> (from a piston or compressor), and stores it as <strong>internal energy $U$</strong>, the molecular motion:</p>
+<div class="eq">$$\Delta U = Q + W_{\text{on gas}},\qquad \Delta U = c_v\,\Delta T,\qquad \text{heat at constant pressure: } Q = c_p\,\Delta T$$</div>
+<p>For air, $c_v\approx718$ and $c_p\approx1005\ \mathrm{J/(kg\,K)}$, with $c_p-c_v=R$ and a ratio $\gamma=c_p/c_v=1.4$. Hot combustion gas has a bit more “wiggle room” in its molecules (CO₂ and water have more ways to store energy), so $c_p\approx1150$ and $\gamma\approx1.33$ at 1000 K. We use 1.4 for cold air and 1.33 for the hot part.</p>
+
+<h2 id="adiabatic" data-short="Squeezing heats">Squeeze it fast and it gets hot</h2>
+<p>A compressor wheel passes air through in a few <em>microseconds</em>: no time to lose heat to the casing. That is an <strong>adiabatic</strong> process ($Q=0$), and all the work goes into temperature:</p>
+<div class="eq">$$P\,v^{\gamma}=\text{const}\quad\Longrightarrow\quad\frac{T_2}{T_1}=\left(\frac{P_2}{P_1}\right)^{\frac{\gamma-1}{\gamma}}=r^{0.286}$$</div>
+<p>Take our engine, $r=1.95$, $T_1=288$ K: $T_2=288\times1.95^{0.286}=348$ K, +60 K if ideal. A real wheel is only ~78 % efficient (some work churns the air into extra heat) so the true outlet is 365 K. The work per kg is $c_p\Delta T=1005\times 78\approx 78$ kJ/kg and at 0.152 kg/s that is <strong>12 kW</strong> of shaft power, as much as 6 electric kettles. The turbine has to deliver all of it.</p>
+<div data-widget="compression-heat"></div>
+
+<h2 id="cycle" data-short="The Brayton cycle">The Brayton cycle: the curved rectangle</h2>
+<p>Now chain four processes together and make a loop. A parcel of air, followed through the engine:</p>
+<ol>
+<li><strong>1 → 2 · Squeeze.</strong> Adiabatic compression: pressure and temperature rise, volume shrinks (the curved left edge).</li>
+<li><strong>2 → 3 · Bang.</strong> Burn fuel at (nearly) constant pressure: temperature and volume grow (the flat top edge).</li>
+<li><strong>3 → 4 · Blow.</strong> Adiabatic expansion through the turbine <em>and</em> nozzle: pressure falls back to ambient, temperature drops (the curved right edge).</li>
+<li><strong>4 → 1 · Cool.</strong> The exhaust mixes into the atmosphere at constant pressure and cools (the flat bottom, outside the engine).</li>
+</ol>
+<p>On a pressure–volume graph that is a rectangle with two curved sides: the <strong>Brayton cycle</strong>. The area enclosed is the net work you get from each kilogram of air. On the temperature–entropy graph it appears as a different but equivalent loop. Experiment: the shaded areas are the same energy.</p>
+<div data-widget="brayton"></div>
+
+<div class="callout fire"><span class="ct">Check this against Chapter 2</span>Press “Our engine (CJ-1)”. The net work is <strong>71 kJ/kg</strong>. All of it becomes jet kinetic energy: $\tfrac12V_e^2 = 71\,000\ \text{J/kg}\Rightarrow V_e=\sqrt{2\times71000}\approx377$ m/s. That is the same exhaust speed we used for the thrust (58 N). Thermodynamics and Newton agree, because they are the same energy.</div>
+
+<h2 id="understand" data-short="Reading the loop">What the loop is telling you</h2>
+<h3>1 · More heat → more work (turn up T₃)</h3>
+<p>Raise $T_3$ (the turbine inlet temperature) and the loop gets taller: more net work from the same air. This is why metallurgy decides engine power: the hotter the metal can run, the more thrust per kilogram of air. Our can liner limits us to ~1 100 K; a modern airliner with cooled single-crystal blades runs 1 900 K.</p>
+<h3>2 · More squeeze → better efficiency (turn up r)</h3>
+<p>The ideal efficiency depends <strong>only</strong> on the pressure ratio:</p>
+<div class="eq">$$\eta_{\text{th}}=1-\frac{1}{r^{(\gamma-1)/\gamma}}=1-\frac{T_1}{T_2}$$</div>
+<p>At $r=2$ that is 18 %; at $r=10$, 48 %; at $r=40$, 65 %. Real values are lower because compressor and turbine aren’t perfect, and the bottom-right panel shows the nasty truth: <em>the lower the component efficiency, the worse it is to raise r</em>, until at some point there is no net work left at all.</p>
+<h3>3 · There is a best r for work (it is not the highest)</h3>
+<p>Net work per kg rises with $r$ then falls: very high $r$ means the compressor eats almost everything the turbine makes. For an ideal cycle the maximum-work pressure ratio is $r_{\text{opt}}=(T_3/T_1)^{\gamma/(2(\gamma-1))}$. For $T_3=1070$ K that is r ≈ 10, much higher than ours; with realistic component efficiencies the peak shifts down to r ≈ 4 (look at the dashed curve). We stay at 2 because a bigger wheel or a second stage costs far more than the extra thrust is worth to a hobbyist.</p>
+<h3>4 · Half the expansion drives the compressor, half makes the jet</h3>
+<p>In the widget the gas expands all the way back to ambient pressure. In a real <em>jet</em> engine that expansion is split in two: the <strong>turbine</strong> takes only as much as the compressor needs (here 78 kJ/kg, close to the compressor’s own 78 kJ/kg), and the remaining pressure drop is spent in the <strong>nozzle</strong>, turning into jet speed (71 kJ/kg net → 377 m/s). In a <em>power</em> turbine (a ship, a power station) the turbine takes everything and delivers shaft power instead.</p>
+<p>The sobering consequence: <strong>the turbine must deliver almost as much power as it makes to the compressor</strong>. Because $W_c/W_t\approx 97\%$ at the real turbine, a few percent of lost efficiency in either wheel eats a big slice of the thrust: that is why chapter 8 spends so long on clearances, balance and blade shape.</p>
+
+<table class="data">
+<tr><th>Engine</th><th class="num">Pressure ratio</th><th class="num">T₃ (K)</th><th class="num">Thermal η (real)</th></tr>
+<tr><td>Hair-dryer with a flame (r = 1.2)</td><td class="num">1.2</td><td class="num">~900</td><td class="num">~2 %</td></tr>
+<tr><td><strong>CJ-1 (ours)</strong></td><td class="num">1.95</td><td class="num">1 070</td><td class="num">~8–10 %</td></tr>
+<tr><td>Model-aircraft turbojet (JetCat P60-class)</td><td class="num">≈ 3.5</td><td class="num">~1 100</td><td class="num">~12 %</td></tr>
+<tr><td>Vintage turbojet (J85)</td><td class="num">≈ 7</td><td class="num">~1 250</td><td class="num">~22 %</td></tr>
+<tr><td>Modern airliner turbofan</td><td class="num">≈ 40–50</td><td class="num">~1 800</td><td class="num">~45 %</td></tr>
+</table>
+
+<div class="callout violet"><span class="ct">Why a Brayton cycle, and not a car-engine cycle?</span>A piston engine runs the loop in four <em>separate strokes</em> inside one cylinder (the Otto cycle). A gas turbine runs all four steps <em>at once</em>, each in its own part of the engine, with the gas flowing continuously through. That makes it light and smooth, and it is why a jet is the best power-to-weight engine we have.</div>
+
+<h2 id="takeaways" data-short="What you learned">What you now know</h2>
+<ul>
+<li>$Pv=RT$: pressure, volume and temperature of a gas are tied together.</li>
+<li>Squeezing air fast (adiabatically) heats it: $T_2/T_1=r^{0.286}$. Our wheel adds ~75 K for r ≈ 2 at 78 % efficiency.</li>
+<li>A jet engine runs the Brayton cycle: squeeze, burn at constant pressure, expand. The enclosed P–V area is net work per kg, and here it all becomes jet speed.</li>
+<li>Higher $T_3$ → more work. Higher $r$ → better efficiency (but best work at moderate r).</li>
+<li>The turbine delivers only what the compressor needs (~97 % of its output goes straight back to the compressor); the rest of the expansion happens in the nozzle. Component efficiency matters hugely.</li>
+</ul>
+
+<div data-widget="quiz">
+<script type="application/json">[
+ {"q":"Air at 288 K is compressed adiabatically to twice the pressure. Roughly what is the new temperature (γ = 1.4)?","o":["288 K (no change)","~315 K","~351 K","~576 K"],"a":2,"why":"T₂ = 288 × 2^0.286 = 351 K."},
+ {"q":"In the Brayton cycle, where does the heat come in?","o":["During compression","At constant pressure, in the combustor","During expansion","In the exhaust"],"a":1,"why":"Step 2→3: fuel burns while pressure stays (nearly) constant, so the gas expands."},
+ {"q":"Ideal Brayton efficiency depends only on…","o":["the fuel type","the turbine inlet temperature","the pressure ratio","the mass flow"],"a":2,"why":"η = 1 − r^(−0.286). T₃ changes the work per kg, not the ideal efficiency."},
+ {"q":"What limits how high we can turn up the turbine inlet temperature T₃ in a cheap engine?","o":["The compressor","The metal’s strength at temperature","Atmospheric pressure","Newton’s third law"],"a":1,"why":"Materials. Chapter 9 explores them."}
+]</script>
+</div>
+
+</article>
+</main>
+</div>
+</body>
+</html>

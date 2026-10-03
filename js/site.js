@@ -52,7 +52,7 @@ function buildTopbar() {
       <a href="06-build.html" class="hide-sm">3D build</a>
       <a href="07-run.html" class="hide-sm">Simulator</a>
       <a href="models.html" class="hot">STL files</a>
-      <button class="icon-btn" id="theme-btn" aria-label="Toggle theme" title="Toggle light / dark">◐</button>
+      <button class="icon-btn" id="theme-btn" aria-label="Toggle theme" title="Toggle light / dark"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/></svg></button>
     </nav>
     <div class="progress" id="progress"></div>`;
   document.getElementById('theme-btn').addEventListener('click', () => {

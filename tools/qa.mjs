@@ -14,6 +14,8 @@ const shots = opt('shots', path.join(root, '.qa-shots'));
 const wait = +opt('wait', 2500);
 const W = +opt('w', 1280), H = +opt('h', 800);
 const full = flag('full');
+const widgets = flag('widgets');
+const only = opt('only', null);
 const evalJs = opt('eval', null);
 const scrollTo = opt('scroll', null);
 const pages = args.length ? args : ['index.html'];
@@ -37,8 +39,24 @@ for (const pg of pages) {
   await page.goto(`http://localhost:${port}/${pg}`, { waitUntil: 'load' });
   await page.waitForTimeout(wait);
   if (scrollTo) { await page.evaluate((sel) => { const e = document.querySelector(sel); if (e) e.scrollIntoView({ block: 'center' }); }, scrollTo); await page.waitForTimeout(wait); }
+  if (full) {   // scroll through so lazy widgets start, then return to top
+    const hgt = await page.evaluate(() => document.documentElement.scrollHeight);
+    for (let y = 0; y < hgt; y += 500) { await page.evaluate((yy) => window.scrollTo(0, yy), y); await page.waitForTimeout(220); }
+    await page.waitForTimeout(1800); await page.evaluate(() => window.scrollTo(0, 0)); await page.waitForTimeout(400);
+  }
   let extra = '';
   if (evalJs) { try { extra = JSON.stringify(await page.evaluate(evalJs)); } catch (e) { extra = 'EVAL ERROR ' + e.message; } await page.waitForTimeout(600); }
+  if (widgets) {
+    const els = await page.$$('[data-widget]');
+    let i = 0;
+    for (const e of els) {
+      const name = await e.getAttribute('data-widget'); i++;
+      if (only && !only.split(',').includes(name)) continue;
+      await e.scrollIntoViewIfNeeded(); await page.waitForTimeout(1400);
+      const f = path.join(shots, pg.replace(/\.html$/, '') + `-w${String(i).padStart(2, '0')}-${name}.png`);
+      try { await e.screenshot({ path: f }); console.log('   widget', name, '->', f); } catch (err) { console.log('   widget', name, 'screenshot failed', err.message.slice(0, 80)); }
+    }
+  }
   const out = path.join(shots, pg.replace(/[^\w.-]/g, '_').replace(/\.html$/, '') + '.png');
   await page.screenshot({ path: out, fullPage: full });
   const un = [...new Set(errs)];

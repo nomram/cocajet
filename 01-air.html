@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1 · Air, gases &amp; chemistry — Jet Engines for Dummies</title>
+<meta name="description" content="What air is made of, why a gas is a fluid, how molecules make pressure, how the atmosphere thins with height, and the chemistry that makes fuel burn.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter">
+
+<span class="eyebrow">Chapter 1 · The science</span>
+<h1>Air, gases &amp; chemistry</h1>
+<div class="meta"><span>~25 min</span><span>4 widgets</span><span>no maths beyond a calculator</span></div>
+<p class="lede">Before we build anything we need to know what we are pushing around. A jet engine does not “burn fuel to make thrust”. It <em>throws air backwards</em>, and the fuel is only there to make that air throw faster.</p>
+
+<div class="safety-strip"><b>Safety:</b> reading is safe. Building and running a gas turbine is not. See <a href="safety.html">Safety first</a> before you touch a tool.</div>
+
+<h2 id="why" data-short="Why start with air?">Why start with air?</h2>
+<p>Look at the engine’s job from the outside. Air goes in the front at ~100 m/s and out of the back at ~380 m/s. That speed-up is the whole product. Everything inside (the wheel that squeezes, the can that burns, the turbine that drives the wheel) exists to give that air extra energy on its way through.</p>
+<p>So the engine’s performance is set by three properties of air:</p>
+<ul>
+  <li><strong>How much of it</strong> arrives each second (mass flow, kg/s).</li>
+  <li><strong>How hot and how squeezed</strong> it is (temperature and pressure: its stored energy).</li>
+  <li><strong>How much of it can burn</strong> (the oxygen content, which fixes how much fuel we can add).</li>
+</ul>
+
+<h2 id="composition" data-short="What air is made of">What air is made of</h2>
+<p>Air is a <em>mixture</em> of gases, not a single substance. Click any gas below. Two numbers dominate: nitrogen (about four-fifths) and oxygen (about one-fifth). Everything else adds up to one percent.</p>
+<div data-widget="air-composition"></div>
+<p>Because it is a mixture we use an <em>average</em> molecular mass. Multiply each gas’s share by its mass and add:</p>
+<div class="eq">$$\bar M = \sum_i x_i M_i \approx 0.7808(28.01)+0.2095(32.00)+0.0093(39.95)+\dots \approx 28.96\ \text{g/mol}$$</div>
+<p>That single number gives us the <strong>specific gas constant</strong> for air, $R = R_u/\bar M = 8.314/0.02896 \approx 287\ \mathrm{J/(kg\,K)}$. You will meet 287 in almost every formula in this guide.</p>
+<div class="callout"><span class="ct">The one fact to remember</span>Only the 21 % that is oxygen can burn. In our engine <em>three quarters of the oxygen is never used</em>: the spare air is what keeps the metal from melting. A jet engine mostly heats and accelerates nitrogen.</div>
+
+<h2 id="fluid" data-short="A gas is a fluid">A gas is a fluid (that you can squash)</h2>
+<p>“Fluid” means <em>anything that flows and takes the shape of its container</em>: liquids <strong>and</strong> gases. So the maths of water pipes and of air ducts are cousins. The big difference is <strong>compressibility</strong>: water barely changes volume under pressure, a gas changes a lot.</p>
+<p>Three properties matter:</p>
+<table class="data">
+<tr><th>Property</th><th>Symbol</th><th>Air at sea level, 15 °C</th><th>Why we care</th></tr>
+<tr><td>Density</td><td>$\rho$</td><td>1.225 kg/m³</td><td>Mass flow $\dot m=\rho A V$; thrust comes from mass flow</td></tr>
+<tr><td>Pressure</td><td>$P$</td><td>101 325 Pa</td><td>Squeezing it is the compressor’s job</td></tr>
+<tr><td>Temperature</td><td>$T$</td><td>288.15 K</td><td>Sets the energy needed to compress and the speed of sound</td></tr>
+<tr><td>Speed of sound</td><td>$a$</td><td>340 m/s</td><td>Tells us when “compressible” effects matter</td></tr>
+<tr><td>Viscosity</td><td>$\mu$</td><td>1.8×10⁻⁵ Pa·s</td><td>Sticky boundary layers on blades → friction losses</td></tr>
+</table>
+<p>The three are tied together by one line, the <strong>ideal gas law</strong> (derived properly in chapter 3):</p>
+<div class="eq">$$P = \rho R T \qquad\Rightarrow\qquad \rho=\frac{101\,325}{287.05\times 288.15}=1.225\ \text{kg/m}^3$$</div>
+<p>The speed of sound is how fast a pressure “message” travels through the gas: $a=\sqrt{\gamma R T}$ with $\gamma=1.4$ for cold air. Compare the speed of a flow with $a$ and you get the <strong>Mach number</strong> $M=V/a$. Play with it:</p>
+<div data-widget="compressibility"></div>
+<p>Notice what happens at engine speeds: at Mach 0.8 the density is already 20 % below its “stagnation” value. If we pretended air were water our predictions would be badly wrong. This is why gas turbines need <em>gas</em> dynamics.</p>
+
+<h2 id="molecules" data-short="Molecules in a box">Where pressure and temperature come from</h2>
+<p>A gas is an enormous crowd of molecules flying in straight lines and bouncing off each other and the walls. That picture explains everything:</p>
+<ul>
+  <li><strong>Pressure</strong> is the molecules hammering on the walls: the total push of all the tiny impacts, per unit area.</li>
+  <li><strong>Temperature</strong> is how <em>energetic</em> the molecules are. Faster molecules means hotter gas.</li>
+  <li><strong>Density</strong> is how many molecules are in a given volume.</li>
+</ul>
+<p>Use the sliders: heat the box, add molecules, or shove the piston in. Watch the measured pressure follow the ideal-gas prediction $P\propto NT/V$, and watch the speed histogram match the theoretical Maxwell–Boltzmann curve.</p>
+<div data-widget="gas-box"></div>
+<div class="callout fire"><span class="ct">Try this: compression heats</span>Press “Slam the piston in”. The piston pushes the molecules like a bat pushes a ball, so every collision sends them away <em>faster</em>. The temperature climbs. This is exactly why a bicycle pump gets hot, and why our compressor wheel raises the air temperature by ~90 °C at pressure ratio 2.</div>
+
+<h2 id="atmosphere" data-short="The atmosphere">The atmosphere: thin air, cold air</h2>
+<p>The air at ground level is squashed by the weight of all the air above it. Climb and there is less above you, so pressure and density fall: roughly <em>halving every 5.5 km</em>. The temperature also falls (about 6.5 °C per km) up to 11 km. A reference model called the <strong>International Standard Atmosphere (ISA)</strong> lets engineers compare engines fairly.</p>
+<div data-widget="atmosphere"></div>
+<p>Two effects fight each other: thin air means less mass flow (less thrust) but cold air is denser and easier to compress (a bit more thrust per kg). Net result at altitude: <em>thrust falls roughly in proportion to density</em>. On a hot summer day at an airfield 1 500 m above sea level a hobby jet can lose a quarter of its thrust. Slide ΔT and altitude to see it.</p>
+
+<h2 id="chemistry" data-short="Why fuel burns">Why fuel burns: the chemistry</h2>
+<p>A fuel such as propane is a chain of carbon atoms with hydrogen attached. Burning it means <strong>rearranging atoms</strong> into more tightly bound molecules (CO₂ and H₂O) and releasing the difference in binding energy as heat. The balanced reaction for propane in air is:</p>
+<div class="eq">$$\mathrm{C_3H_8} + 5\,\mathrm{O_2} + 18.8\,\mathrm{N_2} \longrightarrow 3\,\mathrm{CO_2} + 4\,\mathrm{H_2O} + 18.8\,\mathrm{N_2} + \text{heat}$$</div>
+<p>(The 18.8 N₂ appears on both sides: nitrogen is a spectator, but it has to be heated, which uses up some of the energy. 18.8 = 5 × 3.76, the ratio of nitrogen to oxygen in air.)</p>
+<details class="deep"><summary>Maths: how much air does a kilogram of propane need?</summary><div>
+<p>One mole of propane has mass $3(12.011)+8(1.008)=44.1$ g. It needs 5 moles of O₂ (160 g) and, with the accompanying nitrogen, a total of $5\,(31.998 + 3.76\times 28.013)=687$ g of air.</p>
+<div class="eq">$$\text{AFR}_{\text{stoich}}=\frac{687\ \text{g air}}{44.1\ \text{g fuel}}\approx 15.6\ \text{kg air per kg propane}$$</div>
+<p>The <strong>equivalence ratio</strong> $\varphi=\text{AFR}_{\text{stoich}}/\text{AFR}_{\text{actual}}$ says how rich the mixture is. $\varphi=1$ means perfect proportions; $\varphi<1$ is lean (spare air).</p>
+<p>Heat released: the <strong>lower heating value</strong> of propane is 46.35 MJ/kg. At full power our engine burns 2.9 g/s, so the fuel power is $\dot m_f\,\text{LHV}=0.0029\times 46.35\times10^6\approx 134\ \text{kW}$, the heat output of about 60 kettles.</p>
+</div></details>
+<p>Now play: choose a fuel, drag φ, and see (i) the stoichiometric air:fuel ratio, (ii) how hot the flame gets, and (iii) what the exhaust is made of.</p>
+<div data-widget="combustion"></div>
+<div class="callout violet"><span class="ct">The puzzle every engine designer faces</span>
+<p>A perfectly mixed flame at φ = 1 reaches about 2 000 °C. Nothing we can afford survives that. Yet the turbine can only take roughly 800 °C. The solution: burn at φ ≈ 1 in a small <em>primary zone</em> where the flame is stable, then <strong>dilute</strong> the hot gas with the leftover air so that, overall, we run at φ ≈ 0.3 (the dotted “whole engine” line). We design this in chapter 6, step 6: it is the entire reason the Coke can is full of holes.</p></div>
+
+<h2 id="energy" data-short="Why liquid fuel?">Why a fuel, not a battery?</h2>
+<table class="data">
+<tr><th>Energy source</th><th class="num">MJ per kg</th><th>Note</th></tr>
+<tr><td>Hydrogen</td><td class="num">120</td><td>Great per kg, awful per litre; hard to handle</td></tr>
+<tr><td>Natural gas (methane)</td><td class="num">50</td><td>Needs a pressure vessel</td></tr>
+<tr><td>Propane / butane</td><td class="num">46</td><td><strong>Our fuel</strong>: liquid in a cylinder, gas at the engine, easy to meter</td></tr>
+<tr><td>Kerosene / Jet-A</td><td class="num">43</td><td>The aviation standard; needs a vaporiser or fine spray</td></tr>
+<tr><td>Ethanol</td><td class="num">27</td><td>Already contains oxygen</td></tr>
+<tr><td>Lithium-ion battery</td><td class="num">0.9</td><td>50× less energy per kg than propane (but needs no oxygen)</td></tr>
+</table>
+<p>A kilogram of propane carries as much energy as ~50 kg of Li-ion cells. That is why aircraft burn fuel, and why a 134 kW engine of 2.4 kg is possible at all.</p>
+
+<h2 id="takeaways" data-short="What you learned">What you now know</h2>
+<ul>
+<li>Air is ~78 % nitrogen, ~21 % oxygen. Only the oxygen burns; the rest is working fluid and coolant.</li>
+<li>A gas is a compressible fluid. $P=\rho R T$ ties its state together; $a=\sqrt{\gamma R T}$ is the speed of pressure waves.</li>
+<li>Pressure = molecular impacts; temperature = molecular energy; squeezing a gas makes it hotter.</li>
+<li>Air thins with altitude, so thrust falls with altitude; hot days hurt too.</li>
+<li>Propane needs about 15.6 kg of air per kg. We run far leaner (≈ 50 kg/kg) so the flame doesn’t melt the engine.</li>
+</ul>
+
+<div data-widget="quiz">
+<script type="application/json">[
+ {"q":"Which gas in air actually takes part in the burning?","o":["Nitrogen","Oxygen","Argon","Carbon dioxide"],"a":1,"why":"Only oxygen (21 %) reacts with fuel. Nitrogen is a spectator that carries heat."},
+ {"q":"You compress air in a bicycle pump very quickly. What happens to its temperature?","o":["It stays the same","It falls","It rises, because the moving piston speeds up the molecules","It rises only if the pump leaks"],"a":2,"why":"Work done by the piston raises the molecules’ kinetic energy. That is adiabatic compression, the heart of the compressor."},
+ {"q":"At 5 km altitude air density is roughly…","o":["the same as sea level","about half","about a tenth","zero"],"a":1,"why":"Density halves roughly every 5.5 km in the lower atmosphere, so the engine’s thrust is roughly halved."},
+ {"q":"Our engine runs at φ ≈ 0.3 overall but burns at φ ≈ 1 in the primary zone. Why?","o":["To save fuel","Because propane needs less air","So the flame is stable but the leftover air dilutes the exhaust to a turbine-safe temperature","Because the compressor is too weak"],"a":2,"why":"A φ≈1 flame is ~2 000 °C. Mixing in the spare air afterwards brings it to ~800 °C."}
+]</script>
+</div>
+
+</article>
+</main>
+</div>
+</body>
+</html>

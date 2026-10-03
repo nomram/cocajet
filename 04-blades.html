@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4 · Wings, fans &amp; turbines — Jet Engines for Dummies</title>
+<meta name="description" content="Lift and angle of attack, why blades are twisted, the Euler turbomachinery equation, blade count, wind turbines (Betz limit), hydro and steam turbines: the physics of every bladed machine.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter">
+
+<span class="eyebrow">Chapter 4 · The science</span>
+<h1>Wings, fans &amp; turbines</h1>
+<div class="meta"><span>~45 min</span><span>7 widgets</span><span>aerodynamics + turbomachinery</span></div>
+<p class="lede">Our engine has exactly two moving parts that matter: a wheel that pushes air (the compressor) and a wheel that is pushed by air (the turbine). Both are rings of tiny wings. Understand one wing and you understand windmills, dams, power stations and jets.</p>
+
+<h2 id="lift" data-short="How wings work">How a wing makes lift</h2>
+<p>Stand in a river and hold a flat board at a slight angle: it is shoved sideways. A wing does the same with air, but smoothly. Three views of the same truth, all correct:</p>
+<ul>
+<li><strong>Newton:</strong> the wing deflects air downward; the air pushes the wing up (action and reaction, chapter 2).</li>
+<li><strong>Bernoulli:</strong> faster air has lower pressure. The curved upper surface speeds the flow, so pressure is lower on top than below: net upward force. $P+\tfrac12\rho v^2=\text{const}$ along a streamline.</li>
+<li><strong>Circulation:</strong> the flow around a wing is a uniform stream <em>plus a circulation</em> around the wing. The circulation is set by the sharp trailing edge (the “Kutta condition”: air must leave the rear edge smoothly). Lift per metre of span is $L=\rho V\Gamma$.</li>
+</ul>
+<p>The key control is the <strong>angle of attack</strong> $\alpha$: the angle between the wing’s chord and the oncoming air. Slide it:</p>
+<div data-widget="airfoil"></div>
+<p>Lift grows <em>linearly</em> with angle: thin-airfoil theory says $C_L\approx2\pi(\alpha-\alpha_0)$, about 0.11 per degree. Then, near 15°, comes the <strong>stall</strong>: the air can no longer follow the curve, it separates, lift collapses and drag soars. Every blade in our engine must stay below its stall angle at every radius and flow rate; when the compressor “surges” (chapter 7) it is a stalled wing.</p>
+<div class="eq">$$L=\tfrac12\rho V^2 S\,C_L\qquad D=\tfrac12\rho V^2 S\,C_D\qquad \text{L/D is the "glide ratio"}$$</div>
+
+<h2 id="blades" data-short="From wings to blades">From wings to blades: why they are twisted</h2>
+<p>A fan blade is a wing that travels in a circle. The wind it sees is not the axial flow alone: it is the <strong>vector sum</strong> of the axial airspeed $C_a$ and the blade’s own motion $U=\omega r$. Far from the hub the blade moves faster, so the relative wind $W$ tilts further sideways. To keep the angle of attack right at every radius the blade must twist, steep near the hub, flat near the tip, exactly like a propeller.</p>
+<div class="eq">$$W=\sqrt{C_a^2+U^2},\qquad \beta=\arctan\frac{U}{C_a},\qquad \text{incidence}=\beta-\beta_{\text{blade}}$$</div>
+<p>Try our impeller’s inducer: 6 mm at the hub, 21 mm at the tip, 115 000 rpm. Switch to “flat” and watch the incidence go badly wrong.</p>
+<div data-widget="blade-twist"></div>
+<div class="callout"><span class="ct">Design rule you will use in chapter 6</span>At the tip the relative speed is Mach 0.8–0.9. Push the tip speed higher and shocks form on the blades, losses explode, and the wheel “chokes”. The 56 mm wheel at 115 000 rpm has a tip speed of 337 m/s: close to that limit, and we can’t spin it much faster.</div>
+
+<h2 id="euler" data-short="The Euler equation">How much energy does a wheel give the air?</h2>
+<p>This is the single most important equation in turbomachinery. Take a ring of air of mass $\dot m$ per second entering at radius $r_1$ with swirl velocity $C_{\theta1}$ and leaving at $r_2$ with $C_{\theta2}$. The wheel exerts a torque equal to the change in angular momentum per second, and power is torque × angular speed:</p>
+<div class="eq">$$\tau=\dot m\,(r_2C_{\theta2}-r_1C_{\theta1}),\quad P=\omega\tau\quad\Longrightarrow\quad \Delta h_0=U_2C_{\theta2}-U_1C_{\theta1}$$</div>
+<p>That is the <strong>Euler equation</strong>: the energy per kilogram (J/kg) given to the air equals tip speed × the swirl you induce. For a centrifugal wheel the air enters with no swirl ($C_{\theta1}=0$) so $\Delta h_0=U_2C_{\theta2}$. Two things limit $C_{\theta2}$:</p>
+<ul>
+<li><strong>Backsweep.</strong> If the blades lean back by $\beta_2$ from the radial direction the swirl is reduced: $C_{\theta2}=\sigma U_2 - C_{m2}\tan\beta_2$. Backswept blades give <em>less</em> pressure at design speed but a wider, calmer operating range.</li>
+<li><strong>Slip $\sigma$.</strong> The air doesn’t quite follow the blades: it lags, like water in a rotating bucket. Wiesner’s formula $\sigma=1-\dfrac{\sqrt{\cos\beta_2}}{Z^{0.7}}$ says more blades, less slip.</li>
+</ul>
+<p>The map on the right shows <strong>the energy in the air</strong> as pressure ratio against rpm and wheel diameter. Each white dashed line is a constant tip speed. Everything scales with $U_2^2$: <em>double the tip speed and you get four times the energy</em>, which is why small engines have to spin at 100 000 rpm.</p>
+<div data-widget="euler-work"></div>
+<div class="callout fire"><span class="ct">Our wheel, by hand</span>$U_2=\pi D N/60=\pi(0.056)(115\,000)/60=337$ m/s. $\sigma=1-\sqrt{\cos30^\circ}/(0.85\times14)^{0.7}=0.836$, $C_{m2}=0.28\,U_2=94$ m/s, so $C_{\theta2}=0.836(337)-94\tan30^\circ=227$ m/s and $\Delta h_0=337\times227=76$ kJ/kg (+ some disc friction: ~79 kJ/kg of shaft work). With 77 % efficiency, $PR=(1+0.77\times76\,000/(1005\times288))^{3.5}\approx1.9$. (The full engine model also counts disc friction and recirculation work and gives 1.94: the number the whole guide uses.)</div>
+
+<h3>How many blades?</h3>
+<p>More blades guide the air better (less slip) but add friction and block the passage; too few and each blade is overloaded so the flow separates. Explore with the same model that runs the simulator:</p>
+<div data-widget="blade-count"></div>
+<p>Practical lesson: turbo-compressor wheels use <strong>6–8 full blades plus the same number of short “splitter” blades</strong> (our 7 + 7). The splitters give the guidance of 14 blades at the exit without choking the narrow inlet (the inducer) with 14 leading edges.</p>
+
+<h2 id="wind" data-short="Wind turbines">Reverse the machine: wind turbines</h2>
+<p>A turbine takes energy <em>out</em> of the fluid. Everything is the same, backwards: the relative wind hits the blade, lift is generated, and its component along the rotation drives the shaft. In chapter 2 we found the wind carries $\tfrac12\rho v^3$ watts per m². How much can a rotor take?</p>
+<div class="eq">$$P=\tfrac12\rho A v^3\,C_p,\qquad C_p\le\tfrac{16}{27}=0.593\quad\text{(Betz limit)}$$</div>
+<details class="deep"><summary>Where does the Betz limit come from?</summary><div>
+<p>Let the wind slow to $(1-a)v$ at the rotor and to $(1-2a)v$ far behind it ($a$ = induction factor). Momentum theory gives the force $F=2\rho A v^2a(1-a)$ and so the power $P=Fv(1-a)=2\rho Av^3a(1-a)^2$. Divide by the wind power $\tfrac12\rho Av^3$:</p>
+<div class="eq">$$C_p=4a(1-a)^2\qquad\frac{dC_p}{da}=0\Rightarrow a=\tfrac13\Rightarrow C_p=\tfrac{16}{27}\approx0.593$$</div>
+<p>If the rotor took more it would slow the air so much that it would pile up in front and flow around instead.</p></div></details>
+<p>Real rotors reach 0.45–0.50. The tip-speed ratio $\lambda=\omega R/v$ matters too: blades must keep the right angle of attack on the wind they see. How many blades? One blade is cheap (wobbles, noisy); two are common in small designs; <strong>three</strong> is the standard: smooth, quiet, near-optimal. More blades don’t add much power but a lot of cost (and the best λ falls). Explore it (this is a proper blade-element-momentum solve):</p>
+<div data-widget="wind-turbine"></div>
+
+<h2 id="water" data-short="Hydro, steam, nuclear">Dams, steam, nuclear: turbines everywhere</h2>
+<h3>Hydroelectric turbines</h3>
+<p>Water is 800× denser than air, so it carries 800× the energy per m³ at the same speed. A dam stores it as height: $P=\eta\rho g Q H$. Three runners cover every site:</p>
+<div data-widget="hydro-calc"></div>
+<h3>Steam turbines: coal, gas and nuclear power plants</h3>
+<p>A nuclear reactor is just a very expensive kettle. Fission heats water to steam at ~285 °C and 70 bar; the steam spins a turbine (a many-stage bladed wheel, the same physics as ours) which turns a generator; the exhaust steam is condensed back to water in a cooling tower or river, pumped back to pressure, and the loop repeats. That is the <strong>Rankine cycle</strong>: like Brayton, but the working fluid is boiled and condensed instead of burnt and discarded. Its efficiency is capped by the <strong>Carnot limit</strong> $\eta\le1-T_c/T_h$, which is why hotter is better and why gas turbines, which start 1000 °C hotter, rule the top of the table:</p>
+<div data-widget="carnot-plants"></div>
+<div class="callout"><span class="ct">The family tree</span><strong>Our engine</strong> = a gas turbine used as a jet. A <em>turboshaft</em> engine (helicopters, power stations) adds a second turbine to drive a shaft instead of making a jet. A <em>turbofan</em> adds a big front fan. A <em>combined-cycle plant</em> uses the hot exhaust of a gas turbine to boil water for a steam turbine, achieving 60 % efficiency, the best of any heat engine. It’s all Brayton plus Rankine plus blades.</div>
+
+<h2 id="axial" data-short="Axial vs centrifugal">Axial or centrifugal? Our choices</h2>
+<table class="data">
+<tr><th></th><th>Axial (air flows along the axis)</th><th>Centrifugal / radial (air is flung outward)</th></tr>
+<tr><td>Pressure per stage</td><td>Low (1.2–1.5): needs many stages</td><td>High (up to 4–8 in one stage)</td></tr>
+<tr><td>Frontal area</td><td>Small: ideal for fast aircraft</td><td>Large</td></tr>
+<tr><td>Efficiency</td><td>Higher (up to 90 %)</td><td>Lower (75–82 %)</td></tr>
+<tr><td>Robust, cheap, forgiving?</td><td>Fussy: many blades, tight clearances</td><td><strong>Yes</strong>: a single casting</td></tr>
+<tr><td>CJ-1 uses it for…</td><td><strong>The turbine</strong>: hot gas, modest expansion, one stage is enough</td><td><strong>The compressor</strong>: one stage gives r ≈ 2, and a scrap turbo wheel is free</td></tr>
+</table>
+
+<h2 id="takeaways" data-short="What you learned">What you now know</h2>
+<ul>
+<li>A wing makes lift in proportion to $\alpha$ until it stalls near 15°. Compressor surge = a stalled blade row.</li>
+<li>A rotating blade sees the vector sum of axial speed and blade speed, so it must be twisted.</li>
+<li>Euler: $\Delta h_0=U_2C_{\theta2}$. Energy goes with tip speed squared; slip and backsweep reduce the swirl; ~14 blades at exit is a good compromise.</li>
+<li>Turbines reverse the same physics: wind (Betz ≤ 59 %), hydro ($P=\eta\rho gQH$), steam (Carnot-limited).</li>
+<li>CJ-1 pairs a one-stage centrifugal compressor with a one-stage axial turbine.</li>
+</ul>
+
+<div data-widget="quiz">
+<script type="application/json">[
+ {"q":"A wing’s lift increases roughly linearly with angle of attack until…","o":["it reaches the speed of sound","the airflow separates (stall), around 12–16°","the wing is vertical","the air temperature drops"],"a":1,"why":"Beyond the stall angle the boundary layer separates, so lift collapses and drag rises."},
+ {"q":"Why is a propeller or fan blade twisted?","o":["It looks nicer","Blade speed rises with radius so the relative wind angle changes along the blade","To make it lighter","To reduce noise only"],"a":1,"why":"The airflow angle β = atan(ωr/Cₐ) increases outward; twist keeps the angle of attack right."},
+ {"q":"You double a compressor wheel’s tip speed. The energy per kg added to the air (Euler) becomes about…","o":["2×","4×","8×","unchanged"],"a":1,"why":"ΔH = U₂·Cθ₂ and Cθ₂ ∝ U₂, so ΔH ∝ U₂²."},
+ {"q":"What is the Betz limit?","o":["The maximum safe rpm of a turbine","The maximum fraction (59.3 %) of the wind’s power an ideal rotor can extract","The minimum number of blades","The maximum compressor pressure ratio"],"a":1,"why":"Cp ≤ 16/27 from momentum theory."}
+]</script>
+</div>
+
+</article>
+</main>
+</div>
+</body>
+</html>

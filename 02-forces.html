@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>2 · Forces, thrust &amp; energy — Jet Engines for Dummies</title>
+<meta name="description">Newton's third law turned into the thrust equation: momentum, mass flow, propulsive efficiency, kinetic energy and the energy in moving air and water.>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter">
+
+<span class="eyebrow">Chapter 2 · The science</span>
+<h1>Forces, thrust &amp; energy</h1>
+<div class="meta"><span>~25 min</span><span>5 widgets</span><span>Newton + a little algebra</span></div>
+<p class="lede">An engine pushes on air; the air pushes back. That is the entire secret of jet propulsion. In this chapter we turn that sentence into an equation we can design with.</p>
+
+<h2 id="newton" data-short="Newton in a nutshell">Newton in a nutshell</h2>
+<p>Three laws from 1687 cover everything an engine does:</p>
+<ol>
+<li><strong>Inertia.</strong> Things keep doing what they are doing unless a force acts. Air at rest stays at rest until the compressor shoves it.</li>
+<li><strong>$F = m a$</strong>, or better for fluids, <strong>force = rate of change of momentum</strong>: $F = \dfrac{d(mV)}{dt}$. To push with a force you must change the momentum of <em>something</em>, every second.</li>
+<li><strong>Action and reaction.</strong> When A pushes B, B pushes A back equally hard, in the opposite direction.</li>
+</ol>
+<p>A jet engine pushes air backwards (the <em>action</em>); the air pushes the engine forwards (the <em>reaction</em>). It is not pushing “against” the air behind it, which is why jets work in space-like vacuum when they carry their own oxygen (rockets), and why a balloon flies without anything to grip.</p>
+<p>Prove it to yourself: sit on a skateboard and throw bowling balls backwards. Try the cart below. With every throw the cart gains <em>exactly</em> the momentum that the ball carries away; the total stays at zero.</p>
+<div data-widget="newton-cart"></div>
+<div class="callout"><span class="ct">Spot the jet engine</span>Switch on “machine-gun mode”. A steady stream of balls produces a <em>steady thrust</em> (read it off the “Thrust” tile). Replace the balls by 152 grams of air per second leaving at 380 m/s and you have our engine. The only difference is that the engine can’t run out of balls: it picks up fresh air from the front.</div>
+
+<h2 id="thrust" data-short="The thrust equation">The thrust equation</h2>
+<p>Each second the engine swallows a mass $\dot m$ of air (kg/s) already moving at the flight speed $V_0$, and spits it out at $V_e$. The momentum change per second is the force:</p>
+<div class="eq">$$F=\dot m\,(V_e-V_0)\;+\;(P_e-P_0)\,A_e$$</div>
+<p>(The second term is a small bonus when the gas leaves the nozzle still above atmospheric pressure. It is zero for a gently-expanding nozzle like ours at idle, and about 1–2 N at full power.)</p>
+<details class="deep"><summary>Where the equation comes from</summary><div>
+<p>Draw an imaginary box around the engine (a “control volume”). Air enters the front with momentum flux $\dot m V_0$ and leaves the back with $\dot m_e V_e$ (the mass leaving is the air plus the small mass of fuel, $\dot m_e=\dot m+\dot m_f$, and fuel is only ~2 %, so we usually ignore it). Newton’s second law for the box says that net force on the engine equals the momentum leaving minus the momentum entering, plus the difference in pressure forces on the entry and exit planes:</p>
+<div class="eq">$$F=\dot m_e V_e-\dot m V_0+(P_e-P_0)A_e$$</div>
+<p>It is the thrust of the <em>whole machine</em>: nothing inside the engine matters, only what goes in and what comes out. That is wonderfully useful: <strong>to predict thrust you only need the exhaust speed and the mass flow.</strong></p>
+</div></details>
+<p><strong>Our engine, by hand:</strong> $\dot m = 0.152$ kg/s and $V_e\approx 380$ m/s on a test stand ($V_0=0$):</p>
+<div class="eq">$$F=0.152\times 380\approx 58\ \text{N}\quad(\approx 5.9\ \text{kgf}\approx 13\ \text{lbf})$$</div>
+<p>For scale: a hair-dryer (0.03 kg/s at 20 m/s) makes 0.6 N; a handheld leaf-blower about 12 N. Our little jet makes five times a leaf blower’s push from something smaller than a coffee can.</p>
+<p>Notice the two levers: <strong>more air</strong> or <strong>faster air</strong>. Try both:</p>
+<div data-widget="thrust-calc"></div>
+<p>Also notice the dashed lines: with a flight speed $V_0>0$ the thrust drops, because the air arriving already has momentum we don’t get to add. Jet thrust falls as you speed up, unlike a rocket’s.</p>
+
+<h2 id="efficiency" data-short="Big and slow wins">Big and slow beats small and fast</h2>
+<p>There are many ways to make 58 N. Throw a gram of gas at 58 km/s, or a tonne of air at 0.058 m/s. Which costs less fuel? The jet’s <strong>kinetic energy</strong> is $\tfrac12\dot m V^2$ and that is what we pay for:</p>
+<div class="eq">$$P_{\text{jet}}=\tfrac12\dot m V_e^2 \qquad\text{but thrust is only}\qquad F=\dot m V_e$$</div>
+<p>Energy goes with the <em>square</em> of speed, thrust only with the first power. To get a given thrust, more mass at lower speed needs less power. When the engine is moving, the useful power is $F V_0$, and the rest is wasted as kinetic energy in the wake. The ratio is the <strong>propulsive efficiency</strong>:</p>
+<div class="eq">$$\eta_p=\frac{F V_0}{\tfrac12\dot m(V_e^2-V_0^2)}\;\approx\;\frac{2}{1+V_e/V_0}$$</div>
+<div data-widget="propulsive-efficiency"></div>
+<div class="callout fire"><span class="ct">The whole history of aviation in one curve</span>Propellers move lots of air a little faster than the plane (efficient, but limited to ~700 km/h). Turbofans do the same with a ducted fan: the huge fan on an airliner moves 10× more air than the core. A plain turbojet, our engine, throws a small flow very fast: noisy and thirsty at low speed, but it is the simplest to build, and excellent above Mach 0.8. Chapter 8 shows how to bolt a fan on.</div>
+
+<h2 id="energy" data-short="Work, power, energy">Work, power and energy: where does the fuel go?</h2>
+<p><strong>Energy</strong> (joules) is the ability to do work; <strong>power</strong> (watts) is energy per second. 1 kW = 1000 J/s. Our engine’s fuel carries 134 kW of chemical energy. Where does it end up? The model answers on the next widget:</p>
+<div data-widget="energy-flow"></div>
+<p>Two surprises. First, on the test stand roughly <strong>8 %</strong> of the fuel power becomes jet kinetic energy, the rest leaves as hot exhaust. Second, the useful power $F V_0$ is <strong>zero</strong> at standstill (a force that moves nothing does no work), then climbs as you fly. This is also why jets are efficient at speed (high $V_0$) and poor at idling on the ground.</p>
+<div class="callout"><span class="ct">Simple engines are small-efficiency machines</span>Our compressor squeezes the air only 2:1, so its thermal efficiency is ~7 %. Airliners squeeze 40:1 and reach 40–45 %. We pay for simplicity with fuel. Chapter 3 explains exactly why pressure ratio matters.</div>
+
+<h2 id="fluidpower" data-short="Energy in moving fluids">The energy in moving air and water</h2>
+<p>A turbine does the reverse of a jet: instead of making a fast stream, it <em>takes</em> energy from one. How much is there to take? A stream of density $\rho$ and speed $v$ crossing an area $A$ carries kinetic energy $\tfrac12 (\rho A v) v^2$ per second:</p>
+<div class="eq">$$\frac{P}{A}=\tfrac12\rho v^3$$</div>
+<p>The <em>cube</em> is the big deal: double the speed and eight times the power flows. Water is 800× denser than air, so a 3 m/s river carries more power per square metre than a 14 m/s gale. And our engine’s exhaust, at 380 m/s, carries nearly <strong>10 megawatts per square metre</strong>, which is why the turbine blades see such punishment (chapter 9).</p>
+<div data-widget="fluid-power"></div>
+<p>The same formula runs wind turbines, hydro dams and, in reverse, jets. We’ll use it in chapter 4 when we meet the Betz limit.</p>
+
+<h2 id="takeaways" data-short="What you learned">What you now know</h2>
+<ul>
+<li>Thrust is the rate of change of momentum of the air: $F=\dot m (V_e-V_0)$ (+ a small pressure term).</li>
+<li>Our engine: 0.152 kg/s × 380 m/s ≈ 58 N. You can raise thrust with more mass flow <em>or</em> more speed.</li>
+<li>Energy costs $V^2$, thrust only $V$: accelerate more air more gently if you can (fans, propellers).</li>
+<li>On a stand the engine does no work but makes ~11 kW of jet power; in flight, $F V_0$ is the useful part.</li>
+<li>Moving fluids carry $\tfrac12\rho v^3$ per m²: the ‘fuel’ for wind and hydro turbines.</li>
+</ul>
+
+<div data-widget="quiz">
+<script type="application/json">[
+ {"q":"A jet engine takes in 0.2 kg/s of air and expels it at 300 m/s on a test stand. Thrust is…","o":["6 N","60 N","600 N","0 N, because it isn’t moving"],"a":1,"why":"F = ṁ(Ve − V0) = 0.2 × (300 − 0) = 60 N. The engine doesn’t have to be moving to push."},
+ {"q":"You need a fixed thrust. Which uses less jet power?","o":["A small flow at very high speed","A large flow at lower speed","They are identical","It depends only on the fuel"],"a":1,"why":"P = ½ṁVe² while F = ṁVe, so P = ½F·Ve. Same F with lower Ve costs less power."},
+ {"q":"What happens to the thrust of a given turbojet as it flies faster (everything else equal)?","o":["It rises with speed","It falls, because incoming air already carries momentum","It is unaffected","It becomes zero at the speed of sound"],"a":1,"why":"F = ṁ(Ve − V0): V0 is subtracted. (In reality ram compression then helps, so it is a shallow drop.)"},
+ {"q":"Wind speed doubles. The power in the wind through a rotor becomes…","o":["2×","4×","8×","16×"],"a":2,"why":"P ∝ v³, so 2³ = 8×."}
+]</script>
+</div>
+
+</article>
+</main>
+</div>
+</body>
+</html>
