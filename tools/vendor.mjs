@@ -14,6 +14,7 @@ cp(path.join(t, 'build/three.module.js'), path.join(out, 'three/three.module.js'
 cp(path.join(t, 'examples/jsm/controls/OrbitControls.js'), path.join(out, 'three/OrbitControls.js'));
 cp(path.join(t, 'examples/jsm/loaders/STLLoader.js'), path.join(out, 'three/STLLoader.js'));
 cp(path.join(t, 'examples/jsm/environments/RoomEnvironment.js'), path.join(out, 'three/RoomEnvironment.js'));
+cp(path.join(t, 'examples/jsm/utils/BufferGeometryUtils.js'), path.join(out, 'three/BufferGeometryUtils.js'));
 cp(path.join(t, 'LICENSE'), path.join(out, 'three/LICENSE'));
 // the example modules import from 'three' (bare specifier) -> resolved by the import map in each page
 

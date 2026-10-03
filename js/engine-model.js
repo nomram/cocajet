@@ -60,7 +60,7 @@ export const CJ1 = {
   // limits
   Nmax: 125000,       // never exceed (rpm)
   Ndesign: 115000,    // full-power speed used in the guide (rpm)
-  TITlimit: 1150,     // K, hot-section material limit used for warnings
+  TITlimit: 1200,     // K, hot-section material limit used for warnings
 };
 
 /* --- atmosphere ------------------------------------------------------------ */
@@ -339,8 +339,8 @@ export function stepSpool(p, state, controls, amb, dt, opts = {}) {
   const N = Math.max(state.N, 1500);                       // avoid the 1/omega singularity at standstill
   const gp = gasPath(p, N, controls.mf, amb, { ...opts, lit: state.lit });
   const w = N * Math.PI / 30;
-  // small electric starter: ~0.055 N m at stall, falling to zero at 50 000 rpm
-  const starterTorque = controls.starter ? 0.055 * Math.max(0, 1 - state.N / 50000) : 0;
+  // small brushless starter: ~0.09 N m at stall, falling to zero at 55 000 rpm
+  const starterTorque = controls.starter ? 0.09 * Math.max(0, 1 - state.N / 55000) : 0;
   // bearing + windage drag
   const Pdrag = 9e-14 * N ** 3 + 0.0004 * N;
   const torque = (p.etaM * gp.Pt - gp.Pc - Pdrag) / w + starterTorque;
