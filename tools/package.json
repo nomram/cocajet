@@ -1,0 +1,15 @@
+{
+  "name": "cocajet-tools",
+  "private": true,
+  "type": "module",
+  "description": "Build-time tools for the Coke-can jet guide: parametric STL generator + vendoring helper. The website itself needs no build step.",
+  "scripts": {
+    "stl": "node build-stl.mjs",
+    "vendor": "node vendor.mjs"
+  },
+  "devDependencies": {
+    "manifold-3d": "^3.0.0",
+    "three": "0.160.0",
+    "katex": "^0.16.11"
+  }
+}

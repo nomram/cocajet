@@ -1,0 +1,515 @@
+{
+ "generated": "2026-10-03T23:06:51.042Z",
+ "units": "mm",
+ "axis": "+Z flow, +Y up, rotor spins about +Z",
+ "materials": {
+  "al": {
+   "name": "Aluminium (6061 / A356)",
+   "density": 2700
+  },
+  "can": {
+   "name": "Aluminium can (3004-H19)",
+   "density": 2730
+  },
+  "steel": {
+   "name": "Mild / alloy steel",
+   "density": 7850
+  },
+  "ss304": {
+   "name": "Stainless 304 / 321",
+   "density": 7900
+  },
+  "ss310": {
+   "name": "Stainless 310S",
+   "density": 7900
+  },
+  "inco": {
+   "name": "Inconel 718 / 625",
+   "density": 8200
+  },
+  "ceramic": {
+   "name": "Alumina + brass/steel",
+   "density": 3900
+  }
+ },
+ "params": {
+  "zE": 24,
+  "R2": 28,
+  "rs1": 21,
+  "rh1": 6,
+  "Lax": 17,
+  "b2": 6,
+  "beta1s": 66,
+  "beta2": 30,
+  "nFull": 7,
+  "nSplit": 7,
+  "tRoot": 1,
+  "tTip": 0.55,
+  "embed": 0.7,
+  "clearance": 0.4,
+  "bore": 4,
+  "shell": 2,
+  "rCasIn": 48,
+  "rCasOut": 50,
+  "zFrontWall": 34.6,
+  "zPlateFront": 41,
+  "zPlateRear": 50,
+  "zCasFront": 60,
+  "zCasRear": 165,
+  "rCanOut": 33,
+  "rCanIn": 17,
+  "canWall": 0.5,
+  "zDome": 72,
+  "domeDepth": 6,
+  "zCanRear": 165,
+  "rTurbHub": 21,
+  "rTurbTip": 29.7,
+  "rTurbCase": 30.1,
+  "nNGV": 16,
+  "nRotor": 19,
+  "zRotor": 184.6,
+  "zShaftRear": 194,
+  "zNozzle0": 195,
+  "zNozzleEnd": 255,
+  "rNozzleExit": 20.5,
+  "rConeEnd": 8,
+  "holeRows": [
+   {
+    "name": "primary",
+    "z": 88,
+    "n": 8,
+    "dOut": 5.5,
+    "dIn": 4.5,
+    "ph": 0
+   },
+   {
+    "name": "secondary",
+    "z": 112,
+    "n": 8,
+    "dOut": 6.5,
+    "dIn": 5,
+    "ph": 22.5
+   },
+   {
+    "name": "dilution",
+    "z": 142,
+    "n": 8,
+    "dOut": 8,
+    "dIn": 6.5,
+    "ph": 0
+   }
+  ]
+ },
+ "parts": [
+  {
+   "id": "shaft",
+   "file": "01-shaft.stl",
+   "name": "Main shaft + lock nut",
+   "step": 1,
+   "material": "steel",
+   "materialName": "Mild / alloy steel",
+   "color": "#b9c0c8",
+   "rotor": true,
+   "stand": false,
+   "note": "Ø8 mm hardened steel rod (e.g. ground drill-rod or a 8 mm pin gauge), ~168 mm. M8 nut shown at the hot end.",
+   "tris": 220,
+   "volume_mm3": 8700.6,
+   "area_mm2": 4522.3,
+   "mass_g": 68.3,
+   "bbox": {
+    "min": [
+     -6.8,
+     -5.89,
+     26
+    ],
+    "max": [
+     6.8,
+     5.89,
+     194
+    ]
+   },
+   "genus": 0
+  },
+  {
+   "id": "bearing-tunnel",
+   "file": "02-bearing-tunnel.stl",
+   "name": "Bearing tunnel (spine)",
+   "step": 1,
+   "material": "ss304",
+   "materialName": "Stainless 304 / 321",
+   "color": "#9aa4ad",
+   "rotor": false,
+   "stand": false,
+   "note": "Ø28 × Ø16 steel tube with a bolt-on front flange. Two 8×16×5 bearings press into the ends.",
+   "tris": 2152,
+   "volume_mm3": 57137.3,
+   "area_mm2": 21676.8,
+   "mass_g": 451.4,
+   "bbox": {
+    "min": [
+     -26,
+     -26,
+     50
+    ],
+    "max": [
+     26,
+     26,
+     171
+    ]
+   },
+   "genus": 7
+  },
+  {
+   "id": "impeller",
+   "file": "03-impeller.stl",
+   "name": "Compressor impeller",
+   "step": 2,
+   "material": "al",
+   "materialName": "Aluminium (6061 / A356)",
+   "color": "#c9d1d9",
+   "rotor": true,
+   "stand": false,
+   "note": "56 mm exducer, 7 full + 7 splitter blades, 30° backsweep. Use a scrap-turbo compressor wheel or CNC/cast this shape.",
+   "tris": 16800,
+   "volume_mm3": 20109.8,
+   "area_mm2": 13029.9,
+   "mass_g": 54.3,
+   "bbox": {
+    "min": [
+     -28,
+     -28,
+     10
+    ],
+    "max": [
+     28,
+     28,
+     50
+    ]
+   },
+   "genus": 0
+  },
+  {
+   "id": "diffuser-plate",
+   "file": "04-diffuser-plate.stl",
+   "name": "Diffuser back-plate + vanes",
+   "step": 3,
+   "material": "al",
+   "materialName": "Aluminium (6061 / A356)",
+   "color": "#aeb8c2",
+   "rotor": false,
+   "stand": false,
+   "note": "15 curved vanes slow the air from ~300 m/s to ~120 m/s and turn kinetic energy into pressure.",
+   "tris": 3480,
+   "volume_mm3": 36233.2,
+   "area_mm2": 18717.7,
+   "mass_g": 97.8,
+   "bbox": {
+    "min": [
+     -42,
+     -42,
+     34.85
+    ],
+    "max": [
+     42,
+     42,
+     50
+    ]
+   },
+   "genus": 1
+  },
+  {
+   "id": "compressor-housing",
+   "file": "05-compressor-housing.stl",
+   "name": "Inlet bellmouth + compressor housing",
+   "step": 4,
+   "material": "al",
+   "materialName": "Aluminium (6061 / A356)",
+   "color": "#d3dae0",
+   "rotor": false,
+   "stand": false,
+   "note": "Spun / hand-beaten aluminium or a 3D-printed pattern for casting. 0.4 mm gap over the blade tips.",
+   "tris": 30212,
+   "volume_mm3": 45417.2,
+   "area_mm2": 44766,
+   "mass_g": 122.6,
+   "bbox": {
+    "min": [
+     -57,
+     -57,
+     0
+    ],
+    "max": [
+     57,
+     57,
+     60
+    ]
+   },
+   "genus": 9
+  },
+  {
+   "id": "combustor-casing",
+   "file": "06-combustor-casing.stl",
+   "name": "Combustor casing (pressure vessel)",
+   "step": 5,
+   "material": "ss304",
+   "materialName": "Stainless 304 / 321",
+   "color": "#8e99a3",
+   "rotor": false,
+   "stand": false,
+   "note": "Ø100 × 2 mm stainless pipe, 105 mm long, with welded flanges and two ports (fuel + igniter).",
+   "tris": 4940,
+   "volume_mm3": 92481.2,
+   "area_mm2": 85783.8,
+   "mass_g": 730.6,
+   "bbox": {
+    "min": [
+     -57,
+     -57,
+     60
+    ],
+    "max": [
+     57,
+     57,
+     169
+    ]
+   },
+   "genus": 19
+  },
+  {
+   "id": "flame-tube",
+   "file": "07-flame-tube.stl",
+   "name": "Flame tube (Coke-can annular liner)",
+   "step": 6,
+   "material": "can",
+   "materialName": "Aluminium can (3004-H19)",
+   "color": "#d94b3d",
+   "rotor": false,
+   "stand": false,
+   "note": "Outer wall = a Coke can (Ø66) with the ends cut off; inner wall = Ø35 tube. Holes drilled in 3 rows: primary / secondary / dilution.",
+   "tris": 17120,
+   "volume_mm3": 14321.2,
+   "area_mm2": 58165.1,
+   "mass_g": 39.1,
+   "bbox": {
+    "min": [
+     -33,
+     -33,
+     71.75
+    ],
+    "max": [
+     33,
+     33,
+     165
+    ]
+   },
+   "genus": 89
+  },
+  {
+   "id": "fuel-ring",
+   "file": "08-fuel-ring.stl",
+   "name": "Fuel ring + 8 injector lances",
+   "step": 7,
+   "material": "ss304",
+   "materialName": "Stainless 304 / 321",
+   "color": "#c58b3c",
+   "rotor": false,
+   "stand": false,
+   "note": "Ø5 stainless tube bent into a ring; eight short lances push the gas into the primary zone. Feed enters at the side.",
+   "tris": 8732,
+   "volume_mm3": 4423.6,
+   "area_mm2": 9011.8,
+   "mass_g": 34.9,
+   "bbox": {
+    "min": [
+     -27.6,
+     -27.6,
+     62.3
+    ],
+    "max": [
+     66,
+     27.6,
+     91.5
+    ]
+   },
+   "genus": 9
+  },
+  {
+   "id": "igniter",
+   "file": "09-igniter.stl",
+   "name": "Igniter (spark / glow plug)",
+   "step": 7,
+   "material": "ceramic",
+   "materialName": "Alumina + brass/steel",
+   "color": "#e8e2d0",
+   "rotor": false,
+   "stand": false,
+   "note": "A cheap M10 glow plug or spark plug. The tip sits inside the primary zone through a hole in the can.",
+   "tris": 664,
+   "volume_mm3": 3692,
+   "area_mm2": 1814.6,
+   "mass_g": 14.4,
+   "bbox": {
+    "min": [
+     -8.2,
+     29,
+     82.9
+    ],
+    "max": [
+     8.2,
+     79,
+     97.1
+    ]
+   },
+   "genus": 0
+  },
+  {
+   "id": "ngv",
+   "file": "10-ngv.stl",
+   "name": "Nozzle guide vane ring (16 vanes)",
+   "step": 8,
+   "material": "ss310",
+   "materialName": "Stainless 310S",
+   "color": "#a46b3a",
+   "rotor": false,
+   "stand": false,
+   "note": "Accelerates the hot gas and swirls it 58° into the direction of rotation so the turbine blades can catch it.",
+   "tris": 18208,
+   "volume_mm3": 7645.4,
+   "area_mm2": 12522.7,
+   "mass_g": 60.4,
+   "bbox": {
+    "min": [
+     -33.83,
+     -33.83,
+     165.6
+    ],
+    "max": [
+     33.83,
+     33.83,
+     179.29
+    ]
+   },
+   "genus": 17
+  },
+  {
+   "id": "turbine-wheel",
+   "file": "11-turbine-wheel.stl",
+   "name": "Axial turbine wheel (19 blades)",
+   "step": 8,
+   "material": "inco",
+   "materialName": "Inconel 718 / 625",
+   "color": "#c97b2a",
+   "rotor": true,
+   "stand": false,
+   "note": "Laser/water-jet-cut disc with 19 twisted blades. Stainless 310 for a hobby build, Inconel 713/718 for hours of life.",
+   "tris": 21046,
+   "volume_mm3": 8881.1,
+   "area_mm2": 8160.4,
+   "mass_g": 72.8,
+   "bbox": {
+    "min": [
+     -29.62,
+     -29.66,
+     179
+    ],
+    "max": [
+     29.7,
+     29.76,
+     190
+    ]
+   },
+   "genus": 1
+  },
+  {
+   "id": "turbine-casing",
+   "file": "12-turbine-casing.stl",
+   "name": "Turbine casing (shroud)",
+   "step": 9,
+   "material": "ss310",
+   "materialName": "Stainless 310S",
+   "color": "#7f8a94",
+   "rotor": false,
+   "stand": false,
+   "note": "Rolled / spun stainless. Inner Ø60.2 gives only 0.2–0.4 mm tip clearance over the turbine blades.",
+   "tris": 4400,
+   "volume_mm3": 49881.8,
+   "area_mm2": 31985.8,
+   "mass_g": 394.1,
+   "bbox": {
+    "min": [
+     -57,
+     -57,
+     169
+    ],
+    "max": [
+     57,
+     57,
+     195
+    ]
+   },
+   "genus": 15
+  },
+  {
+   "id": "exhaust-nozzle",
+   "file": "13-exhaust-nozzle.stl",
+   "name": "Exhaust nozzle + tail cone",
+   "step": 9,
+   "material": "ss304",
+   "materialName": "Stainless 304 / 321",
+   "color": "#6f7a85",
+   "rotor": false,
+   "stand": false,
+   "note": "Convergent nozzle: exit annulus ≈ 1 100 mm². The cone hides the shaft nut and is held by three thin struts.",
+   "tris": 15064,
+   "volume_mm3": 35312.9,
+   "area_mm2": 39938.1,
+   "mass_g": 279,
+   "bbox": {
+    "min": [
+     -44,
+     -44,
+     190.91
+    ],
+    "max": [
+     44,
+     44,
+     255.12
+    ]
+   },
+   "genus": 9
+  },
+  {
+   "id": "test-stand",
+   "file": "14-test-stand.stl",
+   "name": "Test stand + two saddle clamps",
+   "step": 10,
+   "material": "steel",
+   "materialName": "Mild / alloy steel",
+   "color": "#4c5560",
+   "rotor": false,
+   "stand": true,
+   "note": "Welded steel plate with two saddles and straps. Bolt it to a heavy bench or the ground. NEVER hand-hold a running engine.",
+   "tris": 1478,
+   "volume_mm3": 602696.7,
+   "area_mm2": 158564.4,
+   "mass_g": 4731.2,
+   "bbox": {
+    "min": [
+     -100,
+     -70,
+     -15
+    ],
+    "max": [
+     100,
+     53.4,
+     275
+    ]
+   },
+   "genus": -2
+  }
+ ],
+ "assembly": {
+  "file": "00-cj1-full-assembly.stl",
+  "tris": 140508
+ }
+}
