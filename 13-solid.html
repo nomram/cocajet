@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>13 · Solid rockets: a fuel that carries its own air — Jet Engines for Dummies</title>
+<meta name="description" content="How solid-propellant motors work: burning-rate law, chamber-pressure balance, why the pressure exponent must stay below one, grain shapes and thrust curves, motor classes, how motors fail and how professionals prevent it. Concept level, no formulations.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter">
+
+<span class="eyebrow">Chapter 13 · Solid rockets</span>
+<h1>Solid rockets: fuel and air in one block</h1>
+<div class="meta"><span>~50 min</span><span>2 widgets</span><span>concept level: no recipes</span></div>
+<p class="lede">The oldest rocket in the world has no pump, no valve and no moving part: a hollow tube of solid propellant with a nozzle at one end. From Chinese fire-arrows to the boosters of the Space Shuttle, the design is the same, and so is its one big drawback: once lit, you cannot turn it off. This chapter explains how a solid motor sets its own pressure, why a single exponent decides whether it is safe or a bomb, how the shape of the block shapes the thrust, and how to read the label on a model-rocket motor.</p>
+<div class="callout danger"><span class="ct">Scope of this chapter</span>Everything here is physics and engineering at the level of a university textbook. It deliberately contains <strong>no propellant formulations, no mixing ratios and no manufacturing steps</strong>, and the widgets work with generic “burn-rate numbers”, not with ingredients. Propellants and motors are made safely only in licensed plants, are regulated in almost every country, and amateur manufacture is a leading cause of injuries in rocketry. If you want to fly solid rockets, use certified motors through a club (see the end of the chapter).</div>
+
+<h2 id="idea" data-short="One block, no air">A fuel that brings its own oxygen</h2>
+<p>Chapter 10 showed that a fuel releases energy only when it meets an oxidiser, and that air is a free supply of one. A solid propellant packs <em>both</em> into one block: an oxidiser, a fuel (usually a rubbery binder that also holds everything together, often with a metal powder as extra fuel) and small amounts of additives, blended so intimately that they react layer by layer from the exposed surface inwards. It burns without air, so it works in a vacuum.</p>
+<p>It does <strong>burn</strong>, it does not <strong>detonate</strong>. This is the difference you met in chapter 10: a burning front crawls into the unburnt material at millimetres per second, driven by heat conduction and pressure, while a detonation is a shock wave moving at kilometres per second. A solid motor is a pressure vessel designed to contain a controlled deflagration; every failure mode in this chapter is some way of turning the first into the second, or of letting the pressure win.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Part</th><th>Job</th><th>Why it matters</th></tr>
+<tr><td><strong>Grain</strong></td><td>the shaped block of propellant</td><td>its <em>shape</em> decides the burning area, so the thrust curve</td></tr>
+<tr><td><strong>Case</strong></td><td>the pressure vessel (cardboard, aluminium, steel, carbon-fibre)</td><td>sees the full chamber pressure: hoop stress $\sigma=Pr/t$</td></tr>
+<tr><td><strong>Liner / insulation</strong></td><td>a layer between the burning grain and the case wall</td><td>keeps the hot gas off the case; also bonds the grain</td></tr>
+<tr><td><strong>Igniter</strong></td><td>a small charge that floods the chamber with hot gas</td><td>must lift the grain surface over its ignition threshold at once (chapter 11: energy and area)</td></tr>
+<tr><td><strong>Nozzle</strong></td><td>the throat that sets the pressure, the bell that makes the thrust</td><td>a de Laval nozzle (chapter 12); a throat insert of graphite or ceramic resists erosion</td></tr>
+<tr><td><strong>Closures</strong></td><td>forward and aft end-closures, seals, retaining ring</td><td>the weak point, as the Challenger accident showed</td></tr>
+</table></div>
+
+<h2 id="classes" data-short="Propellant families">Families of solid propellant (and what each ingredient does)</h2>
+<p>Solid propellants come in three broad families. The table describes the <em>roles</em> and trade-offs, never the amounts.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Family</th><th>The idea</th><th class="num">I<sub>sp</sub> (s)</th><th>Character</th></tr>
+<tr><td><strong>Black powder</strong> (historical)</td><td>a pressed mix of fuel and a solid oxidiser; the original rocket and firework propellant</td><td class="num">≈ 80</td><td>weak, brittle, absorbs moisture, very sensitive to <em>static spark</em>; still used for ejection charges and fireworks</td></tr>
+<tr><td><strong>Double-base</strong></td><td>a colloid of nitrate-ester compounds in which fuel and oxidiser sit in the <em>same</em> molecule</td><td class="num">200 – 230</td><td>nearly smoke-free (no metal), a high pressure exponent; used in small military rockets and in gun propellants</td></tr>
+<tr><td><strong>Composite</strong></td><td>solid oxidiser crystals held in a rubbery fuel binder, usually with metal powder</td><td class="num">240 – 280</td><td>the modern workhorse: big boosters, large hobby motors; can be cast into large grains, safe to handle once cured, no way back once lit</td></tr>
+</table></div>
+<p>What does each part of a composite do?</p>
+<ul>
+<li><strong>The oxidiser</strong> (the crystalline salt <em>ammonium perchlorate</em> is the standard one) supplies the oxygen. It is by far the bulk of the mass. Its chlorine ends up as <em>hydrogen chloride</em> in the exhaust: that is the white cloud behind a big booster, acidic and an environmental concern, and one reason the material is regulated.</li>
+<li><strong>The binder</strong> is a rubbery polymer that is both the main fuel and the glue: it gives the block mechanical strength and elasticity so it survives storage, vibration and acceleration without cracking.</li>
+<li><strong>The metal fuel</strong> (powdered aluminium) raises the flame temperature a lot (chapter 10: energy per kilogram) and the aluminium oxide it leaves is a white smoke of hot solid particles. The particles lose some efficiency, because a solid particle does not expand like a gas, and they are what makes the exhaust so bright.</li>
+<li><strong>Burn-rate modifiers</strong> in tiny amounts speed the burn; the <em>size</em> of the oxidiser crystals does too. Chapter 10’s particle-size widget showed why: finer particles expose more surface, so the reaction zone is faster. Designers blend coarse and fine to tune the rate.</li>
+</ul>
+<p>Real compositions are proprietary, tuned over decades and tested batch by batch; we leave them out on purpose. One more reason is worth stating plainly. <strong>Fine powders are a dust-explosion and a static-ignition hazard</strong>; the minimum ignition energy of chapter 11, which for a flammable powder can be as low as a few millijoules, is less than the spark from your sleeve. That is why propellants are made in remote, grounded, remotely operated plants. “Home-made propellant” is a recurring cause of burns, lost hands and criminal records, and the tests that separate a safe motor from a bomb (strand-burner rate tests, proof pressure, X-ray inspection of every grain) are exactly what a kitchen lacks.</p>
+
+<h2 id="rate" data-short="The burn-rate law">How fast does it burn? r = a·Pⁿ</h2>
+<p>The burning surface recedes at a speed $r$ that rises with the pressure of the gas pressing on it: more pressure pushes the flame closer to the surface, so more heat flows back to the solid. Measured over a wide range, the result is the empirical <strong>burn-rate law</strong>:</p>
+<div class="eq">$$r=a\,P_c^{\,n}\qquad\text{e.g. }a=4\ \text{mm/s at 1 MPa},\ n=0.35\ \Rightarrow\ r\approx6\ \text{mm/s at 3.4 MPa}$$</div>
+<p>The coefficient $a$ depends on the propellant and on the <em>grain temperature</em>: a cold grain burns slower (lower pressure, less thrust), a hot one faster. The reason is chapter 10’s Arrhenius law again, since the surface reaction runs faster when the solid is warmer. A motor is therefore certified for a temperature range, and a rocket left in a hot car is not a rocket to fire. The <strong>pressure exponent $n$</strong> is the star of this chapter: it says how sensitive the burn is to pressure. Typical values are 0.2 to 0.6 for composites; some special “plateau” propellants reach nearly zero.</p>
+
+<h2 id="balance" data-short="Pressure balance">Pressure finds its own level</h2>
+<p>Take the chamber as a box. Propellant turns into gas at the rate $\dot m_{gen}=\rho A_b\,r$ (density times burning area times the speed of the surface). The throat lets it out at $\dot m_{out}=P_cA_t/c^*$ (the choked-nozzle result of chapter 12, with $c^*\approx1\,400$ m/s). If more is made than leaves, the pressure rises, which makes the grain burn faster and the gas leave faster. The two balance when</p>
+<div class="eq">$$\rho A_b\,aP_c^{\,n}=\frac{P_cA_t}{c^*}\quad\Longrightarrow\quad P_c=\big(\rho\,c^*a\,K_n\big)^{\frac1{1-n}},\qquad K_n=\frac{A_b}{A_t}$$</div>
+<p><strong>Worked example</strong> (the default motor in the widget below): grain 29 mm across with a 9 mm hole, two 50 mm segments, throat 5.5 mm, so $A_b=5\,200$ mm², $A_t=23.8$ mm² and $K_n=219$. With $\rho=1\,750$ kg/m³, $c^*=1\,430$ m/s, $a=4$ mm/s at 1 MPa and $n=0.35$ (in units of mm/s and MPa the bracket is $\rho c^*aK_n/10^9=2.19$): $P_c=2.19^{1/0.65}=3.35$ MPa, about 33 atmospheres. The nozzle ($\varepsilon=4$, $C_F=1.49$) then gives $F=C_FP_cA_t=119$ N, $I_{sp}=C_Fc^*/g_0=218$ s, and the 10 mm web burns through in $10/6.1\approx1.6$ s: total impulse ≈ 200 N·s, a class H motor.</p>
+<p>Notice how the pressure responds to the area. Differentiate: $\dfrac{dP_c}{P_c}=\dfrac{1}{1-n}\dfrac{dK_n}{K_n}$.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Exponent n</th><th class="num">1/(1−n)</th><th>If the burning area is 10 % too large (a crack, a void), the pressure is…</th></tr>
+<tr><td>0.0 (plateau propellant)</td><td class="num">1.0</td><td>10 % higher</td></tr>
+<tr><td>0.35 (typical composite)</td><td class="num">1.5</td><td>15 % higher</td></tr>
+<tr><td>0.6</td><td class="num">2.5</td><td>27 % higher</td></tr>
+<tr><td>0.8</td><td class="num">5</td><td>61 % higher</td></tr>
+<tr><td>0.9</td><td class="num">10</td><td>2.6 times higher</td></tr>
+<tr><td>≥ 1</td><td class="num">∞</td><td><strong>no stable pressure exists: runaway</strong></td></tr>
+</table></div>
+<div data-widget="chamber-stability"></div>
+<div class="callout"><span class="ct">Same picture as chapter 10</span>This is the Semenov diagram again: a <em>convex</em> generation curve against a <em>linear</em> loss line. The temperature of a reactor and the pressure of a motor obey the same mathematics, and the cure is the same: make sure the loss line is always steeper than the generation curve in the region where the machine can wander. In a solid motor the five levers of chapter 10 become the checklist below.</div>
+<div class="table-wrap"><table class="data">
+<tr><th>Lever against runaway (chapter 10)</th><th>In a solid motor</th></tr>
+<tr><td>1. keep the generation curve shallow</td><td>choose a propellant with a low exponent $n$ (and high margin to 1)</td></tr>
+<tr><td>2. keep the loss line steep</td><td>size the throat so the pressure is far below what the case can take, and prevent blockage (closures that cannot enter the throat, throat inserts that do not crack)</td></tr>
+<tr><td>3. cap the temperature / pressure</td><td>burst margin of at least 1.5–2 on the case, proven by a hydrostatic proof test at a multiple of the working pressure</td></tr>
+<tr><td>4. do not start from a hot, wrongly sized batch</td><td>inspect every grain (X-ray, ultrasound) for cracks and voids; test the batch’s $a$ and $n$ on small samples first; keep the grain within its temperature range</td></tr>
+<tr><td>5. be able to bring it back</td><td>a solid motor cannot be throttled or shut down; so safety is designed in <em>before</em> ignition (that is the main argument for hybrids, chapter 14)</td></tr>
+</table></div>
+
+<h2 id="grain" data-short="Grain geometry">Shaping the thrust: the grain</h2>
+<p>The burning area $A_b$ changes as the surface recedes, so <em>the shape of the hole is the throttle</em>. The design problem is to choose a shape whose area follows the thrust you want:</p>
+<ul>
+<li><strong>Neutral</strong> (constant area, constant thrust): an <em>end burner</em> that burns like a cigarette (long, thin, and the whole case sees the flame), or a <em>tube burning inside and out</em> where the inner surface grows exactly as fast as the outer one shrinks.</li>
+<li><strong>Progressive</strong> (rising thrust): a plain <em>bore burner</em>: the hole grows, so the area grows. Used when you want to push harder as the rocket gets lighter.</li>
+<li><strong>Regressive</strong> (falling thrust): an <em>outside-burning rod</em>. Useful for limiting acceleration late in the burn.</li>
+<li><strong>BATES grains</strong> (bore plus both end faces burning; stacked in segments): the hobby standard because the segments are simply cast or pressed and stacked, and the thrust stays nearly constant.</li>
+<li><strong>Star, wagon-wheel, finocyl, moon-burner</strong> grains: more complex perforations that give a high initial thrust, a plateau and a clean tail. The Space Shuttle booster’s forward segment had a star-shaped hole so that the thrust dipped as the vehicle passed through the most aerodynamically stressful minute of the flight.</li>
+</ul>
+<p>Try them. Choose a shape, change the throat, and watch the grain regress in the cut-away; click the picture or press “Fire” to scrub through the burn. The rest of the readouts are what a motor designer checks first: the designation, the pressure against the case, and what is left over.</p>
+<div data-widget="solid-burn"></div>
+<h3>Four things to try in the widget</h3>
+<ol>
+<li><strong>Pick each grain in turn</strong> (the throat re-sizes itself so the largest $K_n$ of the burn is 265). Bore burner: thrust rises. Rod: it falls. Tube: flat. BATES: a gentle hump, since its 10 mm web is thin compared with the segment length.</li>
+<li><strong>Shrink the throat</strong> by 20 % (5.5 → 4.4 mm): the area ratio rises by 56 % and the pressure almost doubles, so the burst margin falls to 1.4. Open the throat instead (to 10 mm or more): the pressure sinks below the self-sustaining limit and the fire <em>goes out</em> part-way through, leaving most of the grain unburnt (a motor that “chuffs”).</li>
+<li><strong>Raise the exponent $n$</strong> from 0.35 to 0.7 with the same throat: the equilibrium pressure is four times higher, and the 12 MPa case bursts within 20 ms. This is the stability widget in action.</li>
+<li><strong>Add a hidden crack</strong> that doubles the burning area (100 %): the extra surface exists from the first instant, and the pressure nearly reaches the case limit; at n = 0.5 it exceeds it. That is the textbook <strong>CATO</strong> (“catastrophic at take-off”), the most common way a motor fails.</li>
+</ol>
+<h3>Second-order effects the model includes (and some it hides)</h3>
+<ul>
+<li><strong>Erosive burning.</strong> If gas races down a hole that is too narrow compared with the throat (a port-to-throat area ratio below about 2) the fast flow strips heat into the surface and the grain burns faster than the law says, giving a pressure spike right at ignition. Designers keep the port wide, or accept a longer, thinner motor. The toggle switches it on and off.</li>
+<li><strong>Slivers.</strong> The last bits of a grain are thin remnants that burn out while the pressure falls. Below about 0.7 MPa the propellant stops burning (the deflagration limit); the leftover is dead weight and sometimes thrown out unburnt.</li>
+<li><strong>Tail-off and ignition spike.</strong> The pressure takes a few milliseconds to climb and a few tens of milliseconds to fall; hobbyists call the slow part the “tail”.</li>
+</ul>
+
+<h2 id="label" data-short="Reading a motor label">Reading a model-rocket motor label</h2>
+<p>Certified model motors carry a code such as <strong>C6-5</strong> or <strong>G79-10</strong>:</p>
+<div class="eq">$$\underbrace{\text{C}}_{\text{total impulse class}}\ \underbrace{\text{6}}_{\text{average thrust (N)}}\ -\ \underbrace{\text{5}}_{\text{delay (s)}}$$</div>
+<p>The letter is the <strong>total impulse</strong> $I=\int F\,dt$ in newton-seconds; each letter allows <em>twice</em> the impulse of the one before. The number is the average thrust over the burn, and the delay (in seconds) is the time between burn-out and the small ejection charge that pops the recovery system. Class A starts at about 1.25 N·s:</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Class</th><th class="num">Total impulse (N·s)</th><th>Typical use</th></tr>
+<tr><td>A – B</td><td class="num">1.3 – 5</td><td>starter rockets, gliders</td></tr>
+<tr><td>C – D</td><td class="num">5 – 20</td><td>the classic model-shop motors</td></tr>
+<tr><td>E – G</td><td class="num">20 – 160</td><td>large model rockets</td></tr>
+<tr><td>H – I</td><td class="num">160 – 640</td><td>start of “high-power” (club certification needed)</td></tr>
+<tr><td>J – L</td><td class="num">640 – 5 100</td><td>certified high-power flyers</td></tr>
+<tr><td>M – O</td><td class="num">5 100 – 41 000</td><td>top-level hobby, with additional certification</td></tr>
+</table></div>
+<p>For scale: the CJ-1’s 58 N for one minute is 3 500 N·s, a class L. The turbojet would need 170 g of propane for that minute; the solid motor would need <strong>1.6 kg</strong> of propellant (58 N at an I<sub>sp</sub> of 220 s). You can check the designation of your own design in the widget above: its “H150”-style label is computed from the thrust curve exactly as the certifiers do it.</p>
+
+<h2 id="fail" data-short="How motors fail">How solid motors fail and how professionals prevent it</h2>
+<div class="table-wrap"><table class="data">
+<tr><th>Failure</th><th>Physics</th><th>Defence</th></tr>
+<tr><td><strong>Cracked or debonded grain</strong></td><td>the flame reaches new surface: $A_b$ jumps; pressure rises like $1/(1-n)$ (above)</td><td>mechanical design for thermal and acceleration strains; X-ray and ultrasonic inspection of every grain; no re-use, no modifications</td></tr>
+<tr><td><strong>Voids and porosity</strong></td><td>hidden holes burn open and give a pressure spike</td><td>vacuum casting; inspection; batch testing</td></tr>
+<tr><td><strong>Throat blocked or the closure comes out</strong></td><td>$A_t$ falls (or rises) suddenly: $K_n$ and $P_c$ jump, or pressure drops and the fire goes out</td><td>retaining rings, nozzle designs that cannot be ejected into the throat, graphite or ceramic inserts that do not crack</td></tr>
+<tr><td><strong>Case too weak</strong></td><td>hoop stress $\sigma=P_cr/t$ exceeds the strength (the 3.4 MPa, 20 mm radius, 2 mm wall example gives 34 MPa, well within aluminium, but no margin for a 3× pressure error)</td><td>design for ≥ 1.5–2× the maximum expected pressure; hydrostatic proof test of each case</td></tr>
+<tr><td><strong>Joint or seal leak</strong></td><td>hot gas finds a small gap, erodes it, and the leak grows: the <em>Challenger</em> accident of 1986 was a failed rubber O-ring seal in a booster joint that had lost its elasticity in near-freezing weather, not a propellant fault</td><td>redundant seals, temperature limits, joint redesign, flight-rules that forbid launching outside the tested temperature range</td></tr>
+<tr><td><strong>Wrong temperature</strong></td><td>a hot grain burns faster, so pressure rises with the temperature coefficient of $a$ (a few tenths of a percent per kelvin)</td><td>a stated temperature range for every motor</td></tr>
+<tr><td><strong>Accidental ignition</strong></td><td>static spark, friction, heat: the minimum ignition energy of chapter 11</td><td>grounded handling, no sparks, no heat, no mixing of fine powders outside licensed plants</td></tr>
+</table></div>
+<p>Notice the common thread: <strong>every defence is applied before the fire is lit</strong>, because a solid motor cannot be shut down afterwards. A clean design, a tested batch, a verified case, and a cautious operator are the only safety system there is, which is why the hobby route and the professional route both insist on certified, factory-made motors.</p>
+
+<h2 id="hobby" data-short="Flying them safely">The responsible way to fly solid rockets</h2>
+<ul>
+<li><strong>Join a club</strong>: the National Association of Rocketry (USA), Tripoli Rocketry Association, UKRA (UK) and their national equivalents run launches with range-safety officers, certification levels for larger motors, insurance and a published safety code.</li>
+<li><strong>Use certified commercial motors</strong> exactly as supplied. Never cut, drill, re-pack or “improve” a motor, never use an old or damaged one, never use a motor above your certification level.</li>
+<li><strong>Launch electrically from a stand, from a distance</strong>, with a clear range and the club’s published minimum safe distances for each motor class.</li>
+<li><strong>Simulate before you fly</strong>: free flight-simulation programs (OpenRocket, RASAero) take a certified motor’s published thrust curve (thrustcurve.org collects them) and predict stability, apogee and landing speed; the thrust-curve and impulse widget above shows what such a curve is made of.</li>
+<li><strong>Know the law</strong>: in most countries buying, storing and transporting propellant and motors is regulated by class; ask the club before you buy anything.</li>
+</ul>
+<div class="callout"><span class="ct">The honest comparison with our jet</span>The CJ-1 is a rocket’s opposite in one respect: you can shut it off. Close the fuel valve and it is a cold turbine in a minute. A solid motor never gives you that option. Chapter 14 looks at the rockets that do: hybrids and liquids.</div>
+
+<h2 id="takeaways" data-short="What you learned">What you now know</h2>
+<ul>
+<li>A solid propellant is fuel and oxidiser in one block; it <em>burns</em> in parallel layers (millimetres per second), it does not detonate.</li>
+<li>Burn rate $r=aP_c^n$; chamber pressure settles at $P_c=(\rho c^*aK_n)^{1/(1-n)}$ with $K_n=A_b/A_t$, and thrust $F=C_FP_cA_t$.</li>
+<li>Stability needs $n<1$: the pressure is then self-correcting. The closer $n$ is to 1, the more a small area error (a crack, a blocked throat) is amplified: the factor is $1/(1-n)$. For $n\ge1$ the pressure runs away.</li>
+<li>This is chapter 10’s Semenov diagram with pressure instead of temperature; the same five levers apply.</li>
+<li>Grain shape sets the thrust curve: neutral, progressive or regressive.</li>
+<li>Motor class letters double in total impulse; “C6-5” means class C, 6 N average, 5 s delay.</li>
+<li>All safety is designed in <em>before</em> ignition: inspected grains, proven cases, tested batches, certified motors.</li>
+</ul>
+
+<div data-widget="quiz">
+<script type="application/json">[
+ {"q":"A solid motor has a pressure exponent n = 0.8. A crack adds 10 % to the burning area. By how much does the chamber pressure rise (approximately)?","o":["10 %","25 %","about 60 %","it makes no difference"],"a":2,"why":"dP/P = dKn/Kn / (1−n) = 10 % / 0.2 = 50 %, and over a finite 10 % step about 61 %. A motor with n = 0.35 would only see 15 %: the exponent is the amplifier."},
+ {"q":"Why must n stay below 1?","o":["Otherwise the propellant is too slow","If n ≥ 1, more pressure makes more gas than the throat can pass: the pressure has no stable level and rises until the case fails","The nozzle would choke","It is just a convention"],"a":1,"why":"Gas made grows like Pⁿ, gas let out like P. If the made-curve is as steep as the line or steeper, no stable crossing exists."},
+ {"q":"What is a BATES grain good for?","o":["It burns hotter","Nearly constant burning area (bore growing while the end faces shrink), so a flat thrust curve from simple stackable segments","It cannot crack","It does not need a nozzle"],"a":1,"why":"The bore’s area increases as the ends’ area decreases; for a long enough web the thrust is almost neutral."},
+ {"q":"A model motor is labelled “E9-6”. What does that tell you?","o":["Its exhaust speed is 9 m/s","Class E (20–40 N·s total impulse), 9 N average thrust, a 6 s delay before the ejection charge","9 g of propellant","The ninth model of the E series"],"a":1,"why":"Letter: total impulse class, doubling per letter. Number: average thrust in N. After the dash: the delay in seconds."},
+ {"q":"Which statement about the Challenger accident is correct?","o":["The propellant detonated","A rubber O-ring in a booster field joint had stiffened in cold weather and let hot gas through, burning through the structure","The nozzle fell off","The exponent n was above 1"],"a":1,"why":"It was a seal failure at low temperature, a reminder that elastomers, joints and temperature limits matter as much as the propellant."}
+]</script>
+</div>
+
+</article>
+</main>
+</div>
+</body>
+</html>
