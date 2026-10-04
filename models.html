@@ -128,7 +128,7 @@ function select(id, scroll = true) {
 bAll.onclick = () => { current = null; viewer.solo(null); setStand(); viewer.setCaption('CJ-1 turbojet · click a part'); info.textContent = 'Click a part in the 3D view, or use “View” on a card below.'; bAll.disabled = true; document.querySelectorAll('.stl-card.sel').forEach(c => c.classList.remove('sel')); };
 function setStand() { const s = viewer.parts.get('test-stand'); if (s && !current) { s.vis = standOn; s.outer.visible = standOn; } }
 bStand.onclick = () => { standOn = !standOn; bStand.classList.toggle('on', standOn); setStand(); };
-viewer.load().then(() => { setStand(); viewer.setStep(null); });
+viewer.load().then(() => { viewer.setStep(null); setStand(); });
 
 /* ---------- download card text ---------- */
 const sumTri = manifest.parts.filter(p => !p.stand).reduce((a, p) => a + p.tris, 0);
