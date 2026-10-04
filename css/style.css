@@ -309,7 +309,7 @@ figure.svg svg { width: 100%; height: auto; display: block; }
   .top-links .hide-sm { display: none; }
   .pn { grid-template-columns: 1fr; }
 }
-@media (max-width: 560px) { body { font-size: 16px; } main { padding-top: 22px; } .brand small { display: none; } }
+@media (max-width: 560px) { body { font-size: 16px; } main { padding-top: 22px; } .brand small { display: none; } .topbar { gap: 8px; padding: 0 10px; } .brand { min-width: 0; } .brand > span { overflow: hidden; text-overflow: ellipsis; font-size: .95rem; } .top-links a { display: none; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
 @media print { .topbar, .sidenav, .pn, .viewer, .widget .ctls { display: none !important; } .layout { display: block; } body { background: #fff; color: #000; } }
 
@@ -322,3 +322,5 @@ body.wide-page main { padding-inline: clamp(14px, 2.5vw, 40px); }
 
 /* skeleton box reserved for a lazy widget until it initialises (avoids layout jumps when scrolling to anchors) */
 [data-widget]:not(.widget):not(.stat-row) { min-height: 420px; border: 1px dashed var(--line-2); border-radius: var(--radius); background: color-mix(in srgb, var(--panel) 70%, transparent); margin: 1.8em 0 2.2em; }
+
+@media (max-width: 1100px) { body.wide-page .build-viewer { margin-inline: calc(-1 * clamp(14px, 2.5vw, 40px)); padding-inline: clamp(14px, 2.5vw, 40px); } }
