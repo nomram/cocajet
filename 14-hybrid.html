@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>14 · Hybrid and liquid rockets: separate the ingredients — Jet Engines for Dummies</title>
+<meta name="description" content="Hybrid, liquid and air-breathing engines: how separating fuel and oxidiser buys control. Regression-rate law and O/F shift, propellant choice, cooling, hard starts and how to avoid them, and which engine fits which speed.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter">
+
+<span class="eyebrow">Chapter 14 · Hybrid, liquid and air-breathing</span>
+<h1>Hybrid and liquid rockets: separate the ingredients</h1>
+<div class="meta"><span>~55 min</span><span>4 widgets</span><span>concept level: no recipes</span></div>
+<p class="lede">The solid motor’s problem is that the fuel and the oxidiser are mixed for ever: once lit, it cannot be stopped. The cure is to keep them apart and meet only in the chamber, where valves decide how much of each. That one change gives you throttling, shutdown, restart and an inert fuel grain, and it gives you new problems: plumbing, cooling and starting. This chapter follows the idea through hybrids, liquids, and the engines that use the air while there is some.</p>
+<div class="callout danger"><span class="ct">Scope and safety</span>This chapter explains the engineering and the physics. It contains no propellant formulations, no handling procedures and no build instructions. Liquid and hybrid engines involve cryogenic liquids, toxic or corrosive chemicals and oxidisers that can decompose violently; they are developed on remote test stands by trained teams. The home-scale route to rocketry is certified model motors and a club (chapter 13), and the safe laboratory for the nozzle and thrust ideas is the water rocket of chapter 12.</div>
+
+<h2 id="why" data-short="Why separate them?">Where the reaction is allowed to happen</h2>
+<p>Chapter 10’s lesson about runaway was: a reaction that is <em>limited by supply</em> can be stopped by cutting off the supply. A solid motor’s supply is built in; a fluid-fed engine’s supply goes through a valve. That is the whole difference.</p>
+<div class="table-wrap"><table class="data">
+<tr><th></th><th>Solid</th><th>Hybrid</th><th>Liquid (bipropellant)</th><th>Single liquid (monopropellant)</th></tr>
+<tr><td><strong>Where the ingredients wait</strong></td><td>mixed, in one block</td><td>fuel solid, oxidiser in a tank</td><td>two tanks</td><td>one tank</td></tr>
+<tr><td><strong>Switch off?</strong></td><td>no</td><td>yes (close the valve)</td><td>yes</td><td>yes</td></tr>
+<tr><td><strong>Throttle / restart?</strong></td><td>no</td><td>yes</td><td>yes</td><td>yes</td></tr>
+<tr><td><strong>Parts that move</strong></td><td>none</td><td>one valve (plus a pressure source)</td><td>valves, maybe pumps</td><td>a valve and a catalyst bed</td></tr>
+<tr><td><strong>Isp (vac, s)</strong></td><td>240 – 280</td><td>250 – 320</td><td>300 – 460</td><td>150 – 240</td></tr>
+<tr><td><strong>Main risk</strong></td><td>cracks, pressure runaway</td><td>oxidiser handling, O/F shift, chugging</td><td>cooling, hard starts, leaks</td><td>toxic or unstable propellant</td></tr>
+</table></div>
+
+<h2 id="hybrid" data-short="Hybrid rockets">Hybrid rockets: a flame sheet above a solid wall</h2>
+<p>A hybrid holds a grain of an inert solid fuel (a plastic or a wax-like material; it can be handled, drilled and dropped without drama) with a hole down the middle. Oxidiser from a tank flows down the hole. The flame lives in the <strong>boundary layer</strong>: a thin sheet a little way above the wall, where fuel vapour boiling off the wall meets oxidiser in the stream. Heat from the flame goes back to the wall and evaporates more fuel. The wall therefore recedes at a speed that depends on how hard the flow scrubs it, the <strong>oxidiser mass flux</strong> $G_{ox}=\dot m_{ox}/A_{port}$:</p>
+<div class="eq">$$\dot r=a\,G_{ox}^{\,n}\ \ (n\approx0.5\text{–}0.8),\qquad \dot m_f=\rho_f\,(\pi d L)\,\dot r\ \propto\ d^{\,1-2n}\quad\text{for fixed }\dot m_{ox}$$</div>
+<p>Compare with the solid’s $r=aP^n$: there the burn rate listens to <em>pressure</em>, here it listens to <em>oxidiser flow</em>. That is why a crack in a hybrid grain is not a catastrophe: the fuel flow is set by the flow in the port, not by how much surface the flame can see. Two consequences of the law are the design problems of the whole family:</p>
+<ul>
+<li><strong>The O/F shift.</strong> As the port widens ($d$ grows), the flux falls. For $n>0.5$ the fuel flow falls too, so with a constant oxidiser flow the oxygen-to-fuel ratio $O/F=\dot m_{ox}/\dot m_f$ rises during the burn and drifts off its optimum. A rocket that starts a bit fuel-rich and finishes a bit oxidiser-rich passes through the optimum on the way.</li>
+<li><strong>Low regression rate.</strong> A boundary-layer flame is slower than a premixed one, so the burning surface must be large: long grains, many ports, swirl injection, or fuels that melt and spray (liquefying waxes regress 3 to 5 times faster).</li>
+</ul>
+<div data-widget="hybrid-burn"></div>
+<h3>Things to try</h3>
+<ol>
+<li><strong>Auto-size</strong> for each oxidiser: nitrous oxide wants O/F near 7, liquid oxygen near 2.3, so the same fuel needs a quite different grain length.</li>
+<li><strong>Shrink the initial port</strong> to 15 mm: the shift becomes dramatic, because the port-diameter change is a larger fraction of the original, and the performance loss readout grows.</li>
+<li><strong>Throttle to 50 %</strong>: the thrust halves, but the O/F is lower than at full throttle, since fuel flow falls more slowly than oxidiser flow ($G^{0.65}$). A hybrid throttles, but not for free.</li>
+<li><strong>Press “Abort”</strong>: closing the oxidiser valve ends the burn within a fraction of a second. Compare with chapter 13’s motor, which cannot be stopped.</li>
+<li><strong>Blow-down</strong>: if the oxidiser tank pressure falls as it empties, the flow (and the thrust) drops during the burn.</li>
+</ol>
+<p>Hybrids are not free of problems. A very common one is <strong>chugging</strong>: a low-frequency pulsation in which a pressure rise in the chamber briefly chokes the oxidiser flow, which lowers the pressure, which restores the flow. It is a feedback loop through the feed system (the stability mathematics of chapter 13, with a delay), cured by giving the injector a pressure drop of at least 15–20 % of the chamber pressure, so that the chamber cannot talk back to the tank. Hybrids also leave some fuel behind at the end, and a self-pressurising oxidiser such as nitrous oxide can <em>decompose</em> violently if heated or contaminated, so it brings its own hazards. The most famous hybrid success is SpaceShipOne, the first privately built crewed spacecraft (2004).</p>
+
+<h2 id="liquid" data-short="Liquid rockets">Liquid rockets: valves, pumps and cooling</h2>
+<p>A liquid rocket keeps both ingredients in tanks and sprays them through an <strong>injector</strong> into the chamber. There are two ways to push them there:</p>
+<ul>
+<li><strong>Pressure-fed:</strong> a pressurised gas pushes the liquids out. No turbomachinery, very reliable, but the tanks must be strong and heavy, so it suits small engines and spacecraft thrusters.</li>
+<li><strong>Pump-fed:</strong> turbopumps (a small gas turbine, chapter 4, driving two centrifugal pumps) raise the pressure of the liquids from a few bar to hundreds of bar. A turbopump delivers tens of megawatts from a machine the size of a car engine. The turbine needs hot gas; where it comes from defines the <em>cycle</em>: a <strong>gas generator</strong> burns a little propellant and dumps it overboard; <strong>staged combustion</strong> burns <em>all</em> of one propellant in a preburner and sends the gas on into the main chamber (no waste, a higher Isp, harder to build); an <strong>expander cycle</strong> boils the fuel in the cooling jacket and runs the turbine on the vapour.</li>
+</ul>
+<p>That last cycle shows the central fact of liquid engines: the nozzle and the chamber must be <strong>cooled</strong>. The flame is hotter than the melting point of every material; at the throat the heat flux is tens of megawatts per square metre. The solution is <strong>regenerative cooling</strong>: the fuel flows through channels in the chamber wall on its way to the injector, so the engine’s heat goes into the propellant and comes back as extra energy in the flame. Two companions are <strong>film cooling</strong> (a layer of fuel along the wall) and <strong>ablative liners</strong> (a layer that chars and carries the heat away as it erodes). If the coolant stops, the wall temperature runs away in a fraction of a second: chapter 10’s Semenov picture again, with the heat made by the flame and the heat lost by the coolant.</p>
+<h3>Which propellants?</h3>
+<p>The choice trades Isp, density, boiling point, toxicity and ignition. Cryogenic oxygen with a fuel (hydrogen, methane, kerosene) gives the best performance; “storable” liquids stay liquid at room temperature and many are <strong>hypergolic</strong>: they ignite on contact, so no igniter (chapter 11) is needed, which is why spacecraft use them. A <strong>monopropellant</strong> decomposes over a catalyst by itself: one tank, one valve, lower performance. Hover over the chart to see the trade.</p>
+<div data-widget="propellant-chart"></div>
+
+<h2 id="start" data-short="Starting safely">Starting safely: sequence beats hardware</h2>
+<p>An engine in steady operation is a calm thing: flow in, flow out, the flame anchored. The dangerous moments are the transients. The classic one is the <strong>hard start</strong> (in a jet engine, a <em>hot start</em>): propellant reaches the chamber before the flame exists, so it cannot leave as fast as it enters, and it accumulates. When ignition finally happens, the accumulated vapour burns at nearly constant volume, in milliseconds:</p>
+<div class="eq">$$\Delta P=\frac{(\gamma-1)\,m\,q}{V}$$</div>
+<p>With 10 grams pooled in a litre the pressure jumps by several megapascals, perhaps above what the chamber can take. The same physics made the CJ-1 turbine glow in chapter 7 when you flooded the combustor and lit late. The cure is a rule of sequence and not a stronger case: <strong>ignition first, then propellant</strong> (a pilot flame or a spark running before the main valve opens); <strong>fuel and oxidiser lead and lag</strong> chosen so the mixture is never rich and unlit; and <strong>start sensors</strong> that abort the sequence if the pilot is not proven.</p>
+<div data-widget="hard-start"></div>
+<h3>The same five levers, in a fluid-fed engine</h3>
+<div class="table-wrap"><table class="data">
+<tr><th>Lever against runaway (chapter 10)</th><th>Liquid and hybrid engines</th></tr>
+<tr><td>1. limit the reactant supply</td><td>the valves: a shut valve is a stopped reaction. Dual redundant valves in series; a fail-closed design</td></tr>
+<tr><td>2. keep the flame anchored</td><td>injector design that holds the flame at a fixed place, with a pressure drop big enough to decouple the chamber from the feed system (no chugging)</td></tr>
+<tr><td>3. remove heat faster than it grows</td><td>regenerative, film and ablative cooling, with a cooling-flow margin and temperature sensors on the walls</td></tr>
+<tr><td>4. fix the order of events</td><td>start and stop sequences: ignition proven before main flow; purge the chamber before and after (a nitrogen purge sweeps leftovers out)</td></tr>
+<tr><td>5. design failure to be safe</td><td>blast-resistant test stands, remote operation, burst discs and relief valves on tanks, automated abort on over-temperature or over-pressure</td></tr>
+</table></div>
+<p>Another class of runaway is <strong>combustion instability</strong>: a pressure wave in the chamber changes the burn rate, which strengthens the wave (the same positive feedback as the Semenov and chamber-pressure curves, now with an acoustic delay). Rocket engines fight it with injector patterns, baffles that cut up the chamber’s acoustic modes and resonators; the large F-1 engines of the Apollo programme needed years of testing to tame it.</p>
+
+<h2 id="air" data-short="Using the air">Use the air while there is some</h2>
+<p>If the oxidiser is two-thirds of the propellant mass, then <em>not carrying it</em> would be a big saving: that is what the turbojet does, and it gives 2 000 s against a rocket’s 350. But air-breathing engines work only in a band of speeds:</p>
+<ul>
+<li>A <strong>turbojet or turbofan</strong> compresses the air with rotating blades, which limits it to about Mach 3: at higher speeds the ram-heated air is already too hot to be heated further (compressor-exit temperature limit). Reheat (an afterburner) pushes the thrust up through the transonic region; Concorde used it for take-off and to get through Mach 1, then cruised at Mach 2 on its dry turbojets.</li>
+<li>A <strong>ramjet</strong> has no compressor at all; the speed of the vehicle squeezes the air in the inlet. It is simple and light, works from about Mach 2 to Mach 5, but produces <em>no thrust at standstill</em> and must be accelerated by something else first.</li>
+<li>A <strong>scramjet</strong> keeps the air <em>supersonic</em> through the burner, because slowing the air to subsonic at Mach 8+ would heat it too much. Fuel must burn within a millisecond in a stream moving at 2 km/s (chapter 10’s kinetics, under pressure). NASA’s X-43A flew at Mach 9.6 in 2004.</li>
+<li>A <strong>rocket</strong> works at every speed and altitude, but burns 10 to 20 times more propellant per newton-second.</li>
+</ul>
+<p>Each curve in the widget has a band of speeds where it wins. The right-hand plot adds another way to see it: the <strong>propulsive efficiency</strong>, the share of the jet’s kinetic energy that actually pushes the vehicle. For an air-breathing engine it is $\eta_p=2/(1+V_e/V_0)$: it is best when the jet leaves slowly relative to the vehicle. A slow, fat jet from a large fan is efficient at airliner speeds; a fast, thin jet from a rocket is wasteful at low speed and efficient only when the vehicle itself is going near the exhaust speed (for a rocket, $\eta_p=2(V_0/V_e)/(1+(V_0/V_e)^2)$, with its peak at $V_0=V_e$). That explains the whole progression of the airliner, from propeller to turboprop to bypass turbofan, and why a rocket is a poor way to fly through the atmosphere at 250 m/s and the right one at 8 km/s.</p>
+<div data-widget="isp-vs-mach"></div>
+<div class="callout"><span class="ct">Combining engines</span>Real vehicles use more than one: the SR-71’s J58 was a turbojet that became a ramjet as it accelerated; ejector and rocket-ramjet designs fire a rocket inside a duct to get thrust from standstill; and the SABRE concept cools the incoming hypersonic air to −150 °C in a heat exchanger in a fraction of a second so that a rocket-like chamber can burn it. The frontier is not a new engine but making the transitions smooth.</div>
+
+<h2 id="place" data-short="Where the CJ-1 sits">Where does our turbojet sit on this map?</h2>
+<p>With one number each you can now place everything in the book: the CJ-1 makes 58 N and burns 2.9 g/s of propane: <strong>Isp ≈ 2 070 s</strong>, but works only in air and below Mach 1 or so. The same thrust from a solid motor would need 27 g/s of propellant; from a hydrogen–oxygen rocket 13 g/s; from an ion thruster of 3 000 s, only 2 g/s, but it would need about 1.4 megawatts of electricity (chapter 15). In every case the engineer’s question is the one you have been answering since chapter 2: <em>how much mass do I throw backwards, how fast, and what does it cost me to carry it?</em></p>
+
+<h2 id="takeaways" data-short="What you learned">What you now know</h2>
+<ul>
+<li>Keeping fuel and oxidiser apart gives control: valves stop, throttle and restart the reaction.</li>
+<li>A <strong>hybrid</strong> burns a flame sheet over a solid wall: regression $\dot r=aG_{ox}^n$ depends on the oxidiser flux, not the pressure, so grain cracks are harmless but the O/F drifts as the port widens ($\dot m_f\propto d^{1-2n}$).</li>
+<li>A <strong>liquid</strong> engine needs an injector, usually pumps, and cooling: regenerative cooling turns the wall’s heat into propellant energy.</li>
+<li>Hydrogen has the best Isp but the lowest density; dense propellants win on first stages, hydrogen on upper stages. Volumetric impulse $\rho I_{sp}$ is the figure of merit for tanks.</li>
+<li>Hard starts come from propellant flowing before the flame exists: $\Delta P=(\gamma-1)mq/V$. The cure is sequence: ignition first.</li>
+<li>Every runaway in a fluid-fed engine yields to the same five levers: limit the supply, anchor the flame, out-cool the heat, order the events, and design failure to be safe.</li>
+<li>Jet, ramjet, scramjet and rocket each own a band of Mach numbers; the propulsive efficiency says why.</li>
+</ul>
+
+<div data-widget="quiz">
+<script type="application/json">[
+ {"q":"In a hybrid rocket, what mainly controls how fast the fuel burns?","o":["The chamber pressure, as in a solid","The oxidiser mass flux G = ṁ_ox / A_port flowing over the wall","The colour of the fuel","The altitude"],"a":1,"why":"ṙ = a·G^n. The flame is a boundary-layer sheet fed by the oxidiser stream; pressure matters little."},
+ {"q":"Why does O/F usually rise during a hybrid burn (n > 0.5)?","o":["The oxidiser gets denser","As the port widens the flux drops, so the fuel flow falls (ṁ_f ∝ d^(1−2n)) while the oxidiser flow stays the same","The fuel evaporates","The nozzle erodes"],"a":1,"why":"Bigger port, lower flux, lower regression rate; for n > 0.5 that outweighs the increased surface."},
+ {"q":"What is a hard start?","o":["A rocket that fires too strongly","Propellant arriving before the flame exists, pooling, and burning all at once when ignition finally happens","A jammed starter","A cold battery"],"a":1,"why":"The pooled mass m burns at nearly constant volume: ΔP = (γ−1)mq/V. The cure is ignition first, then propellant."},
+ {"q":"Why is regenerative cooling clever?","o":["It makes the flame colder","The fuel absorbs the wall heat on its way to the injector, so the heat is not lost but returns to the engine in the flame","It needs no pumps","It makes the nozzle lighter"],"a":1,"why":"The wall is cooled by the very propellant that will burn next; the energy is recycled (and used to drive the turbine in the expander cycle)."},
+ {"q":"Which engine is the right one at 8 km/s, and why?","o":["A turbojet, because it has the best Isp","A rocket: its fast exhaust matches the vehicle speed, giving a good propulsive efficiency, and it needs no air","A propeller","A ramjet"],"a":1,"why":"Air-breathing engines run out of air and out of compressor temperature margin; a rocket’s efficiency peaks when the vehicle speed approaches its exhaust speed."}
+]</script>
+</div>
+
+</article>
+</main>
+</div>
+</body>
+</html>
