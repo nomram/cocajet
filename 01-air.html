@@ -44,14 +44,14 @@
 <h2 id="fluid" data-short="A gas is a fluid">A gas is a fluid (that you can squash)</h2>
 <p>“Fluid” means <em>anything that flows and takes the shape of its container</em>: liquids <strong>and</strong> gases. So the maths of water pipes and of air ducts are cousins. The big difference is <strong>compressibility</strong>: water barely changes volume under pressure, a gas changes a lot.</p>
 <p>Three properties matter:</p>
-<table class="data">
+<div class="table-wrap"><table class="data">
 <tr><th>Property</th><th>Symbol</th><th>Air at sea level, 15 °C</th><th>Why we care</th></tr>
 <tr><td>Density</td><td>$\rho$</td><td>1.225 kg/m³</td><td>Mass flow $\dot m=\rho A V$; thrust comes from mass flow</td></tr>
 <tr><td>Pressure</td><td>$P$</td><td>101 325 Pa</td><td>Squeezing it is the compressor’s job</td></tr>
 <tr><td>Temperature</td><td>$T$</td><td>288.15 K</td><td>Sets the energy needed to compress and the speed of sound</td></tr>
 <tr><td>Speed of sound</td><td>$a$</td><td>340 m/s</td><td>Tells us when “compressible” effects matter</td></tr>
 <tr><td>Viscosity</td><td>$\mu$</td><td>1.8×10⁻⁵ Pa·s</td><td>Sticky boundary layers on blades → friction losses</td></tr>
-</table>
+</table></div>
 <p>The three are tied together by one line, the <strong>ideal gas law</strong> (derived properly in chapter 3):</p>
 <div class="eq">$$P = \rho R T \qquad\Rightarrow\qquad \rho=\frac{101\,325}{287.05\times 288.15}=1.225\ \text{kg/m}^3$$</div>
 <p>The speed of sound is how fast a pressure “message” travels through the gas: $a=\sqrt{\gamma R T}$ with $\gamma=1.4$ for cold air. Compare the speed of a flow with $a$ and you get the <strong>Mach number</strong> $M=V/a$. Play with it:</p>
@@ -90,7 +90,7 @@
 <p>A perfectly mixed flame at φ = 1 reaches about 2 000 °C. Nothing we can afford survives that. Yet the turbine can only take roughly 800 °C. The solution: burn at φ ≈ 1 in a small <em>primary zone</em> where the flame is stable, then <strong>dilute</strong> the hot gas with the leftover air so that, overall, we run at φ ≈ 0.3 (the dotted “whole engine” line). We design this in chapter 6, step 6: it is the entire reason the Coke can is full of holes.</p></div>
 
 <h2 id="energy" data-short="Why liquid fuel?">Why a fuel, not a battery?</h2>
-<table class="data">
+<div class="table-wrap"><table class="data">
 <tr><th>Energy source</th><th class="num">MJ per kg</th><th>Note</th></tr>
 <tr><td>Hydrogen</td><td class="num">120</td><td>Great per kg, awful per litre; hard to handle</td></tr>
 <tr><td>Natural gas (methane)</td><td class="num">50</td><td>Needs a pressure vessel</td></tr>
@@ -98,7 +98,7 @@
 <tr><td>Kerosene / Jet-A</td><td class="num">43</td><td>The aviation standard; needs a vaporiser or fine spray</td></tr>
 <tr><td>Ethanol</td><td class="num">27</td><td>Already contains oxygen</td></tr>
 <tr><td>Lithium-ion battery</td><td class="num">0.9</td><td>50× less energy per kg than propane (but needs no oxygen)</td></tr>
-</table>
+</table></div>
 <p>A kilogram of propane carries as much energy as ~50 kg of Li-ion cells. That is why aircraft burn fuel, and why a 134 kW engine of 2.4 kg is possible at all.</p>
 
 <h2 id="takeaways" data-short="What you learned">What you now know</h2>
