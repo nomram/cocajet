@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Formulas, glossary &amp; sources — Jet Engines for Dummies</title>
+<meta name="description" content="Quick reference for the Coke-can turbojet guide: formula sheet, a searchable glossary of 70 terms, bill of materials with costs, FAQ, sources and credits.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter">
+
+<span class="eyebrow">Resources</span>
+<h1>Formulas, glossary &amp; sources</h1>
+<div class="meta"><span>cheat-sheet</span><span>70 terms</span><span>bill of materials</span><span>FAQ</span></div>
+<p class="lede">Everything in one place: the equations the guide uses (with the CJ-1 numbers worked in), a searchable glossary, what the parts cost, answers to the questions people actually ask, and where to read more.</p>
+
+<h2 id="spec" data-short="CJ-1 at a glance">The CJ-1 at a glance</h2>
+<div data-widget="spec-sheet"></div>
+
+<h2 id="formulas" data-short="Formula sheet">Formula sheet</h2>
+<p>Symbols: $\dot m$ mass flow, $V$ velocity, $P$ pressure, $T$ temperature, $\rho$ density, $c_p$ specific heat at constant pressure (1005 J/kg·K cold air, ~1150 J/kg·K hot gas), $\gamma$ ratio of specific heats (1.4 cold, 1.33 hot), $R$ gas constant (287 J/kg·K for air).</p>
+
+<h3>Air and gases (chapter 1)</h3>
+<div class="table-wrap"><table class="data">
+<tr><th>Quantity</th><th>Formula</th><th>CJ-1 example</th></tr>
+<tr><td>Ideal gas</td><td>$P=\rho R T$</td><td>101 325 Pa, 288 K → $\rho=1.225$ kg/m³</td></tr>
+<tr><td>Speed of sound</td><td>$a=\sqrt{\gamma R T}$</td><td>340 m/s at 15 °C; 600 m/s at 600 °C</td></tr>
+<tr><td>Mach number</td><td>$M=V/a$</td><td>nozzle exit ≈ 0.65 at full power: subsonic, not choked</td></tr>
+<tr><td>Stoichiometric propane</td><td>$\mathrm{C_3H_8}+5\,\mathrm{O_2}\to3\,\mathrm{CO_2}+4\,\mathrm{H_2O}$</td><td>15.6 kg air per kg of propane</td></tr>
+<tr><td>Equivalence ratio</td><td>$\phi=\dfrac{(F/A)}{(F/A)_{st}}$</td><td>0.30 overall: very lean, the rest is cooling air</td></tr>
+</table></div>
+
+<h3>Forces and thrust (chapter 2)</h3>
+<div class="table-wrap"><table class="data">
+<tr><th>Quantity</th><th>Formula</th><th>CJ-1 example</th></tr>
+<tr><td>Thrust</td><td>$F=\dot m\,(V_e-V_0)+(P_e-P_0)A_e$</td><td>0.151 × 377 ≈ 57–58 N on the stand</td></tr>
+<tr><td>Jet power</td><td>$\tfrac12\dot m V_e^2$</td><td>10.7 kW (8 % of the 134 kW fuel power)</td></tr>
+<tr><td>Propulsive efficiency</td><td>$\eta_p=\dfrac{2}{1+V_e/V_0}$</td><td>100 m/s flight: 42 %</td></tr>
+<tr><td>Power in a moving fluid</td><td>$P/A=\tfrac12\rho v^3$</td><td>exhaust: ~10 MW/m²; 12 m/s wind: 1 kW/m²</td></tr>
+<tr><td>Betz limit</td><td>$C_{p,\max}=16/27\approx0.593$</td><td>no turbine takes more than 59 % of the wind’s power</td></tr>
+<tr><td>Kinetic energy</td><td>$E=\tfrac12 mV^2$</td><td>rotor of 195 g at 115 000 rpm: ≈ 2.5 kJ</td></tr>
+</table></div>
+
+<h3>Thermodynamics (chapter 3)</h3>
+<div class="table-wrap"><table class="data">
+<tr><th>Quantity</th><th>Formula</th><th>CJ-1 example</th></tr>
+<tr><td>Isentropic compression</td><td>$\dfrac{T_2}{T_1}=\left(\dfrac{P_2}{P_1}\right)^{(\gamma-1)/\gamma}$</td><td>PR 1.94: ideal outlet 1.21 × 288 = 348 K</td></tr>
+<tr><td>Compressor efficiency</td><td>$\eta_c=\dfrac{T_{2s}-T_1}{T_2-T_1}$</td><td>77 % → actual outlet 366 K</td></tr>
+<tr><td>Compressor work</td><td>$w_c=c_p\,(T_2-T_1)$</td><td>78 kJ/kg → 11.8 kW at 0.151 kg/s</td></tr>
+<tr><td>Combustor energy balance</td><td>$\eta_b\,\dot m_f\,\mathrm{LHV}=\dot m\,c_p\,(T_3-T_2)$</td><td>2.9 g/s × 46.4 MJ/kg × 0.94 → ≈ 800 °C turbine inlet</td></tr>
+<tr><td>Turbine work</td><td>$w_t=\eta_t\,c_p\,T_3\left[1-\left(\tfrac{P_4}{P_3}\right)^{(\gamma-1)/\gamma}\right]$</td><td>= $w_c$ (the shaft balance)</td></tr>
+<tr><td>Nozzle exit speed</td><td>$V_e=\sqrt{2c_p T_{4}\left[1-\left(\tfrac{P_0}{P_{4}}\right)^{(\gamma-1)/\gamma}\right]}$</td><td>377 m/s</td></tr>
+<tr><td>Choking</td><td>$P_{04}/P_0\ge\left(\tfrac{\gamma+1}{2}\right)^{\gamma/(\gamma-1)}\approx1.85$</td><td>CJ-1 at full power: 1.30, so the nozzle never chokes</td></tr>
+<tr><td>Brayton efficiency (ideal)</td><td>$\eta_{th}=1-r^{-(\gamma-1)/\gamma}$</td><td>r = 2: 18 % (real engine: 8 %)</td></tr>
+<tr><td>Orifice / hole flow</td><td>$\dot m=C_d A\sqrt{2\rho\,\Delta P}$</td><td>sizes the 1 400 mm² of flame-tube holes</td></tr>
+</table></div>
+
+<h3>Compressors, blades and turbines (chapter 4)</h3>
+<div class="table-wrap"><table class="data">
+<tr><th>Quantity</th><th>Formula</th><th>CJ-1 example</th></tr>
+<tr><td>Tip speed</td><td>$U=\pi D N/60=\omega r$</td><td>0.056 m, 115 000 rpm → 337 m/s</td></tr>
+<tr><td>Euler work</td><td>$\Delta h_0=U_2C_{\theta2}-U_1C_{\theta1}$</td><td>337 × 227 = 76 kJ/kg</td></tr>
+<tr><td>Wiesner slip</td><td>$\sigma=1-\dfrac{\sqrt{\cos\beta_2}}{Z^{0.7}}$</td><td>30° backsweep, effective Z ≈ 12 (7 + 7 blades) → 0.84</td></tr>
+<tr><td>Lift of a wing / blade</td><td>$L=\tfrac12\rho V^2 S\,C_L,\quad C_L\approx2\pi\alpha$ (thin, small α)</td><td>stalls at 12–15°</td></tr>
+<tr><td>Tip-speed ratio (wind turbine)</td><td>$\lambda=\omega R/V$</td><td>modern 3-blade rotors: 6–8</td></tr>
+<tr><td>Blade angle from the flow</td><td>$\tan\beta=\dfrac{U-C_\theta}{C_x}$</td><td>sets the twist of the 19 turbine blades</td></tr>
+</table></div>
+
+<h3>Structures, heat and materials (chapters 8–9)</h3>
+<div class="table-wrap"><table class="data">
+<tr><th>Quantity</th><th>Formula</th><th>CJ-1 example</th></tr>
+<tr><td>Centrifugal stress (blade root, rough)</td><td>$\sigma\approx\tfrac12\rho\,\omega^2\,(r_t^2-r_h^2)$ (plus a taper factor)</td><td>≈ 250 MPa at the root of the turbine blades</td></tr>
+<tr><td>Hoop stress (pressure vessel)</td><td>$\sigma=P\,r/t$</td><td>95 kPa × 48 mm / 2 mm = 2.3 MPa</td></tr>
+<tr><td>Thermal expansion</td><td>$\Delta L=\alpha L\,\Delta T$</td><td>stainless, 300 mm, 600 K: 3 mm</td></tr>
+<tr><td>Thermal stress (clamped)</td><td>$\sigma=E\alpha\,\Delta T$</td><td>steel 400 K: ~1 000 MPa (it yields)</td></tr>
+<tr><td>Creep (Larson–Miller)</td><td>$P=T\,(C+\log_{10}t_r)$, $C\approx20$</td><td>25 °C hotter ≈ ¼ of the life</td></tr>
+<tr><td>Unbalance force</td><td>$F=U\omega^2$</td><td>1 g·mm at 115 000 rpm = 145 N</td></tr>
+<tr><td>Balance grade</td><td>$G=e\,\omega$ (mm/s)</td><td>G2.5 → 0.04 g·mm for 195 g</td></tr>
+<tr><td>Critical speed (Dunkerley)</td><td>$\dfrac1{N_c^2}=\sum\dfrac1{N_i^2}$</td><td>≈ 40 000 rpm: pass through it quickly</td></tr>
+<tr><td>Bypass fan (ideal)</td><td>$\tfrac12\dot m_{tot}(V_e^2-V_0^2)=\eta\,P_{core}$</td><td>B = 4: 116 N on the stand</td></tr>
+</table></div>
+
+<h2 id="glossary" data-short="Glossary">Glossary</h2>
+<div class="widget" style="padding:14px 16px">
+  <input id="gq" type="search" placeholder="Search 70 terms (e.g. surge, creep, slip)…" aria-label="Search the glossary" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--line-2);background:var(--panel);color:var(--text);font:inherit">
+  <div id="gcount" style="font-size:.8rem;color:var(--muted);margin:8px 2px"></div>
+  <dl id="gl" style="margin:0"></dl>
+</div>
+
+<h2 id="bom" data-short="Bill of materials">Bill of materials</h2>
+<p>What a minimal CJ-1 costs in 2020s US dollars if you source sensibly: scrap-yard turbo wheel, waterjet-cut Inconel and stainless from an online cutting service, everything else from hardware stores and RC shops. Prices are rough: they vary by country and supplier. The tools you will need (lathe or access to one, TIG welder, drill press, balancing service) are <em>not</em> included.</p>
+<div class="table-wrap"><table class="data" id="bom-table">
+<tr><th>Part</th><th>Spec</th><th>Source</th><th class="num">USD</th></tr>
+<tr><td>Main shaft</td><td>Ø8 × 168 mm ground hardened rod, M8 hot end, nut</td><td>Linear-shaft supplier</td><td class="num" data-usd="8">8</td></tr>
+<tr><td>Bearings (×2)</td><td>8 × 16 × 5 mm hybrid ceramic</td><td>Bearing shop</td><td class="num" data-usd="30">30</td></tr>
+<tr><td>Impeller</td><td>Scrap turbo compressor wheel, bored to Ø8 and balanced</td><td>Scrap yard + a turbo shop</td><td class="num" data-usd="50">50</td></tr>
+<tr><td>Diffuser plate + vanes</td><td>Aluminium plate, 15 sheet vanes</td><td>Metal supplier, laser cutter</td><td class="num" data-usd="40">40</td></tr>
+<tr><td>Bellmouth + compressor housing</td><td>Spun or cast aluminium</td><td>Local foundry / spinner</td><td class="num" data-usd="60">60</td></tr>
+<tr><td>Bearing tunnel</td><td>Ø28 stainless tube + flange</td><td>Metal supplier</td><td class="num" data-usd="40">40</td></tr>
+<tr><td>Combustor casing + flanges</td><td>Ø100 × 2 mm 304 pipe, 4 mm flanges</td><td>Pipe supplier + cutting service</td><td class="num" data-usd="120">120</td></tr>
+<tr><td>Flame tube</td><td>One soda can + Ø35 tube</td><td>Your recycling bin</td><td class="num" data-usd="15">15</td></tr>
+<tr><td>Fuel ring + lances</td><td>Ø5 stainless tube, fittings</td><td>Hardware store</td><td class="num" data-usd="15">15</td></tr>
+<tr><td>Igniter</td><td>M10 glow plug</td><td>RC engine shop</td><td class="num" data-usd="5">5</td></tr>
+<tr><td>Nozzle guide vanes</td><td>310S sheet, waterjet</td><td>Cutting service</td><td class="num" data-usd="60">60</td></tr>
+<tr><td>Turbine wheel</td><td>Inconel 625/718 plate, waterjet + finishing</td><td>Specialist cutting service</td><td class="num" data-usd="180">180</td></tr>
+<tr><td>Turbine casing</td><td>Rolled 310S</td><td>Sheet-metal shop</td><td class="num" data-usd="60">60</td></tr>
+<tr><td>Exhaust nozzle + cone</td><td>Rolled 304/321</td><td>Sheet-metal shop</td><td class="num" data-usd="40">40</td></tr>
+<tr><td>Test stand</td><td>Steel plate, tube, straps, bolts</td><td>Scrap steel</td><td class="num" data-usd="60">60</td></tr>
+<tr><td>Fuel system</td><td>Regulator, fail-closed solenoid valve, needle valve, hose</td><td>BBQ and hardware stores</td><td class="num" data-usd="40">40</td></tr>
+<tr><td>Starter + ESC + battery</td><td>RC inrunner motor, rubber drive cone, 3S LiPo</td><td>RC shop</td><td class="num" data-usd="70">70</td></tr>
+<tr><td>Instruments &amp; controller</td><td>EGT, rpm, pressure gauge, microcontroller + relays</td><td>Online electronics</td><td class="num" data-usd="57">57</td></tr>
+<tr><td>Protective gear</td><td>Ear defenders + plugs, face shield, extinguisher, gloves</td><td>Hardware store</td><td class="num" data-usd="60">60</td></tr>
+<tr><th colspan="3">Total (without tools, balancing service and spares)</th><th class="num" id="bom-total"></th></tr>
+</table></div>
+<p>Chapter 8’s “cheap and safe” upgrades (bearings, abradable shroud, bellmouth, liner and vaned diffuser) add about USD 270 on top. Budget another 20–30 % for the things that fail on the first runs: gaskets, a replacement can, a spare glow plug, a few fuel fittings.</p>
+
+<h2 id="faq" data-short="FAQ">Frequently asked questions</h2>
+<details class="deep"><summary>Can I really build this?</summary><div><p>It is a serious hobby project: it needs a lathe, welding, access to balancing, a safe place to test and ideally someone experienced to look over your shoulder. Many people have built working micro-turbines from turbochargers; far fewer have done so without an accident or a scrapped wheel. This guide teaches how and why the engine works, and its design is educational rather than proven. If you only want to see one, the simulator and the 3D viewer are the safe way.</p></div></details>
+<details class="deep"><summary>Why propane and not kerosene?</summary><div><p>Gas mixes with air with no effort, so the combustor can be a simple ring of fuel lances. Kerosene (Jet-A, diesel) needs a vaporiser or fine atomiser and a pump, which is another part to design and keep alive. Propane also burns cleanly and stores safely in a bottle. The disadvantage is that it is heavier than air and pools in low spots when it leaks: see the safety page.</p></div></details>
+<details class="deep"><summary>Why is the pressure ratio only about 2:1?</summary><div><p>A single, small, aluminium centrifugal wheel runs out of tip speed and strength. 337 m/s at the tip is already near Mach 0.9 relative to the air in the inducer. Higher pressure needs a stronger wheel, more compressor stages, or both: that is what airliners do, up to 40:1.</p></div></details>
+<details class="deep"><summary>Why does the engine need a starter?</summary><div><p>At low speed the compressor squeezes so little air that the turbine can only break even with a very hot flame, so the engine cannot sustain itself. The starter spins the rotor up to about 17 000 rpm, we light the fuel, and the starter keeps helping until the engine is self-sustaining at roughly 45 000 rpm (idle is 48 000). In the simulator you can watch this happen and see what a hot start or a wet start does.</p></div></details>
+<details class="deep"><summary>Can I print the STL files and run the engine?</summary><div><p>No. A printed compressor wheel would shatter; a printed turbine wheel would melt. Printing is for fit-checks, patterns for casting, jigs and gauges. The <a href="models.html#print">gallery page</a> says what each part must really be made from.</p></div></details>
+<details class="deep"><summary>How accurate is the simulator?</summary><div><p>It is a physics model with simplifications: a one-dimensional mean-line compressor, a lumped-heat metal model, a single-zone combustor. It captures trends and orders of magnitude (thrust, temperatures, the start-up sequence, how things go wrong), not the last 10 %. Real engines differ with machining quality, leaks, ambient conditions and many things not modelled. Treat it as a training aid, not as a certificate.</p></div></details>
+<details class="deep"><summary>Does the site work offline?</summary><div><p>Yes: the 3D library, math renderer and all STL files are included in the repository (no external CDNs). Because the pages load JavaScript modules and STL files, open them through a local web server (<code>python3 -m http.server</code> in the project folder) rather than by double-clicking, since browsers block these requests from <code>file://</code> pages.</p></div></details>
+<details class="deep"><summary>How loud is it, really?</summary><div><p>115–125 dB at 1 m at full power: comparable to a jet-ski or a chainsaw, but with a shriek that carries. Hearing damage starts in seconds without protection. The <a href="safety.html">safety page</a> has a calculator.</p></div></details>
+<details class="deep"><summary>Can I use these materials and numbers in my own design?</summary><div><p>Use them to learn and to estimate, not as design allowables. Material curves are rounded, representative values; real alloys vary by supplier, heat treatment and batch. A real design needs the data sheet of the actual material and a safety factor you can justify.</p></div></details>
+
+<h2 id="sources" data-short="Sources & reading">Sources and further reading</h2>
+<p>The equations here are standard textbook thermodynamics and turbomachinery. The numbers (efficiencies, losses, material curves) are typical, rounded values for small engines, chosen so the whole guide agrees with itself; they are not measurements of a specific engine. For anything you rely on, check them against these sources.</p>
+<div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(300px,1fr))">
+<div class="card"><span class="num">MODEL TURBINES</span><h3>Schreckling, <em>Gas Turbine Engines for Model Aircraft</em></h3><p>Traplet Publications, 1994. The classic builder’s book: design, parts, starting and running of hobby turbines.</p></div>
+<div class="card"><span class="num">TEXTBOOK</span><h3>Saravanamuttoo, Rogers, Cohen, Straznicky, Nix: <em>Gas Turbine Theory</em></h3><p>Pearson, 7th ed. 2017. Cycles, components, off-design matching: the backbone of chapters 3 and 5.</p></div>
+<div class="card"><span class="num">TEXTBOOK</span><h3>Mattingly, <em>Elements of Propulsion: Gas Turbines and Rockets</em></h3><p>AIAA, 2nd ed. 2006. Thrust equation, cycle analysis, afterburners, bypass engines.</p></div>
+<div class="card"><span class="num">TURBOMACHINERY</span><h3>Dixon &amp; Hall, <em>Fluid Mechanics and Thermodynamics of Turbomachinery</em></h3><p>Butterworth-Heinemann, 7th ed. 2014. Velocity triangles, Euler work, centrifugal compressors, radial and axial turbines.</p></div>
+<div class="card"><span class="num">COMBUSTION</span><h3>Lefebvre &amp; Ballal, <em>Gas Turbine Combustion</em></h3><p>CRC Press, 3rd ed. 2010. Primary / secondary / dilution zones, liner cooling, stability limits.</p></div>
+<div class="card"><span class="num">AERODYNAMICS</span><h3>Anderson, <em>Fundamentals of Aerodynamics</em></h3><p>McGraw-Hill. Lift, angle of attack, stall, compressible flow and nozzles.</p></div>
+<div class="card"><span class="num">OVERVIEW</span><h3>Rolls-Royce, <em>The Jet Engine</em></h3><p>Wiley, 5th ed. 2015. An illustrated introduction to every part of a real engine.</p></div>
+<div class="card"><span class="num">ENGINEERING</span><h3>Boyce, <em>Gas Turbine Engineering Handbook</em></h3><p>Elsevier. Practical operation, bearings, vibration, materials and failure modes.</p></div>
+<div class="card"><span class="num">PAPER</span><h3>Wiesner, F. J. (1967)</h3><p>“A review of slip factors for centrifugal impellers”, <em>Journal of Engineering for Power</em> 89(4), 558–572. The slip formula in chapter 4.</p></div>
+<div class="card"><span class="num">PAPER</span><h3>Larson &amp; Miller (1952)</h3><p>“A time-temperature relationship for rupture and creep stresses”, <em>Transactions of the ASME</em> 74, 765–775. The creep parameter in chapter 9.</p></div>
+<div class="card"><span class="num">PAPER</span><h3>Betz, A. (1920)</h3><p>“Das Maximum der theoretisch möglichen Ausnützung des Windes durch Windmotoren”, <em>Zeitschrift für das gesamte Turbinenwesen</em> 26. The 16/27 limit.</p></div>
+<div class="card"><span class="num">STANDARDS</span><h3>ISO 2533 · ISO 21940-11 · EN 1993-1-2 / 1-4</h3><p>Standard atmosphere (chapter 1); rotor balancing grades, formerly ISO 1940-1 (chapter 8); strength of steel and stainless steel at high temperature (chapter 9).</p></div>
+<div class="card"><span class="num">FREE ONLINE</span><h3>NASA Glenn, <em>Beginner’s Guide to Propulsion</em></h3><p>grc.nasa.gov, in the K-12 section: engine animations, the thrust equation and an engine simulator.</p></div>
+<div class="card"><span class="num">DATA SHEETS</span><h3>Special Metals: Inconel 625 and 718</h3><p>Manufacturer data sheets for strength and creep data of the nickel alloys; stainless producers publish the same for 304, 310S and 321.</p></div>
+</div>
+
+<h2 id="credits" data-short="Credits">Credits and licences</h2>
+<ul>
+<li><strong>three.js</strong> (r160, MIT licence) draws the 3D viewer. <strong>KaTeX</strong> (MIT) typesets the equations. Both are bundled in <code>vendor/</code>, so the site needs nothing from a CDN.</li>
+<li><strong>manifold-3d</strong> (Apache-2.0) is the solid-modelling kernel that generates the STL files; <strong>Playwright</strong> was used for browser testing. Neither is needed to view the site.</li>
+<li>Everything else (text, widgets, physics model, simulator, geometry generator) was written for this project and is licensed under the GNU AGPL v3 shown in the repository’s <code>LICENSE</code> file.</li>
+<li>The “Coca-Cola” name belongs to its owners. This project is not affiliated with or endorsed by them: “Coke can” is simply the nickname builders give to this style of engine, which uses an ordinary drink can as its combustion liner.</li>
+</ul>
+
+<div class="callout fire"><span class="ct">One last time</span>This guide explains jet engines; it does not make anyone a safe builder. The most useful thing you can do before you build is to find an experienced model-turbine builder or club and learn from them. Stay behind a barrier, wear ear and eye protection, and never run a part you would not trust to spin at 100 000 rpm next to your head.</div>
+
+</article>
+</main>
+</div>
+
+<script type="module">
+const G = [
+['Afterburner','A fuel-spraying ring and flame-holder in the jet pipe that burns the unused oxygen after the turbine for extra thrust, at a high fuel cost (chapter 8).'],
+['Air–fuel ratio (AFR)','Mass of air divided by mass of fuel. Propane burns completely at 15.6:1 (stoichiometric); our engine runs at about 52:1 overall because most air only cools.'],
+['Angle of attack','The angle between a wing or blade’s chord line and the oncoming air. Lift rises with it until the wing stalls at 12–15°.'],
+['Annular combustor','A ring-shaped combustion chamber wrapped around the shaft. The Coke-can liner is one: outer wall = can, inner wall = tube.'],
+['Axial turbine','A turbine in which the gas flows parallel to the shaft through rings of blades. Ours has a nozzle guide ring and a single wheel of 19 blades.'],
+['Backsweep','Impeller blades that curve away from the direction of rotation at the exit. It lowers the exit speed and stabilises the flow; ours is 30°.'],
+['Balance grade (G)','ISO rating of the allowed rotor unbalance: G = e·ω, in mm/s. Turbomachinery rotors are balanced to G2.5 or better.'],
+['Bellmouth','The smooth, rounded entry at the front of the engine that lets air enter without separating and losing pressure.'],
+['Betz limit','The maximum fraction (16/27 ≈ 59 %) of a wind’s kinetic energy any turbine can extract.'],
+['Boundary layer','The thin layer of slow air against a surface. If it separates from the wall (in a too-steep diffuser or on a stalled blade), efficiency collapses.'],
+['Brayton cycle','The thermodynamic cycle of a gas turbine: compress, add heat at constant pressure, expand, reject heat. On a P–V plot it is a near-rectangle.'],
+['Bypass ratio','Air flowing around the engine core (through the fan) divided by the air through the core. Zero for a plain turbojet; 10–12 for an airliner.'],
+['Centrifugal compressor','A compressor that flings air outward from the centre of a spinning impeller and collects it in a diffuser. Simple and robust: the choice for small engines.'],
+['Choked flow','When the flow in a nozzle reaches the speed of sound at the throat, more pressure upstream no longer makes it flow faster. Mass flow then only depends on upstream conditions.'],
+['Combustion efficiency','The fraction of the fuel’s energy that is actually released. ~94 % for our liner, 99 % for good engines.'],
+['Combustor','The chamber where fuel burns in the compressed air. Also called burner or flame tube assembly.'],
+['Compressor map','A chart of pressure ratio versus air flow for several speeds, with lines of constant efficiency and a surge line.'],
+['Containment ring','A thick steel band around the turbine wheel to catch fragments if it bursts. Not optional.'],
+['Creep','Slow, permanent stretching of a metal held hot under constant stress. It decides the life of turbine blades.'],
+['Critical speed','A rotation speed at which the shaft’s natural bending frequency matches the spin and vibrations grow. Ours is about 40 000 rpm, passed through quickly during start-up.'],
+['Diffuser','A passage that slows air down and so turns velocity into pressure. In a centrifugal engine it follows the impeller.'],
+['Dilution zone','The rear section of the flame tube where large holes mix in cool air to bring the gas down to the temperature the turbine can survive.'],
+['EGT','Exhaust gas temperature, measured just behind the turbine. The most important instrument on a turbine: it is also what the controller limits.'],
+['Enthalpy','Heat content of a flowing gas per kilogram, h = cp·T. Compressors add enthalpy; turbines remove it.'],
+['Equivalence ratio (φ)','Actual fuel–air ratio divided by the stoichiometric one. φ = 1 is a perfect burn; the engine overall runs at φ = 0.3; the flame zone at φ ≈ 1.'],
+['Euler equation','Work added per kg of air = tip speed × swirl velocity: Δh₀ = U₂Cθ₂. The foundation of all turbomachinery.'],
+['Exducer / inducer','The outer exit edge (exducer) and the inlet eye (inducer) of a centrifugal impeller.'],
+['Fatigue','Cracking from many repeated stress cycles: start-ups, vibration, thermal cycling.'],
+['Film cooling','A thin layer of cool air flowing along the hot wall of the liner, protecting it from the flame. This is why the Coke can survives.'],
+['Flame-out','The flame dying while running. Often from too lean a mixture, too little air, or fuel starvation.'],
+['Flame tube (liner)','The perforated tube inside the combustor casing in which the flame lives, cooled by air entering through holes.'],
+['Heat soak','The slow flow of heat from the hot section into the bearing area after shutdown. It can cook bearings and oil if the engine is stopped hot.'],
+['Hot start','A start where the temperature climbs too high, usually from too much fuel while the rotor is too slow.'],
+['Hung start','The engine lights but fails to accelerate past low speed (too little energy for the turbine to take over).'],
+['Impeller','The spinning wheel with curved blades of a centrifugal compressor.'],
+['Incidence','The angle at which the air meets a blade’s leading edge. Wrong incidence causes shock-like losses.'],
+['Inconel','A family of nickel–chromium superalloys that keep strength and resist oxidation at 700–900 °C. The right choice for turbine wheels.'],
+['Isentropic','Ideal, reversible and without heat exchange. Real compressors and turbines are rated by how close they get to the isentropic result.'],
+['Kinetic energy','The energy of motion, ½mV². The jet’s kinetic energy per second equals the engine’s net work.'],
+['Larson–Miller parameter','A single number combining temperature and time that predicts creep rupture life: P = T(C + log t).'],
+['Lean blowout','Flame extinction when the mixture is too weak to burn. A real risk at low fuel flow.'],
+['Mach number','Speed divided by the local speed of sound.'],
+['Mean-line analysis','Calculating the flow along one average streamline through each component, ignoring variation across the passage. The physics model behind the widgets and the simulator works this way.'],
+['Mass flow','Kilograms of air (or gas) passing per second: 0.151 kg/s for the CJ-1.'],
+['Newton’s laws','Inertia; force = rate of change of momentum; action and reaction. The third one is why a jet moves.'],
+['NGV (nozzle guide vanes)','A ring of fixed vanes before the turbine that accelerate the gas and swirl it into the blades.'],
+['Nozzle','A narrowing passage that accelerates the exhaust, turning pressure into velocity and thrust.'],
+['Overall pressure ratio','Pressure at the compressor exit divided by inlet pressure: 1.94 for the CJ-1 and 40–50 for large airliners.'],
+['Pressure ratio','Outlet divided by inlet pressure, for any component.'],
+['Primary zone','The front of the flame tube where fuel mixes and burns at close to the ideal ratio. Swirling air holds the flame in place.'],
+['Propulsive efficiency','The fraction of the jet’s kinetic energy that actually propels the vehicle: ηp = 2/(1 + Ve/V₀).'],
+['Rotor','All the spinning parts together: shaft, impeller, turbine wheel and nut. 195 g on the CJ-1.'],
+['Slip factor','The shortfall in the swirl velocity a real impeller gives compared to a perfectly guided flow; about 0.84 here.'],
+['Specific heat (cp)','The energy needed to heat 1 kg of gas by 1 K: about 1005 J/kg·K for cold air, 1150 J/kg·K for hot combustion gas.'],
+['Spool','A compressor, shaft and turbine rotating together as one unit. The CJ-1 is a single-spool engine; large turbofans have two or three.'],
+['Stagnation (total) temperature','The temperature the gas would reach if brought to rest. Engine station temperatures (T₀₂, T₀₃…) are stagnation values.'],
+['Stall / surge','When the flow breaks down in a compressor (stall) and the whole compressor flow reverses with a bang (surge). Caused by too much pressure for too little flow.'],
+['Starter','The motor that spins the rotor up until the engine can sustain itself, normally an RC brushless motor on a rubber cone.'],
+['Stoichiometric','The exact fuel–air ratio at which all fuel and all oxygen are consumed.'],
+['Stress','Force per area inside a part, in megapascals. If it exceeds the yield strength the part deforms permanently.'],
+['Swirl','The tangential (sideways) velocity given to the air by an impeller or nozzle guide vanes.'],
+['Thermal efficiency','Useful work (or jet kinetic energy) divided by the fuel’s energy: ~8 % for the CJ-1, 40–45 % for the best airliner engines.'],
+['Thrust','The forwards force an engine produces: F = ṁ(Ve − V₀).'],
+['Tip clearance','The tiny gap between spinning blade tips and the casing. Every 0.1 mm of excess costs efficiency.'],
+['Tip speed','Speed of the outer edge of the impeller or turbine, ωr. Limited by strength and (for compressors) by Mach number.'],
+['Turbine','The wheel that extracts energy from the hot gas to drive the compressor.'],
+['TIT','Turbine inlet temperature: the hottest gas temperature the turbine sees, and the limit for blade life.'],
+['TSFC','Thrust-specific fuel consumption: fuel burned per hour per newton of thrust. 0.18 kg/(N·h) for the CJ-1.'],
+['Wet start','Fuel enters but fails to ignite and pools; it may then ignite all at once with a flash. Always stop the fuel, keep spinning and wait.'],
+['Yield strength','The stress at which a metal starts to deform permanently. It drops as temperature rises.'],
+];
+G.sort((a, b) => a[0].localeCompare(b[0], 'en'));
+const dl = document.getElementById('gl'), q = document.getElementById('gq'), cnt = document.getElementById('gcount');
+const rows = G.map(([t, d]) => {
+  const dt = document.createElement('dt'), dd = document.createElement('dd');
+  dt.textContent = t; dd.textContent = d;
+  dt.style.cssText = 'font-weight:700;margin-top:10px'; dd.style.cssText = 'margin:2px 0 0;color:var(--text-2);font-size:.92rem;max-width:80ch';
+  dl.append(dt, dd); return { t, d, dt, dd, key: (t + ' ' + d).toLowerCase() };
+});
+function filter() {
+  const s = q.value.trim().toLowerCase(); let n = 0;
+  for (const r of rows) { const show = !s || r.key.includes(s); r.dt.hidden = r.dd.hidden = !show; if (show) n++; }
+  cnt.textContent = s ? `${n} of ${rows.length} terms match “${q.value.trim()}”` : `${rows.length} terms`;
+}
+q.addEventListener('input', filter); filter();
+// bill of materials total
+let tot = 0; document.querySelectorAll('#bom-table [data-usd]').forEach(td => tot += +td.dataset.usd);
+document.getElementById('bom-total').textContent = 'USD ' + tot.toLocaleString('en');
+</script>
+</body>
+</html>
