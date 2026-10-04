@@ -18,7 +18,7 @@ export default function init(el) {
   body.append(h('div', { class: 'ctls' }, inp, pre), h('div', { class: 'wgrid', style: { marginTop: '12px' } }, h('div', {}, out), h('div', {}, bag, h('div', { class: 'readouts', style: { marginTop: '8px' } }, ...Object.values(ro).map(r => r.el)))));
   const note = h('p', { class: 'muted', style: { marginTop: '8px' } }); body.append(note);
   const css = document.createElement('style');
-  css.textContent = '.fm-out table{width:100%;border-collapse:collapse;font-size:.92rem}.fm-out td,.fm-out th{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left}.fm-out th{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.fm-out .bar{height:9px;border-radius:5px;background:var(--fire);display:block}.fm-err{color:var(--bad);font-weight:700}';
+  css.textContent = '.fm-out{overflow-x:auto;min-width:0}.fm-out+*{min-width:0}.wgrid>div{min-width:0}.fm-out table{width:100%;border-collapse:collapse;font-size:.92rem}.fm-out td,.fm-out th{padding:5px 8px;border-bottom:1px solid var(--line);text-align:left}.fm-out th{font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.fm-out .bar{height:9px;border-radius:5px;background:var(--fire);display:block}.fm-err{color:var(--bad);font-weight:700}';
   el.append(css);
   const ctx = bag.getContext('2d');
   function draw(counts) {
