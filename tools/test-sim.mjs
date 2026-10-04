@@ -20,9 +20,9 @@ sc('auto start to full power', () => {
   s.setThrottle(0); until(s, x => x.N < 52000, 40); ok(s.phase === 'run' && s.lit, 'throttle chop does not blow the flame out (' + fmt(s) + ')');
   s.stop(); ok(until(s, x => x.phase === 'off', 900, 0.1), 'cool-down completes');
 });
-sc('hot start (manual, 0.9 g/s at 25 000 rpm)', () => {
+sc('hot start (manual, 0.8 g/s at 25 000 rpm)', () => {
   const s = new EngineSim(); s.setMode('manual'); s.manual.starter = true; until(s, x => x.N > 25000, 30);
-  s.manual.ignition = true; s.manual.fuel = 0.9; let peak = 0; until(s, x => { peak = Math.max(peak, x.gp.T04); return x.t > 12; }, 20);
+  s.manual.ignition = true; s.manual.fuel = 0.8; let peak = 0; until(s, x => { peak = Math.max(peak, x.gp.T04); return x.t > 12; }, 20);
   ok(s.lit || peak > 1000, 'lights or overheats'); ok(peak > 1150, 'EGT spikes to ' + (peak - 273).toFixed(0) + ' °C (> 880 °C)');
 });
 sc('wet start (3 g/s at 22 000 rpm)', () => {

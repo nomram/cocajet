@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>11 · Ignition and spark plugs — Jet Engines for Dummies</title>
+<meta name="description" content="How a spark lights a flame: minimum ignition energy, Paschen's law, coil and capacitor-discharge circuits, spark-plug anatomy and heat range, glow plugs, where to put the igniter, and how to build your own spark plug from a bolt and a ceramic tube.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter">
+
+<span class="eyebrow">Chapter 11 · Fire and ignition</span>
+<h1>Ignition and spark plugs</h1>
+<div class="meta"><span>~45 min</span><span>6 widgets + a 3D model</span><span>bonus: build your own plug</span></div>
+<p class="lede">Chapter 10 ended with an uncomfortable fact: a fuel–air mixture can sit for years next to oxygen without reacting, because the molecules must climb an energy hill. Something has to push a tiny region over it, once, so the flame can take over and keep itself going. That something is the igniter. It is the cheapest part of the engine and the one that stops it starting more often than any other.</p>
+
+<h2 id="kernel" data-short="What a spark does">What a spark does: a flame kernel</h2>
+<p>A spark is a thin channel of plasma, a fraction of a millimetre wide and about 10 000 K at its core, that exists for a millisecond or so. It puts a small packet of energy (millijoules) into the gas around it. If that gas heats up enough, its reactions become fast enough (chapter 10: the Arrhenius factor) to make more heat than the kernel loses, and a flame ball grows. If the kernel loses heat faster than it makes it (to the cold electrodes next to it, or to gas flowing past), it dies and the spark was wasted.</p>
+<p>The smallest spark that can light a given mixture is called its <strong>minimum ignition energy</strong> (MIE). For propane in still air at the best mixture it is only <strong>0.25 mJ</strong>: the energy of a static-electricity shock from a doorknob is ten times more. But an engine is not still air at the best mixture. Slide the controls to see what a real combustor does to that number.</p>
+<div data-widget="ignition-energy"></div>
+<p>Three practical lessons come straight out of it:</p>
+<ul>
+<li><strong>Use a bigger spark than you think you need.</strong> A spark 50× the best-case MIE costs almost nothing and lights the mixture over a much wider range.</li>
+<li><strong>A bigger gap helps the flame, but costs voltage.</strong> Below about 2 mm the electrodes quench the young kernel (the “quenching distance”). That is why modern plugs have gaps near 1 mm and very sharp electrodes: it is a compromise with the next section.</li>
+<li><strong>Fast gas blows the kernel away.</strong> Put the plug where the flow is slow: the lee of a swirl vane, a recirculation zone, the primary zone behind the dome.</li>
+</ul>
+
+<h2 id="voltage" data-short="How many volts?">How many volts does it take? Paschen’s law</h2>
+<p>Air is an insulator until the electric field is strong enough to strip electrons from molecules. Those electrons knock out more, and in a few nanoseconds an avalanche makes a conducting channel: the spark. The breakdown voltage depends on how many molecules the electrons have to cross, that is, on <strong>gap × gas density</strong> (Paschen’s law):</p>
+<div class="eq">$$V_b=\frac{B\,p\,d}{\ln(A\,p\,d)-\ln\!\big[\ln(1+1/\gamma)\big]}\qquad(\text{air: }A=15,\ B=365\ \text{in V, cm, Torr})$$</div>
+<p>For our 0.8 mm gap in room air that is about <strong>4.2 kV</strong> (the familiar “3 kV per millimetre” is for gaps of a few millimetres). While the CJ-1 is being cranked, the combustor is only at 1.05 bar, so the starting spark needs the same ~4.3 kV. But compress the air and the requirement climbs: at the full-power pressure and temperature of the combustor (1.85 bar, 366 K) it is 5.7 kV, and in the cylinder of a petrol engine (10 bar, 600 K) it is 15 kV and more. That is why car coils make 25–40 kV, and why a plug that sparks happily on the bench can misfire under load. A coil that makes 15–25 kV leaves plenty of margin, if the insulation can take it (see the creepage rule below).</p>
+<div data-widget="paschen"></div>
+
+<h2 id="circuits" data-short="Where the energy comes from">Where the spark energy comes from</h2>
+<p>Three circuits cover almost every igniter:</p>
+<ul>
+<li><strong>Inductive coil</strong> (the car ignition coil). A transistor lets current flow through the coil’s primary for the <em>dwell</em> time, the current grows as $I=\tfrac{V}{R}(1-e^{-tR/L})$, storing $\tfrac12LI^2$. Cutting the current makes the magnetic field collapse and the secondary (≈100 times more turns) produces tens of kilovolts. Cheap, rugged, and the same part is in every petrol engine and every hobby turbine.</li>
+<li><strong>Capacitor discharge (CDI).</strong> A small converter charges a capacitor to 300–400 V, and a switch dumps it into a pulse transformer: $E=\tfrac12CV^2$. Very short, very hot spark; used in outboards, chainsaws, motorbikes.</li>
+<li><strong>Piezoelectric clicker.</strong> A spring hammer strikes a crystal that produces kilovolts from mechanical stress; no battery, about a millijoule. Fine for a barbecue (where the mixture is perfect and still), marginal in a moving, swirling, pressurised engine.</li>
+</ul>
+<div data-widget="ignition-circuits"></div>
+<div class="callout"><span class="ct">How the ECU drives it</span>The controller (chapter 7) turns the igniter on when the rotor passes 17 000 rpm and pulses the coil’s transistor at about 20 Hz with a 3 ms dwell: one spark every 50 ms, each of ~30 mJ. In the simulator you can change the igniter (a weak 3 mJ coil, a strong 100 mJ one, or a glow plug) and watch what that does to starting.</div>
+
+<h2 id="anatomy" data-short="Anatomy of a plug">Inside a spark plug</h2>
+<figure class="svg">
+<svg viewBox="0 0 760 330" role="img" aria-label="Cross-section of a spark plug with its parts labelled" style="max-height:340px">
+<defs><style>
+.pl-t{font:600 12.5px ui-sans-serif,system-ui,sans-serif;fill:var(--text-2)}.pl-l{stroke:var(--muted);stroke-width:1;fill:none}
+</style></defs>
+<!-- insulator -->
+<path d="M290 20 h60 v10 h12 v10 h-12 v14 h12 v14 h-12 v14 h12 v14 h-12 v90 h28 v70 h-90 z" fill="#efe8d8" stroke="#a89e86" stroke-width="2"/>
+<!-- terminal stud -->
+<rect x="312" y="2" width="16" height="22" rx="3" fill="#cfd6dc" stroke="#7c8791"/>
+<!-- shell (hex + thread) -->
+<path d="M262 215 h140 v38 h-18 v66 h-104 v-66 h-18z" fill="#98a3ad" stroke="#5f6b76" stroke-width="2"/>
+<rect x="274" y="254" width="104" height="8" fill="#c97b4a"/><!-- crush washer -->
+<!-- bore + insulator nose inside shell: draw nose ceramic -->
+<rect x="306" y="215" width="40" height="92" fill="#efe8d8" stroke="#a89e86" stroke-width="2"/>
+<!-- centre electrode -->
+<rect x="324" y="22" width="4" height="296" fill="#dfe5ea" stroke="#7c8791"/>
+<!-- ground strap -->
+<path d="M388 319 v-24 h-72 v8" fill="none" stroke="#bfc7cf" stroke-width="7" stroke-linejoin="round"/>
+<g class="pl-l"><line x1="420" y1="22" x2="440" y2="22"/><line x1="420" y1="95" x2="440" y2="95"/><line x1="420" y1="160" x2="440" y2="160"/><line x1="420" y1="232" x2="440" y2="232"/><line x1="420" y1="262" x2="440" y2="262"/><line x1="420" y1="296" x2="440" y2="296"/><line x1="350" y1="312" x2="440" y2="332"/>
+<line x1="300" y1="130" x2="180" y2="130"/><line x1="326" y1="170" x2="180" y2="190"/><line x1="326" y1="300" x2="180" y2="300"/><line x1="320" y1="314" x2="180" y2="314"/></g>
+<g class="pl-t"><text x="446" y="26">terminal: the HV lead clips on here</text><text x="446" y="99">insulator: alumina ceramic ribs lengthen the surface path (creepage)</text><text x="446" y="164">sealing: ceramic cement or a glass seal holds the gas back</text><text x="446" y="236">shell: steel, thread seals into the engine; hex for a spanner</text><text x="446" y="266">copper crush washer: gas-tight seal</text><text x="446" y="300">insulator nose: its length sets the “heat range”</text>
+<text x="20" y="134">centre electrode wire</text><text x="20" y="194">(Ø 1–2 mm Kanthal, nickel,</text><text x="20" y="208">iridium or platinum tip)</text><text x="20" y="304">ground strap</text><text x="20" y="318">gap ≈ 0.8 mm</text></g>
+</svg>
+<figcaption>A spark plug is a high-voltage feed-through: a metal wire insulated by ceramic inside a pressure-tight steel body. Everything else is detail.</figcaption>
+</figure>
+<p>The ceramic is the star. <strong>Alumina</strong> (Al₂O₃, 94–99 %) is a good electrical insulator even at 1 000 °C, conducts heat reasonably (25–30 W/m·K), is hard, and survives thermal shock if it is not abused. The two rules of ceramic insulators:</p>
+<ul>
+<li><strong>Creepage:</strong> a spark prefers to flash along the outside of the insulator rather than jump the gap if the surface path is short or dirty. Rule of thumb: at least 1 mm of surface path per kilovolt; 15–20 mm outside the engine for a 15–25 kV plug, which is why plugs have a long ribbed neck.</li>
+<li><strong>Thermal shock:</strong> ceramic cracks if one side is heated fast. Don’t put a cold wet plug straight into a hot casing.</li>
+</ul>
+<h3>The heat range</h3>
+<p>The tip of the insulator sits in the flame. It is heated by the gas and cooled by conduction down the ceramic into the metal body. A <em>long</em> nose conducts heat poorly, so the tip gets hot (a “hot plug”); a <em>short</em> nose is a “cold plug”. The target is the window between about 450 °C (hot enough that soot burns off) and 850 °C (cool enough not to glow and light the mixture by itself). That window is the same for every plug; what changes is how much heat your combustor feeds it.</p>
+<div data-widget="plug-heat-range"></div>
+
+<h2 id="others" data-short="Other igniters">Other ways to light it</h2>
+<div class="table-wrap"><table class="data">
+<tr><th>Igniter</th><th>How it lights</th><th>Strengths</th><th>Weaknesses</th></tr>
+<tr><td><strong>Spark plug</strong></td><td>a plasma kernel of 10–100 mJ</td><td>fast, strong, no warm-up, standard parts</td><td>needs a high-voltage supply and good insulation; fouls if wetted with liquid fuel</td></tr>
+<tr><td><strong>Glow plug</strong> (the one in chapter 6)</td><td>a coil at 1 000 °C ignites gas touching it</td><td>trivial to drive (2 cells), no HV</td><td>needs seconds to heat, weaker, burns out, only lights a narrow mixture band</td></tr>
+<tr><td><strong>Hot wire</strong></td><td>the same, with a bare nichrome wire</td><td>dirt cheap</td><td>fragile; wire can break</td></tr>
+<tr><td><strong>Torch igniter</strong></td><td>a small propane flame (itself lit by a spark) fires into the main combustor</td><td>a big, hot flame: lights almost anything, even liquid fuel</td><td>extra gas line and valve, more parts</td></tr>
+<tr><td><strong>Plasma / laser</strong></td><td>an arc or a focused beam</td><td>very high energy</td><td>research and big engines</td></tr>
+</table></div>
+<div class="callout tip"><span class="ct">Why many hobby turbines use a glow plug first</span>It needs no high voltage and makes no radio noise that could upset the controller. The price is that it lights a narrower band of mixtures, so the start sequence has to hit the right fuel flow more precisely. Use the simulator’s igniter selector to compare.</div>
+
+<h2 id="place" data-short="Where to put it">Where to put the igniter in the CJ-1</h2>
+<p>The mixture at the plug depends on the rotor speed (air flow, pressure) and on the fuel flow. Too little fuel is too lean to burn; too much is too rich. Combine the engine model of chapter 5 with the ignition-energy model above and you can map exactly where in (rpm, fuel flow) space a given igniter works. The white line is the controller’s actual start path from the simulator.</p>
+<div data-widget="igniter-placement"></div>
+<p>What this map tells you about <strong>where</strong> to put the plug (the STL’s <em>igniter</em> part sits in the primary zone, 15 mm behind the dome, through a hole in the liner):</p>
+<ul>
+<li><strong>In the primary zone,</strong> where the swirling air holds the mixture near stoichiometric and the speed is low. Not in the dilution zone (too lean, too cold), not in the cooling film (too cold and fast).</li>
+<li><strong>Close to a fuel lance but not in its jet.</strong> A plug that is squirted with liquid or a very rich jet fouls and fails (the “wet plug”); too far and the mixture is lean.</li>
+<li><strong>Retracted or flush</strong> with the liner wall, not sticking into the flame: the heat-range chart shows why.</li>
+<li><strong>Away from where the casing air jets blow:</strong> fast flow quenches the kernel.</li>
+</ul>
+
+<h2 id="diy" data-short="Bonus: build one">Bonus: make your own spark plug</h2>
+<p>A new plug costs about $4, and you should buy one to compare. But a spark plug is simple enough that making one is an excellent way to understand it. This one is built from a bolt, a ceramic tube and some wire. Pull it apart and download its STL files:</p>
+<div data-widget="mini-stl" data-manifest="models/extras/diy-plug.json" data-title="The home-made spark plug (all dimensions in millimetres)"></div>
+<div class="table-wrap"><table class="data">
+<tr><th>Part</th><th>Material and size</th><th>Where to get it</th><th>Notes</th></tr>
+<tr><td><strong>Body</strong></td><td>M10 × 1.0 hex bolt, A2 / 304 stainless, 28 mm long, drilled through Ø 5.0</td><td>hardware or fastener supplier</td><td>drill small first (3 mm), then 5.0, slowly with cutting oil; stainless work-hardens. M10 × 1.0 is a standard small-engine thread; if you only have M10 × 1.25, tap the engine boss to match.</td></tr>
+<tr><td><strong>Insulator</strong></td><td>alumina single-bore tube, Ø 4.8 outside, Ø 1.7 bore, 48 mm long</td><td>thermocouple protection tubes (furnace and kiln suppliers)</td><td>cut with a diamond blade, wet; never grind dry (ceramic dust). Leave 20 mm outside the body for creepage and 1.5 mm proud at the nose.</td></tr>
+<tr><td><strong>Centre electrode</strong></td><td>Ø 1.6 mm Kanthal A1 (FeCrAl) or Inconel 600 wire</td><td>resistance-wire suppliers, welding suppliers</td><td>grows a protective oxide skin in the flame. Plain steel rusts away; copper melts. Tungsten TIG rod works but oxidises and goes brittle above 500 °C.</td></tr>
+<tr><td><strong>Ground strap</strong></td><td>1 × 3 mm nichrome 80/20 or 310 stainless strip, ~14 mm</td><td>resistance-wire and sheet suppliers</td><td>spot- or TIG-weld it to the face of the body, bend it over the electrode, and set the gap with a 0.8 mm feeler gauge.</td></tr>
+<tr><td><strong>Seal</strong></td><td>high-temperature ceramic cement (alumina/silica, rated 1 500 °C+)</td><td>stove, forge and kiln suppliers</td><td>fill the rear 6 mm of the bore around the insulator, cure as instructed. Not epoxy, not silicone: they char at 300 °C.</td></tr>
+<tr><td><strong>Washer, lead</strong></td><td>annealed copper crush washer; silicone plug wire rated ≥ 25 kV with a 5 kΩ suppressor</td><td>hardware, car-parts store</td><td>the suppressor limits radio noise that can reset a microcontroller.</td></tr>
+</table></div>
+<h3>Making it</h3>
+<ol>
+<li><strong>Drill the body</strong> straight through, deburr both ends, and chamfer the bore at the nose end so the ceramic sits flat.</li>
+<li><strong>Cut the insulator</strong> to length and wipe it clean. Check it slides into the bore with about 0.1 mm to spare.</li>
+<li><strong>Thread the wire through</strong> the insulator; it should stick out 1.5 mm at the nose. Make a small bead or crimp at the terminal end, 6 mm beyond the ceramic.</li>
+<li><strong>Cement the insulator into the body</strong>, rear end first, centring it. Let it cure fully (hours), then bake gently as the cement’s instructions say.</li>
+<li><strong>Weld on the ground strap,</strong> bend it over the electrode tip, and set the gap to 0.8 mm.</li>
+<li><strong>Fit the copper washer</strong> and the boot (a length of silicone tube over the protruding ceramic).</li>
+</ol>
+<h3>Testing it, in this order</h3>
+<ol>
+<li><strong>Bench spark, outdoors, with no fuel anywhere near.</strong> In open air at 0.8 mm it should spark cleanly at 20 Hz from a 12 V coil and driver. If it sparks along the ceramic instead of across the gap, the creepage is too short or the ceramic is dirty.</li>
+<li><strong>Pressure test.</strong> Screw it into a test fitting, apply 3 bar of compressed air (twice the working pressure) and brush on soapy water: any bubble is a leak.</li>
+<li><strong>Heat test.</strong> Heat the tip with a propane torch for 30 s and let it cool slowly. If the ceramic cracks, it would have cracked in the engine.</li>
+<li><strong>First run:</strong> low power, a few seconds, then inspect the tip and the cement.</li>
+</ol>
+<table class="data"><tr><th>It goes wrong because…</th><th>Look for</th></tr>
+<tr><td>the spark tracks along the ceramic</td><td>short or dirty insulator surface; lengthen it, clean it, add ribs or a silicone boot</td></tr>
+<tr><td>no spark at all, or weak spark under pressure</td><td>gap too wide for the coil (see Paschen above); carbon bridging the nose</td></tr>
+<tr><td>the plug leaks</td><td>cement cracked or never cured; washer not crushed</td></tr>
+<tr><td>the centre wire disappears</td><td>wrong alloy; use Kanthal, Inconel or platinum</td></tr>
+<tr><td>the tip glows after shut-down</td><td>nose too long (a “hot” plug) or plug pushed into the flame</td></tr>
+</table>
+<div class="callout danger"><span class="ct">High voltage and fire: the rules</span>
+<ul>
+<li>An ignition coil makes 20–40 kV. The current is tiny but the shock can still hurt, and the energy can be dangerous to anyone with a pacemaker. Never touch the lead or plug while the coil is powered; switch off before you handle anything.</li>
+<li>Test sparks only where there is no fuel, gas or vapour. A spark is an ignition source, and it makes radio noise: keep it away from the controller’s wires.</li>
+<li>Wear eye protection when drilling, grinding or breaking ceramic and avoid breathing the dust.</li>
+<li>If your plug fails the pressure test or heat test, don’t fit it. Buy a $4 plug.</li>
+</ul></div>
+
+<h2 id="takeaways" data-short="What you learned">What you now know</h2>
+<ul>
+<li>A spark makes a hot kernel of gas; if the kernel makes heat faster than it loses it, a flame grows. Propane needs ≥ 0.25 mJ at best and 10–1000× more in a lean, moving, cold or small-gap condition.</li>
+<li>Breakdown voltage follows gas density × gap (Paschen): 4.2 kV for 0.8 mm in room air, 5.7 kV at the CJ-1’s full-power pressure, 15 kV in a petrol-engine cylinder.</li>
+<li>Coil, capacitor discharge and piezo igniters store ½LI², ½CV² or just mechanical energy; a coil with 3 ms dwell gives ~30 mJ at 20 Hz.</li>
+<li>A plug is a ceramic feed-through; creepage stops flash-over and the insulator’s nose length sets its heat range (keep the tip between 450 °C and 850 °C).</li>
+<li>Where it lights is a band in (rpm, fuel flow): put the plug in the primary zone, near but not in the fuel jet, flush with the wall.</li>
+<li>A home-made plug is a bolt, a tube of alumina, a Kanthal wire and a strap: test it for spark, pressure and heat before it goes anywhere near an engine.</li>
+</ul>
+
+<div data-widget="quiz">
+<script type="application/json">[
+ {"q":"Why does the same spark plug need more volts in a pressurised combustor than in open air?","o":["The fuel is conductive","The air is compressed: more molecules in the gap, so a higher breakdown voltage","The plug is hotter","The spark is shorter"],"a":1,"why":"Paschen’s law: breakdown voltage depends on gas density × gap. At 1.85 bar and 366 K the density is 1.5 times that of room air, and the voltage rises from 4.2 kV to 5.7 kV for a 0.8 mm gap."},
+ {"q":"What does the minimum ignition energy of propane (0.25 mJ) mean?","o":["Any spark of that energy always lights any mixture","The least energy that can light the best mixture in still air at room conditions","The energy of the flame","The energy of a glow plug"],"a":1,"why":"Real conditions (lean, rich, fast flow, small gap) raise it by factors of 10 to 1000, so real igniters deliver tens of mJ."},
+ {"q":"A plug tip runs at 300 °C and is fouling with soot. What should you try?","o":["A plug with a longer insulator nose (hotter)","A plug with a shorter nose (colder)","A bigger gap only","A larger cooling fan"],"a":0,"why":"Below ~450 °C soot does not burn off. A longer nose is a worse heat path, so the tip runs hotter."},
+ {"q":"Why must a home-made plug be pressure-tested and heat-tested before it goes in the engine?","o":["To make it look professional","The cement, washer and ceramic have to survive 2–3 bar and a thermal shock; a failure can leak fuel or crack under load","Because the law requires it","To measure the voltage"],"a":1,"why":"A leaking or cracked plug leaks a mixture of fuel and flame out of the combustor, next to a source of ignition."}
+]</script>
+</div>
+
+</article>
+</main>
+</div>
+</body>
+</html>

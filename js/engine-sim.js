@@ -5,6 +5,7 @@
    ========================================================================== */
 import { CJ1, FUELS, isa, gasPath, buildFuelTable, stepSpool, R_AIR } from './engine-model.js';
 import { FuelSupply } from './fuel-supply.js';
+import { plugState, lightProbability } from './ignition-model.js';
 
 export const PHASES = {
   off: 'Off', starter: 'Spin-up (starter)', ignition: 'Ignition', ramp: 'Accelerating', run: 'Running',
@@ -67,6 +68,7 @@ export class EngineSim {
     this.mode = 'auto';           // 'auto' (ECU) | 'manual'
     this.throttle = 0;            // 0..1 (auto)
     this.manual = { fuel: 0, starter: false, ignition: false };
+    this.igniter = { type: 'spark', E: 25, gap: 0.8 };          // 25 mJ spark, 0.8 mm gap
     this.events = [];
     this.fuelSys = new FuelSupply({ T: 288.15 });
     this._rebuildAmbient();
@@ -102,7 +104,7 @@ export class EngineSim {
     this.starter = false; this.ignition = false;
     this.fuelSys.reset(this.amb.T);
     this.batt = { soc: this.batt ? this.batt.soc : 1, V: 12.4, I: 0 };      // a 3S LiPo carries over between runs
-    this.surgeT = 0; this.surgePhase = 0; this.surgeCycles = 0; this.surgeMod = 1; this._surgeFlag = false;
+    this.surgeT = 0; this.surgePhase = 0; this.surgeCycles = 0; this.surgeMod = 1; this._surgeFlag = false; this.ignP = 0;
     this.starved = false; this.thrustMeas = 0; this.starterLevel = 0; this.dNdt = 0;
     this.trim = 0; this.wheelDamage = 0; this.destroyed = false;
     if (this.egtLimit == null) this.egtLimit = 1110;       // K (837 °C): the ECU backs the fuel off above this exhaust temperature
@@ -255,11 +257,12 @@ export class EngineSim {
   _lightLogic(dt, mf) {
     const phi = this.pzPhi(mf);
     if (!this.lit) {
-      // the spark only lights a mixture that is neither too weak nor too rich at the plug
-      if (this.ignition && mf > 0.00028 && this.N > 8000 && this.N < 62000 && phi > 0.65 && phi < 2.6) {
-        this.lightTimer += dt;
-        if (this.lightTimer > 1.4) { this.lit = true; this.lightTimer = 0; }
-      } else this.lightTimer = Math.max(0, this.lightTimer - dt);
+      // an igniter only lights a mixture that is combustible at the plug: see ignition-model.js (chapter 11)
+      const g = this.gp, ok = this.ignition && mf > 0.00028 && this.N > 8000 && this.N < 62000;
+      const pr = ok ? lightProbability(this.igniter, phi, plugState(g.m, g.P02, g.T02)) : 0;
+      this.ignP = pr;
+      if (pr > 0.001) { this.lightTimer += dt * 20 * pr; if (this.lightTimer > 1) { this.lit = true; this.lightTimer = 0; } }
+      else this.lightTimer = Math.max(0, this.lightTimer - dt);
     } else {
       // blow-out: primary zone outside the lean / rich stability limits (propane flammability: phi 0.5 - 2.5)
       const lean = phi < 0.42 && this.N > 25000;
