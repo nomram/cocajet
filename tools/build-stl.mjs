@@ -365,7 +365,7 @@ function boltHoles(n, rBolt, rHole, z0, z1, phase = 0) {
   const blades = polarArray(blade, P.nRotor, 0);
   const m = unionAll([disc, ...blades]);
   addPart({ id: 'turbine-wheel', name: 'Axial turbine wheel (19 blades)', step: 8, material: 'inco', color: '#c97b2a', rotor: true, m,
-    note: 'Laser/water-jet-cut disc with 19 twisted blades. Stainless 310 for a hobby build, Inconel 713/718 for hours of life.' });
+    note: 'Water-jet-cut disc with 19 twisted blades. Inconel 625/718/713 for the wheel (stainless creeps out in hours at this stress). 310S only for low-rpm demos.' });
 }
 
 /* ====================================================================================

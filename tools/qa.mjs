@@ -33,7 +33,7 @@ for (const pg of pages) {
   const page = await ctx.newPage();
   const errs = [];
   page.on('console', m => { if (['error', 'warning'].includes(m.type())) errs.push(`[${m.type()}] ${m.text()}`); });
-  page.on('pageerror', e => errs.push('[pageerror] ' + e.message));
+  page.on('pageerror', e => errs.push('[pageerror] ' + e.message + ' @ ' + String(e.stack || '').split('\n').slice(1, 4).join(' | ')));
   page.on('requestfailed', r => /\.stl$/.test(r.url()) && /ERR_ABORTED/.test(r.failure()?.errorText || '') ? null : errs.push('[requestfailed] ' + r.url() + ' ' + (r.failure()?.errorText || '')));
   page.on('response', r => { if (r.status() >= 400) errs.push(`[http ${r.status()}] ${r.url()}`); });
   await page.goto(`http://localhost:${port}/${pg}`, { waitUntil: 'load' });

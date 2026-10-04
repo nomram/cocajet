@@ -70,8 +70,8 @@
     <div class="callout tip"><span class="ct">Cheap ways to make it</span>
       <ul><li><strong>Best bargain:</strong> a <em>scrap turbocharger compressor wheel</em> (~56 mm exducer: the Garrett T25/GT28-class, from any scrap yard, USD 30–70). Bore it to Ø8 H7 (a lathe, a collet, a steady hand) and balance it (chapter 8). These wheels are designed for 120 000 rpm.</li>
       <li><strong>Print &amp; cast:</strong> print the STL in castable resin / PLA, make a plaster or investment mould, cast A356 aluminium (+1 % shrink compensation).</li>
-      <li><strong>Mill it:</strong> from 6061-T6 billet on a 4/5-axis CNC; the blades are ruled surfaces so even a 3-axis can do a flank-milled version.</li>
-      <li>Aluminium is fine at this tip speed: stress ≈ 130 MPa vs 276 MPa yield, but not above ~150 °C: compressor wheels stay cool (366 K).</li></ul></div>
+      <li><strong>Mill it</strong> from <em>forged</em> 2618-T61 (or 2014-T6/7075-T6) bar on a 4/5-axis CNC; the blades are ruled surfaces so a flank-milled version is possible on 3-axis. <strong>Not 6061</strong>: at 337 m/s the disc stress is 130–250 MPa (chapter 9) and 6061 has little margin.</li>
+      <li>Aluminium wheels are only OK because the air stays cool (93 °C at the exit); keep a ≥ 1.3× speed margin to burst. A scrap turbo wheel is already proven for this duty.</li></ul></div>
   </section>
 
   <!-- ===================== STEP 3 ===================== -->
@@ -177,9 +177,9 @@
     <h3>What they do</h3>
     <p>The <strong>nozzle guide vanes</strong> (NGV) are a stationary ring of cambered vanes between two thin cones. They squeeze the flow (area drops from 2 800 to 1 450 mm²), accelerating it to ~310 m/s and turning it 58° into the direction of rotation. The <strong>turbine wheel</strong> is a disc with 19 blades: they turn the flow back toward the axis, and the swirl momentum they remove is the energy that drives the compressor ($\Delta h_0=U(C_{\theta2}-C_{\theta3})\approx 75$–80 kJ/kg, 12 kW at 0.15 kg/s).</p>
     <div data-widget="turbine-stage"></div>
-    <p>Notice the match with the STL: the rotor blade enters at ~15° and leaves at 60° from the axis, exactly the angles in the solver. A turbine blade root sees a centrifugal stress of $\sigma\approx\tfrac12\rho\omega^2(r_t^2-r_h^2)\approx$ 160 MPa while at ~800 °C: that is why only alloys such as 310 stainless or Inconel qualify (chapter 9).</p>
+    <p>Notice the match with the STL: the rotor blade enters at ~15° and leaves at 60° from the axis, exactly the angles in the solver. A turbine blade root sees a centrifugal stress of $\sigma\approx\tfrac12 k\rho\omega^2(r_t^2-r_h^2)\approx$ 250 MPa while at ~750 °C. Stainless steel creeps to rupture in hours under that; only nickel superalloys (Inconel 625/718/713) qualify (chapter 9 shows the numbers).</p>
     <div class="callout tip"><span class="ct">Cheap ways to make it</span>
-      <ul><li><strong>Wheel from plate:</strong> waterjet a 4 mm 310S disc, cut 19 blades from 1.5 mm sheet, twist each ~10° in a vice, and TIG- or laser-weld them into slots in the rim. <em>Balance the finished wheel</em> before it ever sees rpm.</li>
+      <ul><li><strong>Wheel from plate:</strong> waterjet a 4 mm <em>Inconel 625 or 718</em> disc, cut 19 blades from 1.5 mm sheet, twist each ~10° in a vice, and TIG- or laser-weld them into slots in the rim (310S is acceptable only for short, low-speed demonstration runs below ~70 000 rpm). <em>Balance the finished wheel</em> before it ever sees rpm.</li>
       <li><strong>Turbo turbine:</strong> a scrap-turbo turbine wheel (Inconel, radial inflow) is a robust alternative: design a radial-inflow variant and let the junkyard supply an off-the-shelf rotor.</li>
       <li><strong>NGV ring:</strong> 1.5 mm 310 sheet formed into the two cones, 16 vanes cut from the same sheet, curved on a mandrel, spot-welded in slotted holes.</li>
       <li><strong>Safety margin:</strong> the real danger is a bursting disc. Never run a home-made wheel without a containment ring and distance (see <a href="safety.html">Safety</a>).</li></ul></div>
@@ -218,7 +218,7 @@
     <tr><td>Controller</td><td>Sequence the start, protect the engine</td><td>An Arduino/ESP32 with a relay board (the ECU in the simulator is the same logic)</td><td class="num">20</td></tr>
     <tr><td>Protection</td><td>Hearing (jet noise ≈ 120 dB at 1 m), eyes, fire</td><td>Ear defenders + plugs, face shield, CO2/dry-powder extinguisher, welding gloves</td><td class="num">60</td></tr>
     </table></div>
-    <p>With the engine itself, a realistic total <strong>including a basic machine-shop and gas fittings is about USD 600–900</strong>; most of the cost is the turbine (wheel + vanes + casing ≈ USD 200) and the stainless casing/flanges (≈ USD 120).</p>
+    <p>With the engine itself, a realistic total <strong>including a basic machine-shop and gas fittings is about USD 700–1 100</strong>; most of the cost is the turbine (an Inconel wheel + vanes + casing ≈ USD 300) and the stainless casing/flanges (≈ USD 120).</p>
     <div class="btn-row" style="margin:14px 0"><a class="btn fire" href="07-run.html">▶ Run it in the simulator</a><a class="btn" href="models.html">⬇ Download all STL files</a><a class="btn" href="safety.html">Safety checklist</a></div>
   </section>
 

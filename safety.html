@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Safety first — Jet Engines for Dummies</title>
+<meta name="description" content="Why a home-built gas turbine is dangerous and how to manage the risks: rotor burst energy, fire and fuel, hot exhaust, noise, carbon monoxide, intake hazards, legal issues and a pre-run checklist.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter">
+
+<span class="eyebrow" style="color:var(--bad)">Read before anything else</span>
+<h1>Safety first</h1>
+<div class="meta"><span>~15 min</span><span>4 widgets</span><span>pre-run checklist</span></div>
+<p class="lede">A micro gas turbine is a 100 000 rpm flywheel with a blowtorch inside it, a noise like a jet fighter, and a 400 m/s jet out the back. Hobbyists build and fly them safely every day. The ones who stay safe respect these five facts.</p>
+
+<div class="callout danger"><span class="ct">This guide is educational</span>
+<p>Everything in this guide (the physics, the maths, the STL files, the simulator) is meant to explain how a gas turbine works. It is <strong>not</strong> a build-safe, certified design and it has not been tested as hardware. Building a real one means machining rotating parts to ±0.05 mm, balancing them, and accepting real risks. If you don’t have access to a machine shop, an experienced mentor and a safe place to test, <em>don’t build it</em>: buy a commercial micro-turbine (they exist, with certified wheels, controllers and fail-safes) or just enjoy the simulator.</p></div>
+
+<h2 id="rotor" data-short="1 · Rotating energy">1 · Rotating energy: the wheel can burst</h2>
+<p>At 115 000 rpm the rim of our turbine wheel moves at 340 m/s: faster than a rifle bullet leaves a short barrel. Centrifugal stress goes as $\rho\omega^2r^2$: spin 10 % too fast and the stress rises 21 %. A cracked blade, an overheated disc, or a wheel out of balance can fail in a fraction of a second, and the pieces leave in the plane of the wheel at rim speed.</p>
+<div data-widget="rotor-energy"></div>
+<ul>
+<li><strong>Never</strong> stand, sit, or let anyone stand in the plane of the compressor or turbine wheel (±15°).</li>
+<li>Fit a <strong>containment ring</strong> (a thick steel band around the turbine) if you can; it is what separates a bang from a hazard.</li>
+<li>Balance every wheel. A 1 g·mm imbalance at 115 000 rpm is 145 N of rotating force.</li>
+<li>Never exceed the design speed. Fit a hard rpm limit in the controller.</li>
+<li>Use proper alloys (310 stainless, Inconel) for the turbine wheel: no aluminium, no mild steel, no 3D-printed plastic, no mystery metal. See chapter 9.</li>
+</ul>
+
+<h2 id="fire" data-short="2 · Fire & fuel">2 · Fire and fuel</h2>
+<p>Propane is heavier than air: a leak pools in low spots and ignites on the first spark. At full power our engine burns 10 kg of it per hour; the hardware reaches 800 °C and the exhaust is hotter still. A wet start (too much fuel, no ignition) fills the combustor with gas that then goes off with a bang.</p>
+<ul>
+<li><strong>Outdoors, always.</strong> Never in a garage, shed, or under a roof. Exhaust contains carbon monoxide and, in an enclosed space, the engine will also exhaust all the oxygen.</li>
+<li>Fail-closed solenoid, a regulator, a flashback arrestor, soapy-water leak tests, bottle upright and 3 m behind the engine.</li>
+<li>A fire extinguisher (CO₂ or dry powder) and a second person.</li>
+<li>If the engine does not light, <strong>close the gas, keep spinning the starter, and wait</strong> before trying again, so the unburned propane is blown out.</li>
+</ul>
+
+<h2 id="heat" data-short="3 · Hot exhaust & jet">3 · Hot exhaust and the jet</h2>
+<p>The exhaust leaves at 376 m/s and about 670 °C. A jet slows with distance as roughly $V\approx6.3\,D\,V_e/x$, so a 40 mm jet is still 30 m/s (a storm) at 3 m. The casings glow dull-red in the dark and stay hot for many minutes after shut-down. Run the zones below to see how far the hazards reach.</p>
+<div data-widget="danger-zones"></div>
+
+<h2 id="noise" data-short="4 · Noise">4 · Noise</h2>
+<p>A small jet at full power measures 115–125 dB at 1 m. That is above the level at which hearing damage starts in seconds, and it is loud even half a kilometre away (neighbours, police, the dog). Plugs <em>and</em> muffs, every time, and a short run time:</p>
+<div data-widget="noise-safety"></div>
+
+<h2 id="other" data-short="5 · Intake, burns, fumes">5 · Intake, burns, fumes</h2>
+<ul>
+<li><strong>Intake:</strong> only within about 15 cm of the bellmouth is the suction strong enough to pull a rag, a glove or hair. Keep loose clothing, jewellery and tools away; no gloves when near it. Put a mesh guard over the inlet.</li>
+<li><strong>Burns:</strong> the casing, flanges and exhaust remain above 60 °C (a burn threshold) for a long time after shut-down. Treat everything as hot until you’ve checked with a thermometer.</li>
+<li><strong>Fumes:</strong> carbon monoxide is odourless. Never run it indoors, and don’t sit downwind in the plume.</li>
+<li><strong>Heat soak:</strong> never shut off hot and just walk away: run the starter to cool the hot section, or the bearings, oil and casing heat-soak and fail.</li>
+</ul>
+
+<h2 id="cell" data-short="A sensible test cell">A sensible test cell</h2>
+<div class="table-wrap"><table class="data">
+<tr><th>Item</th><th>Recommendation</th></tr>
+<tr><td>Location</td><td>Open field, concrete pad or gravel; no grass; clear of buildings, roads, vehicles and people by 30 m in the jet line and the wheel planes.</td></tr>
+<tr><td>Operator position</td><td>Behind a plywood-and-steel barrier, off-axis, 5+ m away, with the engine controlled <em>remotely</em> (cable or wireless) and a hardwired fuel-cut switch.</td></tr>
+<tr><td>Barriers</td><td>A thick steel plate or sand-filled barrels between the engine’s wheel planes and any people.</td></tr>
+<tr><td>Thrust stand</td><td>Bolted to a heavy base; thrust measured with a load cell, never by hand.</td></tr>
+<tr><td>Sensors</td><td>EGT, rpm, fuel pressure; automatic cut-out above set EGT/rpm limits.</td></tr>
+<tr><td>People</td><td>Two people minimum; briefed; hearing and eye protection; spectators far away.</td></tr>
+</table></div>
+
+<h2 id="law" data-short="Legal & neighbours">Legal and neighbours</h2>
+<p>Rules vary by country and city, and this page is not legal advice. Check: <strong>noise ordinances</strong>; <strong>storage and handling of LPG/propane</strong> (quantity limits, bottle certification); <strong>open-flame and burn bans</strong>; any <strong>model-aircraft rules</strong> if you plan to fly it (jet-powered models are often restricted to approved fields and certified pilots); and <strong>insurance</strong> (a model-flying club’s policy may cover turbines; your home policy probably doesn’t). Telling your neighbours before a test run is both polite and sensible.</p>
+
+<h2 id="checklist" data-short="The checklist">The pre-run checklist</h2>
+<div data-widget="checklist"></div>
+
+<div class="callout fire"><span class="ct">Bottom line</span>If a safe run requires you to relax any item above, don’t run. A home-built turbine that has been designed, machined, balanced, tested and operated by someone who respects it is a fine hobby. One built carelessly is a bomb with a gearbox. Use the simulator to learn the sequence; use the checklist; ask experienced builders (the model-turbine community is generous with advice).</div>
+
+</article>
+</main>
+</div>
+</body>
+</html>

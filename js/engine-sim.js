@@ -80,6 +80,7 @@ export class EngineSim {
     if (V0 != null) this.V0 = V0;
     this._rebuildAmbient();
   }
+  setParam(obj) { Object.assign(this.p, obj); this._rebuildAmbient(); }
   setParts(parts) {
     for (const pt of parts) this.partMeta[pt.id] = { z0: pt.bbox.min[2], z1: pt.bbox.max[2], material: pt.material };
     this._initThermal();

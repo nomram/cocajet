@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>7 · Run it: the simulator — Jet Engines for Dummies</title>
+<meta name="description" content="Start, run, throttle and break a virtual Coke-can turbojet in 3D: live airflow, flame, glowing metal, gauges, an ECU start sequence, manual controls and failure scenarios (hot start, flame-out, surge, liner burn-through).">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+<style>
+.sim-layout { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr); gap: 18px; max-width: 1600px; margin: 18px auto 0; align-items: start; }
+.sim-view .viewer { height: clamp(430px, 66vh, 680px); }
+.phase-bar { display: flex; gap: 10px; align-items: center; margin: 10px 0 0; flex-wrap: wrap; }
+.phase-chip { font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-size: .78rem; padding: 6px 12px; border-radius: 999px; background: var(--panel-3); border: 1px solid var(--line-2); }
+.phase-chip.run { color: var(--ok); border-color: var(--ok); } .phase-chip.bad { color: var(--bad); border-color: var(--bad); } .phase-chip.warm { color: var(--fuel); border-color: var(--fuel); }
+.phase-text { color: var(--text-2); font-size: .92rem; flex: 1; min-width: 240px; }
+.sim-panel { display: flex; flex-direction: column; gap: 12px; }
+.panel-card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); padding: 12px 14px; }
+.panel-card h4 { margin: 0 0 8px; }
+.gauges { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.gauges canvas { width: 100%; aspect-ratio: 1.15; display: block; }
+.alarm { display: none; margin: 6px 0 0; padding: 8px 12px; border-radius: 10px; font-weight: 700; font-size: .86rem; background: color-mix(in srgb, var(--bad) 16%, var(--panel)); border: 1px solid var(--bad); color: var(--bad); }
+.alarm.on { display: block; }
+.dmg { height: 10px; border-radius: 6px; background: var(--line); overflow: hidden; margin-top: 6px; }
+.dmg > i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--ok), var(--fuel), var(--bad)); transition: width .3s; }
+.evlog { font-family: var(--mono); font-size: .8rem; max-height: 170px; overflow-y: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--bg-2); padding: 8px 10px; }
+.evlog div { padding: 2px 0; color: var(--text-2); } .evlog div.bad { color: var(--bad); } .evlog b { color: var(--muted); font-weight: 600; margin-right: 8px; }
+.big-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.big-btns .btn { padding: 11px 6px; font-weight: 800; }
+.scen { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
+.scen .btn { text-align: left; justify-content: flex-start; flex-direction: column; align-items: flex-start; gap: 3px; height: 100%; }
+.scen .btn small { font-weight: 500; color: var(--muted); font-size: .76rem; line-height: 1.35; }
+@media (max-width: 1100px) { .sim-layout { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body class="wide-page">
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<div style="max-width:1600px;margin:0 auto">
+<span class="eyebrow">Chapter 7 · The engine</span>
+<h1>Run it: the engine simulator</h1>
+<p class="lede" style="max-width:85ch">The CJ-1 you just built, alive. Press <strong>START</strong> and watch the whole sequence: starter spin-up, spark, light-off, acceleration, idle. Then use the throttle, switch on the airflow and the heat view, and try to break it on purpose, because the best way to understand an engine is to see how it fails.</p>
+<div class="safety-strip"><b>It’s a model.</b> The physics is real (the same mean-line model as every chapter) but a real engine has more failure modes and no undo button. See <a href="safety.html">Safety first</a> before running anything real.</div>
+</div>
+
+<div class="sim-layout">
+  <div class="sim-view">
+    <div class="viewer" id="sv"></div>
+    <div class="phase-bar"><span class="phase-chip" id="phaseChip">OFF</span><span class="phase-text" id="phaseText"></span></div>
+    <div class="alarm" id="alarm"></div>
+  </div>
+
+  <div class="sim-panel">
+    <div class="panel-card">
+      <div class="big-btns">
+        <button class="btn fire" id="bStart">▶ START</button>
+        <button class="btn" id="bStop">■ STOP</button>
+        <button class="btn" id="bKill" title="Close the fuel valve immediately">✖ KILL FUEL</button>
+        <button class="btn" id="bReset">↺ RESET</button>
+      </div>
+      <div class="ctl" style="margin-top:12px"><label>Throttle (target speed 48 000 → 115 000 rpm)</label><output id="thrOut">0 %</output><input type="range" id="thr" min="0" max="100" step="1" value="0"></div>
+      <label class="tgl" style="margin-top:8px"><input type="checkbox" id="manual"> Manual mode: I control the starter, the igniter and the fuel valve myself (no ECU)</label>
+      <div id="manualBox" style="display:none;margin-top:8px">
+        <div class="btn-row"><button class="btn small" id="mStarter">Starter: OFF</button><button class="btn small" id="mIgn">Igniter: OFF</button></div>
+        <div class="ctl" style="margin-top:8px"><label>Fuel valve</label><output id="fuelOut">0.00 g/s</output><input type="range" id="fuel" min="0" max="4" step="0.02" value="0"></div>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <div class="gauges"><canvas id="gRpm"></canvas><canvas id="gEgt"></canvas></div>
+      <div class="readouts" id="ros"></div>
+      <div style="margin-top:8px;font-size:.78rem;color:var(--muted);font-weight:700;letter-spacing:.06em;text-transform:uppercase">Flame-tube liner damage <span id="dmgPct" style="float:right;color:var(--text)">0 %</span></div>
+      <div class="dmg"><i id="dmg"></i></div>
+    </div>
+
+    <div class="panel-card">
+      <h4>Conditions</h4>
+      <div class="ctls">
+        <div class="ctl"><label>Altitude</label><output id="altOut">0 m</output><input type="range" id="alt" min="0" max="6000" step="100" value="0"></div>
+        <div class="ctl"><label>Hot / cold day</label><output id="dtOut">0 °C</output><input type="range" id="dT" min="-30" max="30" step="1" value="0"></div>
+        <div class="ctl"><label>Flame-tube material</label><span></span><select id="liner"><option value="can">Coke can (aluminium)</option><option value="ss304">Stainless 304</option><option value="ss310">Stainless 310S</option><option value="inco">Inconel 625</option></select></div>
+        <div class="ctl"><label>Time warp (cool-downs are long)</label><span></span><select id="warp"><option value="1">1× real time</option><option value="2">2×</option><option value="4">4×</option><option value="10">10×</option></select></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:1600px;margin:22px auto 0">
+  <div class="wgrid even" style="grid-template-columns:repeat(4,minmax(0,1fr))"><canvas class="plot" id="cRpm"></canvas><canvas class="plot" id="cEgt"></canvas><canvas class="plot" id="cThr"></canvas><canvas class="plot" id="cFuel"></canvas></div>
+  <div class="wgrid even" style="margin-top:16px">
+    <div><h4>Event log</h4><div class="evlog" id="evlog"></div></div>
+    <div><h4>Things to try (failure scenarios)</h4>
+      <div class="scen">
+        <button class="btn" data-sc="demo">▶ Full demo<small>Auto start, accelerate to full power, hold, chop, cool down.</small></button>
+        <button class="btn" data-sc="hot">🔥 Hot start<small>Manual: light it with 0.9 g/s at 25 000 rpm. Too much fuel for the airflow: EGT spikes past 1 000 °C.</small></button>
+        <button class="btn" data-sc="wet">💧 Wet start<small>Manual: dump 3 g/s on the igniter. Over-rich: the flame can’t light, or blows out.</small></button>
+        <button class="btn" data-sc="lean">💨 Lean flame-out<small>At full power, cut fuel to 0.5 g/s. The mixture is too weak to burn.</small></button>
+        <button class="btn" data-sc="block">🚧 Block 45 % of the nozzle<small>Closes the exit: pressure and temperature climb, flow falls: towards surge.</small></button>
+        <button class="btn" data-sc="burn">🥫 Burn the can<small>Run the aluminium liner at full power until it burns through; then swap to stainless.</small></button>
+      </div>
+      <p id="scenNote" style="font-size:.88rem;color:var(--text-2);margin-top:10px"></p>
+    </div>
+  </div>
+
+  <div class="chapter" style="max-width:960px;margin:44px auto 0">
+  <h2 id="seq" data-short="The start sequence">The start sequence, step by step</h2>
+  <ol>
+    <li><strong>Starter on.</strong> The shaft is spun to about 20 000 rpm; the compressor already moves air.</li>
+    <li><strong>Igniter on, valve cracked.</strong> A trickle of propane (0.3–0.5 g/s) enters the primary zone; after a second or two it lights. A soft “whump” is normal; a loud bang means too much gas.</li>
+    <li><strong>Ramp.</strong> The controller adds fuel along the engine’s steady-state curve with a limited rate. The starter helps up to ~45 000 rpm, then fades.</li>
+    <li><strong>Idle</strong> at ~48 000 rpm: self-sustaining. The fuel flow it holds is the “steady” curve of chapter 5.</li>
+    <li><strong>Throttle:</strong> the controller targets a speed between idle and 115 000 rpm and adds/removes fuel to chase it, limited by EGT and by acceleration rate so the compressor never surges.</li>
+    <li><strong>Cool-down.</strong> Fuel off. The starter keeps spinning (at ≤ 22 000 rpm) until the hot section is under 125 °C, then everything stops.</li>
+  </ol>
+  <h2 id="read" data-short="What the gauges mean">What the gauges mean</h2>
+  <div class="table-wrap"><table class="data">
+  <tr><th>Gauge</th><th>What it tells you</th><th>Red flag</th></tr>
+  <tr><td><strong>RPM</strong></td><td>Spool speed. Thrust ∝ roughly (rpm)³ at the top end</td><td>Above 125 000: overspeed, the disc can burst</td></tr>
+  <tr><td><strong>EGT</strong></td><td>Temperature behind the turbine: a proxy for turbine inlet temperature</td><td>Above ~850 °C: the cheap alloys and the can are in trouble</td></tr>
+  <tr><td><strong>Thrust</strong></td><td>Net force from the model, N</td><td>—</td></tr>
+  <tr><td><strong>Fuel flow</strong></td><td>Propane, g/s. The ECU’s main output</td><td>Climbing without rpm following = rich, hot, or a leak</td></tr>
+  <tr><td><strong>Pressure ratio</strong></td><td>Compressor exit ÷ ambient</td><td>Dropping suddenly at high rpm = surge/stall</td></tr>
+  <tr><td><strong>Liner damage</strong></td><td>How close the flame tube is to burning through</td><td>100 %: hole, flame on the casing</td></tr>
+  </table></div>
+  <h2 id="trouble" data-short="Troubleshooting">Troubleshooting table</h2>
+  <div class="table-wrap"><table class="data">
+  <tr><th>Symptom</th><th>Cause</th><th>Cure</th></tr>
+  <tr><td>Hot start</td><td>Too much fuel while rpm is still low and airflow weak</td><td>Lower the light-off fuel; start the starter longer before fuel</td></tr>
+  <tr><td>Hung start</td><td>Lit, but stuck at low rpm: the turbine can’t break even</td><td>More starter assist; check for compressor rub or low fuel pressure</td></tr>
+  <tr><td>Wet start</td><td>Too rich to light; unburnt gas collects, then ignites with a bang</td><td>Purge by spinning with the fuel off</td></tr>
+  <tr><td>Flame-out on throttle chop</td><td>Fuel cut faster than the rotor decelerates → too lean</td><td>Keep a fuel floor of ~50 % of the steady value (the ECU here does)</td></tr>
+  <tr><td>Surge / stall</td><td>Back-pressure too high for the compressor at that speed</td><td>Open the nozzle; slow the acceleration; check for a damaged diffuser</td></tr>
+  <tr><td>Rising EGT at steady throttle</td><td>Fouling, a failing liner or air leakage</td><td>Shut down and inspect</td></tr>
+  </table></div>
+  <p><a class="btn" href="08-improve.html">Next: make it better, cheaply →</a></p>
+  </div>
+</div>
+</main>
+</div>
+
+<script type="module">
+import { EngineViewer, loadManifest } from './js/viewer3d.js';
+import { EngineSim, PHASES, LINERS } from './js/engine-sim.js';
+import { Plot } from './js/plot.js';
+import { drawGauge } from './js/sim-ui.js';
+import { CJ1 } from './js/engine-model.js';
+import { h } from './js/ui.js';
+
+const $ = (id) => document.getElementById(id);
+const sim = new EngineSim();
+let viewer = null;
+
+/* ---------- 3D ---------- */
+viewer = new EngineViewer($('sv'), { tools: ['spin', 'explode', 'cut', 'xray', 'flow', 'heat', 'view', 'reset'], flow: true, caption: 'CJ-1 · live' });
+viewer.load().then(() => { viewer.attachSim(sim); viewer.setHeat('real'); updateUI(true); }).catch((e) => { console.error(e); $('sv').innerHTML = '<div class="vloading">3D needs WebGL, which your browser blocked. The gauges still work.</div>'; });
+// when the viewer failed we still run the sim
+let fallbackTimer = setTimeout(() => { if (!viewer || !viewer.manifest) { /* no 3D: drive the sim ourselves */ let last = performance.now(); setInterval(() => { const n = performance.now(); sim.step((n - last) / 1000 * (+$('warp').value)); last = n; }, 50); } }, 8000);
+
+/* ---------- controls ---------- */
+const say = (t) => { $('scenNote').textContent = t; };
+$('bStart').onclick = () => { if ($('manual').checked) { $('manual').checked = false; setManual(false); } sim.start(); };
+$('bStop').onclick = () => sim.stop();
+$('bKill').onclick = () => { if ($('manual').checked) { manual.fuel = 0; $('fuel').value = 0; $('fuelOut').textContent = '0.00 g/s'; } sim.killFuel(); };
+$('bReset').onclick = () => { sim.reset(); sim.setParam({ ...CJ1 }); $('liner').value = 'can'; sim.liner = 'can'; clearCharts(); $('thr').value = 0; $('thrOut').textContent = '0 %'; sim.setThrottle(0); if ($('manual').checked) { $('manual').checked = false; setManual(false); } };
+$('thr').oninput = () => { sim.setThrottle($('thr').value / 100); $('thrOut').textContent = $('thr').value + ' %'; };
+const manual = sim.manual;
+function setManual(on) {
+  $('manualBox').style.display = on ? '' : 'none';
+  if (on) { sim.setMode('manual'); manual.starter = false; manual.ignition = false; manual.fuel = sim.mf * 1000; $('fuel').value = manual.fuel; $('fuelOut').textContent = manual.fuel.toFixed(2) + ' g/s'; }
+  else { sim.setMode('auto'); manual.starter = false; manual.ignition = false; sim.phase = sim.lit ? 'run' : (sim.N > 2000 ? 'cooldown' : 'off'); }
+  $('mStarter').textContent = 'Starter: ' + (manual.starter ? 'ON' : 'OFF'); $('mIgn').textContent = 'Igniter: ' + (manual.ignition ? 'ON' : 'OFF');
+  $('mStarter').classList.toggle('on', manual.starter); $('mIgn').classList.toggle('on', manual.ignition);
+}
+$('manual').onchange = (e) => setManual(e.target.checked);
+$('mStarter').onclick = () => { manual.starter = !manual.starter; $('mStarter').textContent = 'Starter: ' + (manual.starter ? 'ON' : 'OFF'); $('mStarter').classList.toggle('on', manual.starter); };
+$('mIgn').onclick = () => { manual.ignition = !manual.ignition; $('mIgn').textContent = 'Igniter: ' + (manual.ignition ? 'ON' : 'OFF'); $('mIgn').classList.toggle('on', manual.ignition); };
+$('fuel').oninput = () => { manual.fuel = +$('fuel').value; $('fuelOut').textContent = manual.fuel.toFixed(2) + ' g/s'; };
+let ambT = 0; const ambUpd = () => { clearTimeout(ambT); ambT = setTimeout(() => sim.setAmbient({ altitude: +$('alt').value, dT: +$('dT').value }), 120); $('altOut').textContent = $('alt').value + ' m'; $('dtOut').textContent = ($('dT').value > 0 ? '+' : '') + $('dT').value + ' °C'; };
+$('alt').oninput = ambUpd; $('dT').oninput = ambUpd;
+$('liner').onchange = () => { sim.liner = $('liner').value; sim._burned = false; sim.linerDamage = 0; };
+$('warp').onchange = () => { if (viewer) viewer.timeWarp = +$('warp').value; };
+
+/* ---------- scenarios ---------- */
+let scTimer = null;
+function wait(cond, fn, ms = 200) { clearInterval(scTimer); scTimer = setInterval(() => { if (cond()) { clearInterval(scTimer); fn(); } }, ms); }
+function resetClean() { $('bReset').click(); }
+const SC = {
+  demo() { resetClean(); say('Full demo running: start → idle → full power → throttle chop → cool-down. Watch the gauges and the heat view.'); sim.start(); wait(() => sim.phase === 'run', () => { $('thr').value = 100; $('thr').oninput(); wait(() => sim.N > 112000, () => { setTimeout(() => { $('thr').value = 0; $('thr').oninput(); setTimeout(() => sim.stop(), 9000); }, 6000); }); }); },
+  hot() { resetClean(); $('manual').checked = true; setManual(true); manual.starter = true; $('mStarter').click(); $('mStarter').click(); say('Hot start: the starter spins it up; at 25 000 rpm we light it with 0.9 g/s. The rotor is slow, the air weak, so the flame runs far too hot.'); wait(() => sim.N > 25000, () => { manual.ignition = true; manual.fuel = 0.9; $('fuel').value = 0.9; $('fuelOut').textContent = '0.90 g/s'; $('mIgn').textContent = 'Igniter: ON'; }); },
+  wet() { resetClean(); $('manual').checked = true; setManual(true); manual.starter = true; say('Wet start: at 22 000 rpm we pour 3 g/s of propane onto the igniter. Far too rich to burn.'); wait(() => sim.N > 22000, () => { manual.ignition = true; manual.fuel = 3; $('fuel').value = 3; $('fuelOut').textContent = '3.00 g/s'; $('mIgn').textContent = 'Igniter: ON'; }); },
+  lean() { say('Lean flame-out: starting normally, running at full power, then the fuel is cut back hard.'); resetClean(); sim.start(); wait(() => sim.phase === 'run', () => { $('thr').value = 100; $('thr').oninput(); wait(() => sim.N > 105000, () => { $('manual').checked = true; setManual(true); manual.fuel = 0.5; $('fuel').value = 0.5; $('fuelOut').textContent = '0.50 g/s'; manual.starter = false; }); }); },
+  block() { say('Blocked nozzle: 45 % of the exit area is closed off (A₅ 1 119 → 615 mm²). The ECU holds rpm, so fuel and TIT rise while flow collapses toward the surge line.'); resetClean(); sim.setParam({ A5: 615e-6 }); sim.start(); wait(() => sim.phase === 'run', () => { $('thr').value = 100; $('thr').oninput(); }); },
+  burn() { say('Aluminium liner at full power. Watch the liner-damage bar: it wears out in a couple of minutes (use 10× time warp). Then pick “Stainless 310S” in the material box and reset.'); resetClean(); $('liner').value = 'can'; sim.liner = 'can'; $('warp').value = 4; $('warp').onchange(); sim.start(); wait(() => sim.phase === 'run', () => { $('thr').value = 100; $('thr').oninput(); }); },
+};
+document.querySelectorAll('[data-sc]').forEach(b => b.onclick = () => SC[b.dataset.sc]());
+
+/* ---------- instruments + charts ---------- */
+const ros = {};
+[['thr', 'Thrust', 'N', 'hot'], ['fuel', 'Fuel', 'g/s', 'fuel'], ['pr', 'Pressure ratio', '', 'cool'], ['tit', 'TIT (calc)', '°C', 'hot'], ['m', 'Air flow', 'kg/s', 'cool'], ['used', 'Fuel used', 'g', 'fuel']].forEach(([k, l, u, c]) => {
+  const v = h('span', { class: 'v' }, '–'), uu = h('span', { class: 'u' }, u), el = h('div', { class: 'ro ' + c }, h('div', { class: 'k' }, l), h('div', {}, v, uu));
+  ros[k] = { el, set: (t, cls) => { v.textContent = t; el.className = 'ro ' + (cls || c); } }; $('ros').append(el);
+});
+const W = 90, mk = (id, o) => new Plot($(id), Object.assign({ xmin: -W, xmax: 0, aspect: 1.5, xlabel: 'seconds ago', margin: { l: 52, r: 10, t: 26, b: 38 }, xticks: [-90, -60, -30, 0] }, o));
+const pl = { rpm: mk('cRpm', { ymin: 0, ymax: 130, ylabel: '1000 rpm', title: 'Rotor speed' }), egt: mk('cEgt', { ymin: 0, ymax: 1000, ylabel: '°C', title: 'EGT (solid) / TIT (dashed)' }), thr: mk('cThr', { ymin: 0, ymax: 70, ylabel: 'N', title: 'Thrust' }), fuel: mk('cFuel', { ymin: 0, ymax: 4, ylabel: 'g/s', title: 'Fuel flow' }) };
+let D = { t: [], rpm: [], egt: [], tit: [], thr: [], fuel: [] }, lastSample = -1;
+function clearCharts() { D = { t: [], rpm: [], egt: [], tit: [], thr: [], fuel: [] }; lastSample = -1; }
+function drawChart(p, key, color, extra) {
+  const c = p.begin().col; p.axes(); const now = sim.t, xs = D.t.map(t => t - now);
+  p.line(xs, D[key], { color: c[color] || color, width: 2.6 });
+  if (extra) p.line(xs, D[extra], { color: c.fire, width: 1.8, dash: [5, 4] });
+  p.vline(0, { color: c.muted, dash: [2, 3] });
+}
+function updateUI(force) {
+  const s = sim, g = s.gp, v = s.visual();
+  const N = s.N, egtC = g.T04 - 273.15, titC = g.T03 - 273.15;
+  const rpmNow = N / 1000;
+  drawGauge($('gRpm'), { value: rpmNow, min: 0, max: 140, label: 'Rotor', unit: '×1000 rpm', zones: [[0, 40, '--air'], [40, 118, '--ok'], [118, 128, '--fuel'], [128, 140, '--bad']], ticks: 7 });
+  drawGauge($('gEgt'), { value: Math.max(0, egtC), min: 0, max: 1000, label: 'EGT', unit: '°C', zones: [[0, 600, '--air'], [600, 780, '--ok'], [780, 850, '--fuel'], [850, 1000, '--bad']], ticks: 5 });
+  ros.thr.set(g.thrust.toFixed(1)); ros.fuel.set((s.mf * 1000).toFixed(2)); ros.pr.set(g.PRc.toFixed(2)); ros.tit.set(s.lit ? titC.toFixed(0) : '–'); ros.m.set(g.m.toFixed(3)); ros.used.set((s.fuelUsed * 1000).toFixed(0));
+  const dmg = Math.round(s.linerDamage * 100); $('dmg').style.width = dmg + '%'; $('dmgPct').textContent = dmg + ' %';
+  // phase
+  const manualMode = s.mode === 'manual';
+  const pname = manualMode ? (s.lit ? 'Running · manual' : N > 3000 ? 'Spinning · manual' : 'Manual · stopped') : PHASES[s.phase];
+  const chip = $('phaseChip'); chip.textContent = pname; chip.className = 'phase-chip ' + (s.phase === 'run' || (manualMode && s.lit) ? 'run' : s.phase === 'fault' || s.phase === 'flameout' ? 'bad' : s.phase === 'ramp' || s.phase === 'ignition' ? 'warm' : '');
+  const TEXT = { off: 'Engine is off. Press START: the controller will run the whole sequence for you. Or tick “manual mode” to run it yourself.', starter: 'The starter is spinning the shaft up. No fuel yet, just air through the compressor. The rotor passes through its critical speed (~40 000 rpm) later, quickly.', ignition: 'Igniter is sparking and a little propane is flowing. Light-off usually takes 1–2 seconds.', ramp: 'Flame is on. Fuel is rising along the steady-state curve with a rate limit; the starter fades out at ~45 000 rpm.', run: 'Self-sustaining. The throttle sets the target rpm and the controller trims the fuel. Try the scenarios below.', cooldown: 'Fuel is off; the starter keeps air flowing to cool the hot section below 125 °C. Use the time-warp if it’s boring.', flameout: 'The flame went out. The controller closes the fuel valve and starts a cool-down.', fault: 'Fault: see the event log.' };
+  $('phaseText').textContent = manualMode ? 'Manual mode: you hold the starter, igniter and fuel valve. Light only with the starter above ~17 000 rpm and a small fuel flow. Watch EGT.' : TEXT[s.phase];
+  // alarms
+  const al = [];
+  if (g.T04 > 1120 && s.lit) al.push('OVER-TEMPERATURE'); if (N > CJ1.Nmax * 1.03) al.push('OVERSPEED'); if (g.surge && s.lit) al.push('COMPRESSOR SURGE'); if (s.linerDamage >= 1) al.push('LINER BURNT THROUGH');
+  const ae = $('alarm'); ae.classList.toggle('on', al.length > 0); ae.textContent = '⚠ ' + al.join(' · ');
+  // series
+  if (s.t - lastSample >= 0.25) {
+    lastSample = s.t; D.t.push(s.t); D.rpm.push(rpmNow); D.egt.push(Math.max(0, egtC)); D.tit.push(s.lit ? titC : null); D.thr.push(g.thrust); D.fuel.push(s.mf * 1000);
+    while (D.t.length && D.t[0] < s.t - W - 1) for (const k of Object.keys(D)) D[k].shift();
+  }
+  // events
+  const ev = s.events.slice(-9).reverse(), log = $('evlog');
+  const key = ev.map(e => e.t + e.msg).join('|');
+  if (log.dataset.k !== key) { log.dataset.k = key; log.innerHTML = ''; ev.forEach(e => log.append(h('div', { class: e.kind === 'bad' ? 'bad' : '' }, h('b', {}, e.t.toFixed(0) + ' s'), e.msg))); }
+}
+let tick = 0;
+setInterval(() => {
+  updateUI(); tick++;
+  if (tick % 3 === 0) { drawChart(pl.rpm, 'rpm', 'air'); drawChart(pl.egt, 'egt', 'bad', 'tit'); drawChart(pl.thr, 'thr', 'fire'); drawChart(pl.fuel, 'fuel', 'fuel'); }
+}, 90);
+Object.values(pl).forEach(p => p.onDraw(() => { drawChart(pl.rpm, 'rpm', 'air'); drawChart(pl.egt, 'egt', 'bad', 'tit'); drawChart(pl.thr, 'thr', 'fire'); drawChart(pl.fuel, 'fuel', 'fuel'); }));
+updateUI(true);
+</script>
+</body>
+</html>

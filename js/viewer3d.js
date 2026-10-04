@@ -305,9 +305,15 @@ export class EngineViewer {
   attachSim(sim) {
     this.sim = sim;
     if (this.manifest && sim.setParts) sim.setParts(this.manifest.parts);
+    // the engine's clock runs on its own timer, so it follows real time even when frames are slow
+    clearInterval(this._simTimer); this._simLast = performance.now();
+    this._simTimer = setInterval(() => {
+      const now = performance.now(), dt = Math.min(0.5, (now - this._simLast) / 1000); this._simLast = now;
+      if (this.sim && !document.hidden && this._visibleOrSim !== false) this.sim.step(dt * this.timeWarp);
+    }, 40);
   }
 
-  detachSim() { this.sim = null; this.vis = null; }
+  detachSim() { this.sim = null; this.vis = null; clearInterval(this._simTimer); }
 
   /* ---------- camera ---------- */
   setView(name, animate = true) {
@@ -381,13 +387,13 @@ export class EngineViewer {
   /* ---------- main loop ---------- */
   _tick() {
     this._raf = requestAnimationFrame(this._tick);
-    const dt = Math.min(0.05, this._clock.getDelta());
+    const raw = this._clock.getDelta(), dt = Math.min(0.05, raw);
     if (!this._visible || document.hidden) return;
-    this._update(dt);
+    this._update(dt, Math.min(0.35, raw));
     this.renderer.render(this.scene, this.camera);
   }
 
-  _update(dt) {
+  _update(dt, simDt = dt) {
     // camera tween
     const tw = this._camTween;
     if (tw) {
@@ -406,10 +412,7 @@ export class EngineViewer {
 
     // simulation
     let vis = this.vis;
-    if (this.sim) {
-      this.sim.step(dt * this.timeWarp);
-      vis = this.vis = this.sim.visual();
-    }
+    if (this.sim) vis = this.vis = this.sim.visual();
     // rotor spin (slow-motion version of the real rpm)
     let w = this.state.spin ? this.spinRate : 0;
     if (vis) w = this.state.spin ? vis.N * Math.PI / 30 * this.opts.spinSlow : 0;
@@ -439,7 +442,7 @@ export class EngineViewer {
   }
 
   dispose() {
-    cancelAnimationFrame(this._raf);
+    cancelAnimationFrame(this._raf); clearInterval(this._simTimer);
     document.removeEventListener('visibilitychange', this._vis);
     this._ro.disconnect(); if (this._io) this._io.disconnect();
     this.controls.dispose();

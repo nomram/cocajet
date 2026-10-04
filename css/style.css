@@ -141,7 +141,7 @@ h4 { font-size: 1rem; font-weight: 700; margin: 1.5em 0 .3em; color: var(--text-
 .callout p, .callout li { color: var(--text-2); }
 .callout.tip { --c: var(--ok); } .callout.warn { --c: var(--warn); } .callout.danger { --c: var(--bad); } .callout.fire { --c: var(--fire); } .callout.violet { --c: var(--violet); }
 .callout.danger { border-width: 1.5px; }
-.safety-strip { display: flex; gap: 12px; align-items: center; padding: 10px 16px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--bad) 45%, var(--line)); background: color-mix(in srgb, var(--bad) 10%, var(--panel)); font-size: .88rem; color: var(--text-2); margin-bottom: 22px; }
+.safety-strip { display: block; padding: 10px 16px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--bad) 45%, var(--line)); background: color-mix(in srgb, var(--bad) 10%, var(--panel)); font-size: .88rem; color: var(--text-2); margin-bottom: 22px; }
 .safety-strip b { color: var(--bad); }
 
 details.deep { margin: 1.4em 0; border: 1px solid var(--line); border-radius: var(--radius); background: var(--panel); max-width: 78ch; }

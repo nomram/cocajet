@@ -32,7 +32,7 @@ export default async function init(el) {
       ['Turbine', 'Ø59.4 axial wheel, 19 blades; 16-vane nozzle guide ring'],
       ['Nozzle exit', 'annulus ' + (CJ1.A5 * 1e6).toFixed(0) + ' mm² (r 20.5 outer / 8 cone)'],
       ['Length / diameter', '≈ 255 mm long (without the plume), Ø114 over the flanges'],
-      ['Rotor', 'Ø8 shaft, two 8×16×5 bearings, polar inertia ' + (CJ1.I * 1e6).toFixed(0) + ' g·mm²'],
+      ['Rotor', 'Ø8 shaft, two 8×16×5 bearings, polar inertia ' + (CJ1.I * 1e7).toFixed(0) + ' g·cm²'],
       ['Mass', mass],
     ]],
   ];

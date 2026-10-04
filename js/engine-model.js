@@ -54,7 +54,7 @@ export const CJ1 = {
   Cd: 0.96,
   // shaft
   etaM: 0.97,         // mechanical efficiency
-  I: 5.2e-5,          // rotor polar inertia [kg m^2]
+  I: 3.4e-5,          // rotor polar inertia [kg m^2]  (54 g impeller + 73 g turbine + 68 g shaft)
   // fuel
   fuel: 'propane',
   // limits
