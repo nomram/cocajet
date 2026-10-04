@@ -104,7 +104,7 @@ export class EngineSim {
     this.batt = { soc: this.batt ? this.batt.soc : 1, V: 12.4, I: 0 };      // a 3S LiPo carries over between runs
     this.surgeT = 0; this.surgePhase = 0; this.surgeCycles = 0; this.surgeMod = 1; this._surgeFlag = false;
     this.starved = false; this.thrustMeas = 0; this.starterLevel = 0; this.dNdt = 0;
-    this.trim = 0;
+    this.trim = 0; this.wheelDamage = 0; this.destroyed = false;
     if (this.egtLimit == null) this.egtLimit = 1110;       // K (837 °C): the ECU backs the fuel off above this exhaust temperature
     this.phaseT = 0; this.lightTimer = 0;
     this.gp = gasPath(this.p, 1500, 0, this.amb, { V0: this.V0, lit: false });
@@ -132,6 +132,7 @@ export class EngineSim {
   /* ---------------- user commands ---------------- */
   setThrottle(x) { this.throttle = Math.min(1, Math.max(0, x)); }
   start() {
+    if (this.destroyed) { this.noteOnce('destroyed', 'The turbine wheel has failed. Press RESET to fit a new rotor.', 'bad', 3); return; }
     if (this.phase === 'off' || this.phase === 'flameout' || this.phase === 'fault') {
       this.phase = 'starter'; this.phaseT = 0; this.mode = 'auto';
       this.note('Starter motor on: spinning the shaft up.');
@@ -191,11 +192,12 @@ export class EngineSim {
           // feed-forward from the steady-state table + a bounded PD correction, with rate limits and an EGT limiter
           const err = Math.min(1, Math.max(-1, (Nt - this.N) / Math.max(Nt, 1)));
           const T04 = this.gp ? this.gp.T04 : 0;
-          const limiting = T04 > this.egtLimit;
+          const egtLim = (this.phase === 'ramp' || (this.dNdt || 0) > 2000) ? Math.min(this.egtLimit, 1060) : this.egtLimit;   // stricter while accelerating
+          const limiting = T04 > egtLim;
           // slow integral trim: lets the controller find the fuel a worn or damaged engine really needs
-          if (this.lit && this.phase === 'run' && !limiting) this.trim = Math.min(0.9, Math.max(-0.2, this.trim + Math.min(0.2, Math.max(-0.2, err)) * 0.25 * dt));
+          if (this.lit && this.phase === 'run' && !limiting && Math.abs(err) < 0.04) this.trim = Math.min(0.9, Math.max(-0.2, this.trim + err * 0.6 * dt));   // only near the set-point: no wind-up while accelerating
           let want = ff * (1 + this.trim + Math.min(0.30, Math.max(-0.45, 14 * err - 4.0e-6 * (this.dNdt || 0))));
-          if (limiting) want *= Math.max(0.6, 1 - (T04 - this.egtLimit) / 250);
+          if (limiting) want *= Math.max(0.6, 1 - (T04 - egtLim) / 250);
           want = Math.max(want, 0.52 * ff);                       // never lean-blow-out the flame on a throttle chop
           // surge protection: back off the fuel while the compressor is on its stall line
           if (this.surgeT > 0.05) want *= Math.max(0.55, 1 - 0.5 * this.surgeT);
@@ -362,6 +364,19 @@ export class EngineSim {
         if (this.linerDamage >= 1 && !this._burned) { this._burned = true; this.note('Liner burn-through! Metal at ' + Math.round(peak - 273) + ' °C. Shut down and replace/upgrade the flame tube.', 'bad'); }
       }
     }
+    // turbine wheel: creep life falls about 4x for every 25 K (Larson-Miller); an Inconel wheel lasts thousands of hours at 680 C
+    if (!this.destroyed && !this.immortal) {
+      const tw = this.temps['turbine-wheel'];
+      let Tw = this.lit ? 0.8 * 0.5 * (g.T03 + g.T04) + 0.2 * g.T02 : 0;
+      if (tw) { Tw = 0; for (const v of tw) Tw = Math.max(Tw, v); }
+      if (Tw > 900) {
+        this.wheelDamage = Math.min(1, this.wheelDamage + dt / (2.0e7 * Math.pow(4, -(Tw - 950) / 25)));
+        if (this.wheelDamage >= 1) {
+          this.destroyed = true; this.lit = false; this.phase = 'fault'; this.phaseT = 0; this.mf = 0; this.mfCmd = 0;
+          this.note('TURBINE WHEEL FAILURE: the blades crept and ruptured at ' + Math.round(Tw - 273) + ' °C. A real engine would now throw metal. Press RESET.', 'bad');
+        }
+      }
+    }
   }
 
   /** Per-part wall temperature (K) at normalised axial position 0..1 */
@@ -393,7 +408,7 @@ export class EngineSim {
         ngv: Math.max(5, vNGV), turb: Math.max(5, vTurb), noz: Math.max(5, g.Ve),
       },
       nozChoked: g.nozChoked, pr04: g.P04 / this.amb.P, starter: this.starter, ignition: this.ignition,
-      surge: this.surgeT > 0.05, surgeMod: this.surgeMod, surgePhase: this.surgePhase % 1, linerDamage: this.linerDamage, T04C: T(g.T04), T03C: T(g.T03),
+      surge: this.surgeT > 0.05, surgeMod: this.surgeMod, wheelDamage: this.wheelDamage, destroyed: this.destroyed, surgePhase: this.surgePhase % 1, linerDamage: this.linerDamage, T04C: T(g.T04), T03C: T(g.T03),
       // the thrust calculation, term by term (what the HUD prints)
       thrustCalc: {
         F: this.thrust, mg: g.mg, Ve: g.Ve, mom: g.thrustParts.mom, press: g.thrustParts.press, ram: g.thrustParts.ram,

@@ -33,8 +33,8 @@ sc('lean flame-out at full power', () => {
   const s = new EngineSim(); s.start(); s.setThrottle(1); until(s, x => x.N > 112000, 60);
   s.setMode('manual'); s.manual.fuel = 0.5; s.manual.starter = false; until(s, x => !x.lit, 10); ok(!s.lit, 'flame goes out when fuel is cut to 0.5 g/s');
 });
-function block(f, limiter, T = 80) {
-  const s = new EngineSim(); s.egtLimit = limiter ? 1110 : 1e9; s.start(); s.setThrottle(1); until(s, x => x.N > 114000, 60); s.step(6);
+function block(f, limiter, T = 80, immortal = false) {
+  const s = new EngineSim(); s.immortal = immortal; s.egtLimit = limiter ? 1110 : 1e9; s.start(); s.setThrottle(1); until(s, x => x.N > 114000, 60); s.step(6);
   let surged = false, peak = 0;
   for (let i = 0; i < T * 5; i++) { s.setFault({ A5: 1.119e-3 * (1 - (1 - f) * Math.min(1, i / 100)) }); for (let k = 0; k < 10; k++) { s.step(0.02); peak = Math.max(peak, s.gp.T04); if (s.surgeT > 0.05) surged = true; } }
   return { s, surged, peak };
@@ -43,9 +43,12 @@ sc('nozzle 20 % blocked, ECU limiter ON: EGT is held, thrust is traded away', ()
   const { s, peak, surged } = block(0.8, true); console.log('   ', fmt(s));
   ok(peak < 1223 && !surged, 'peak EGT ' + (peak - 273).toFixed(0) + ' °C, no surge'); ok(s.lit && s.N > 60000, 'engine still running at ' + s.N.toFixed(0) + ' rpm');
 });
-sc('nozzle 40 % blocked, ECU limiter OFF: overheat, surge, flame-out', () => {
-  const { s, peak, surged } = block(0.6, false); console.log('   ', fmt(s), 'surge cycles', s.surgeCycles);
-  ok(peak > 1400, 'EGT reaches ' + (peak - 273).toFixed(0) + ' °C'); ok(surged, 'compressor surges'); ok(!s.lit, 'the flame goes out');
+sc('nozzle 40 % blocked, ECU limiter OFF, indestructible wheel: repeated surge', () => {
+  const { s, peak, surged } = block(0.6, false, 80, true); console.log('   ', fmt(s), 'surge cycles', s.surgeCycles);
+  ok(peak > 1400, 'EGT reaches ' + (peak - 273).toFixed(0) + ' °C'); ok(surged && s.surgeCycles >= 3, 'compressor surges repeatedly (' + s.surgeCycles + ' cycles)');
+});
+sc('same, but a real Inconel wheel: it creeps and ruptures', () => {
+  const { s } = block(0.6, false, 80, false); console.log('   ', fmt(s)); ok(s.destroyed && !s.lit, 'turbine wheel failure stops the engine');
 });
 sc('Coke-can liner burns through at full power', () => {
   const s = new EngineSim(); s.setParts && 0; s.start(); s.setThrottle(1);
