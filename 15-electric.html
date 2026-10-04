@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>15 · Electric jets: fans, ions and wind — Jet Engines for Dummies</title>
+<meta name="description" content="Electric propulsion from first principles: the ducted fan and why it beats a jet on efficiency but loses on energy density, gridded ion thrusters (Child–Langmuir limit, Isp, mission design), ion-wind thrusters and their spark limit, and a map of every engine by thrust and specific impulse.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter">
+
+<span class="eyebrow">Chapter 15 · Electric propulsion</span>
+<h1>Electric jets: fans, ions and wind</h1>
+<div class="meta"><span>~50 min</span><span>4 widgets</span><span>the last piece of the map</span></div>
+<p class="lede">Every engine so far got its energy from a chemical reaction in the same stream of gas it threw backwards. An electric engine breaks that link: the energy arrives through a wire, and the working fluid is just something to push. That frees the exhaust speed from the chemistry (an ion thruster throws atoms ten times faster than any flame) and it moves the problem somewhere else: you need a lot of electrical power, and a kilogram of battery stores a small fraction of what a kilogram of fuel does. This chapter works through the three electric “jets” (the ducted fan, the ion thruster and the ion wind) and ends with one picture that places every engine of the book.</p>
+
+<h2 id="fan" data-short="The electric jet">The electric jet: a fan in a duct</h2>
+<p>A ducted fan is the simplest engine there is: a motor spins a fan that accelerates a column of air, and the reaction is thrust $F=\dot m(V_e-V_0)$. There is nothing to ignite and nothing to cool but the motor. Treat the fan as an <em>actuator disk</em>: it adds power $P$ to a stream of air of density $\rho$ leaving through an exit area $A_e$. With no forward speed, $P=\tfrac12\dot mV_e^2$ and $\dot m=\rho A_eV_e$, which gives</p>
+<div class="eq">$$F=\big(4\rho A_e\big)^{1/3}\,P^{2/3}\qquad\Longleftrightarrow\qquad \frac{F}{P}=\frac{2}{V_e}\ \ (\text{ideal})$$</div>
+<p>Two things follow. First, thrust grows only as the <em>two-thirds power</em> of the power: doubling the power buys 59 % more thrust. Second, the way to get more thrust per watt is a bigger disk and a slower jet: a large slow jet is efficient, a small fast one is wasteful (exactly the propulsive-efficiency lesson of chapter 14, and the reason a helicopter rotor is huge and a jet engine is small). A 90 mm fan fed with 4.5 kW of electricity makes about 55 N, close to our CJ-1, at a jet speed of 90 m/s compared with the CJ-1’s 570 m/s.</p>
+<p>Now compare honestly with the propane turbojet. Per kilowatt drawn from its energy source, the fan makes about <strong>12 N per kW</strong> of electricity, and the CJ-1 about <strong>0.44 N per kW</strong> of fuel heat: the electric engine is 27 times more efficient at turning energy into thrust. But the energy has to be stored, and propane holds 12.8 kWh per kilogram while a good lithium battery holds 0.18: 70 times less. Efficiency 27 times better, storage 70 times worse: the propane jet still wins the energy-per-thrust contest, by 2.6 times, and the gap widens the longer you fly.</p>
+<div data-widget="edf"></div>
+<div class="callout"><span class="ct">What would flip the answer?</span>Try the “battery specific energy” slider: at around 380 Wh/kg (about twice today’s cells) the battery mass for a 5-minute run falls below the propane jet’s fuel, bottle and regulator. That is why hobby RC jets are now mostly electric fans (short flights, no hot parts, no fuel handling), while airliners, which need hours, are not. Real engines also make sound and heat in other places: a ducted fan is less noisy at the exit than a turbojet but not silent.</div>
+
+<h2 id="ion" data-short="Ion thrusters">Ion thrusters: acceleration by voltage</h2>
+<p>To go beyond 100 m/s of exhaust speed with a fan you would need ever more power; to reach tens of kilometres per second you need another approach: <strong>an electric field</strong>. Take a gas atom, strip an electron to make an ion with charge $q$, and let it fall through a voltage $V$. It gains kinetic energy $qV$, so</p>
+<div class="eq">$$v=\sqrt{\frac{2qV}{m}},\qquad F=\dot m\,v=I\sqrt{\frac{2mV}{q}},\qquad I_{sp}=\frac{v}{g_0},\qquad P=\frac{IV}{\eta}$$</div>
+<p>For xenon ($m=131$ u) at 1 100 V, $v=40$ km/s: an $I_{sp}$ of more than 4 000 s. Combine the equations: for a given power the thrust is $F/P=2\eta/v$. <strong>Speed and thrust per watt trade directly</strong>: double the exhaust speed and you halve the thrust you get for each kilowatt. An ion thruster of 2.5 kW gives about 100 mN, which is the weight of a coin or two.</p>
+<p>The reason it cannot give more is the <strong>space-charge limit</strong>. Ions are all positive, and repel each other; a crowd of them between two grids shields the field and caps the current density (the Child–Langmuir law): $J_{max}=\tfrac49\varepsilon_0\sqrt{2q/m}\,V^{3/2}/d^2$. A smaller grid gap or a higher voltage lets more through (but at some point a spark between the grids ends the story: chapter 11’s breakdown once more). To raise the thrust you need a larger grid; to raise the Isp you need a higher voltage.</p>
+<p>A neutraliser (a small electron emitter, usually a hollow cathode) sprays electrons into the beam. Without it the spacecraft would charge up negative and pull the ions straight back. The tiny thrust is not a handicap in space, where there is no drag: 90 mN on 500 kg is an acceleration of 0.18 mm/s², but it goes on for months, and months add up. NASA’s <em>Dawn</em> spacecraft used three ion engines to visit both Vesta and Ceres (2011–2018), a Δv of more than 11 km/s from 425 kg of xenon, which no chemical rocket of that size could have done.</p>
+<div data-widget="ion-thruster"></div>
+<h3>Things to try</h3>
+<ol>
+<li><strong>Change the propellant</strong>: argon is cheap and light and gives a higher Isp for the same voltage, but needs more power per newton ($F/P=2\eta/v$): the cheap gas costs electricity.</li>
+<li><strong>Raise the voltage</strong> to 3 000 V: Isp rises as $\sqrt V$ while the thrust at constant loading hardly changes; power climbs as $V^{3/2}$.</li>
+<li><strong>Cut the available power</strong> to 1 kW: the controller throttles the beam current, and the thrust falls proportionally. This is how an ion engine behaves at Jupiter, where sunlight is 27 times weaker than at Earth.</li>
+<li><strong>Look at the mission readouts</strong>: the same Δv with a chemical rocket (Isp 320 s) needs several times the propellant mass. The price is time: hundreds of days instead of minutes.</li>
+</ol>
+<div class="table-wrap"><table class="data">
+<tr><th>Electric thruster</th><th>How it works</th><th class="num">Isp (s)</th><th>Typical use</th></tr>
+<tr><td><strong>Resistojet / arcjet</strong></td><td>heat the propellant with a heater or an arc, then expand it in a nozzle</td><td class="num">150 – 800</td><td>small satellite manoeuvres</td></tr>
+<tr><td><strong>Hall-effect thruster</strong></td><td>a magnetic field traps electrons that ionise the gas; the electric field accelerates the ions (no grids)</td><td class="num">1 000 – 3 000</td><td>satellite station-keeping and orbit-raising; used by satellite constellations on krypton or argon</td></tr>
+<tr><td><strong>Gridded ion</strong></td><td>ions accelerated through two grids at 1–5 kV</td><td class="num">2 000 – 10 000</td><td>deep-space probes (Dawn, BepiColombo)</td></tr>
+<tr><td><strong>Electrospray / FEEP</strong></td><td>ions or droplets pulled out of a conducting liquid by a field</td><td class="num">500 – 5 000</td><td>micro-thrust (micronewtons) for precision pointing</td></tr>
+<tr><td><strong>Magnetoplasmadynamic</strong></td><td>a megawatt arc accelerated by its own magnetic field</td><td class="num">2 000 – 8 000</td><td>laboratory, future nuclear-electric ships</td></tr>
+</table></div>
+
+<h2 id="wind" data-short="Ion wind">Ion wind: an engine with no moving parts and no tank</h2>
+<p>In air, a different kind of electric thruster is possible. A very thin wire at tens of kilovolts has such a strong field at its surface that it ionises the air next to it (a <em>corona</em>, the same process that makes a power line hiss on a damp day). The ions are pulled across a gap to a smooth collector, colliding with air molecules on the way and dragging them along: a silent wind with no fan blades. The ideal thrust is $F=I\,d/\mu$: current times gap divided by the ion mobility $\mu\approx2\times10^{-4}$ m²/(V·s). Real electrodes give about a third of that.</p>
+<p>There is a window: below roughly 0.5 kV per millimetre of gap there is no corona; above about 1.4 kV per millimetre the corona turns into a <strong>spark</strong> (the breakdown of chapter 11, whose Paschen curve you have already met). Inside the window, thrust rises as the square of the voltage. The widget lets you explore that window and the central trade-off: a longer gap needs a higher voltage, so it gets harder to stay below sparking.</p>
+<div data-widget="ion-wind"></div>
+<div class="callout danger"><span class="ct">Safety: this is a calculator, not a build guide</span>Ion-wind demonstrations use 20–40 kV. The current is a milliampere, which is why it is not instantly lethal, but 30 kV can still give a painful and dangerous shock, a burn, and can be fatal for a person with a heart condition or a pacemaker; capacitors stay charged after switching off; corona makes ozone and nitrogen oxides; and sparks start fires. If you want to see the effect, do it in a school or university laboratory, under supervision, with a commercially built, current-limited supply, and never touch the electrodes. A real ion-wind aircraft exists: in 2018 an MIT team flew a 2.45 kg, five-metre aeroplane for 60 metres with no moving parts. The efficiency, around 2 N/kW, is a hundred times worse than a fan’s, which is why it is still a curiosity.</div>
+
+<h2 id="map" data-short="The map of all engines">One map for every engine in the book</h2>
+<p>The three electric engines share one limit that no chemical engine has: <strong>power</strong>. The jet power of any engine is $P=\tfrac12FV_e=\tfrac12F\,I_{sp}\,g_0$, so thrust and Isp trade against each other for a given power. A chemical rocket burns propellant at a terrific rate: the Shuttle booster’s 12 MN at 2.4 km/s is 14 <em>gigawatts</em> of jet power from a tube of propellant. An ion thruster has the power of a couple of hair dryers. Even on its way to orbit with an ion engine at an Isp of 3 000 s, a one-tonne vehicle hovering against gravity needs $P=\tfrac12\times10^4\ \text{N}\times29\,400\ \text{m/s}=147$ MW, which is a solar array of more than a third of a square kilometre. That is the entire reason that lifting off a planet is done by chemistry, and getting around the solar system with electricity.</p>
+<div data-widget="propulsion-map"></div>
+<p>Look at where each of our engines sits: rockets at the right of centre in thrust, far from the power-limited electric region; the turbojet in between, with an Isp five to ten times a rocket’s because the oxidiser is free; the airliner turbofan farther up still, because its big bypass fan is exactly the same idea as this chapter’s ducted fan, driven by a gas turbine: <em>a slow, fat jet is efficient</em>.</p>
+
+<h2 id="cj1" data-short="Back to the CJ-1">What this says about our turbojet</h2>
+<p>Put the CJ-1 against its electric twin and the whole book is in the comparison:</p>
+<div class="table-wrap"><table class="data">
+<tr><th></th><th>CJ-1 (propane turbojet)</th><th>Electric ducted fan (same 58 N)</th></tr>
+<tr><td>Energy source</td><td>propane, 12.8 kWh/kg</td><td>lithium battery, 0.18 kWh/kg</td></tr>
+<tr><td>Power from the source</td><td>≈ 130 kW of fuel heat</td><td>≈ 5 kW of electricity</td></tr>
+<tr><td>Jet speed</td><td>≈ 570 m/s (hot, fast)</td><td>≈ 90 m/s (cold, slow)</td></tr>
+<tr><td>Mass for a 5-minute run</td><td>≈ 0.9 kg of propane + bottle</td><td>≈ 2.5 kg of battery</td></tr>
+<tr><td>Noise and heat</td><td>very loud; 700 °C exhaust</td><td>far quieter; warm motor</td></tr>
+<tr><td>Complexity</td><td>combustion, ignition, fuel system, control loop</td><td>motor and controller</td></tr>
+<tr><td>Best for</td><td>long runs, high speed, high altitude</td><td>short runs, low speed, simplicity</td></tr>
+</table></div>
+<p>Neither is “better”: each wins in the band where its limit does not bite. That is the engineering way of thinking, and the one that this book has been after from the first chapter: <em>find the equation that limits the design, and see how far each machine is from it.</em></p>
+
+<h2 id="takeaways" data-short="What you learned">What you now know</h2>
+<ul>
+<li>An electric engine separates energy (from a wire) from working fluid. Its limits are electrical power and the mass of the energy store.</li>
+<li>Ducted fan: $F=(4\rho A_e)^{1/3}P^{2/3}$, and $F/P\approx2/V_e$. A big slow jet is efficient; thrust grows only as $P^{2/3}$.</li>
+<li>The fan is 27× more efficient than the CJ-1 in turning energy into thrust, but a battery holds 70× less energy per kilogram than propane: propane wins by about 2.6× for a given run time.</li>
+<li>Ion thruster: $v=\sqrt{2qV/m}$, $F=I\sqrt{2mV/q}$, $F/P=2\eta/v$. Exhaust at tens of km/s, thrust at tens of millinewtons, limited by the Child–Langmuir space-charge limit.</li>
+<li>Ion wind: $F=\eta Id/\mu$, a narrow window between corona onset and spark-over; about 1–2 N/kW.</li>
+<li>Jet power $P=\tfrac12FI_{sp}g_0$ ties thrust and Isp: chemical engines make gigawatts, electric ones kilowatts. That is why we use chemistry to leave the ground and electricity to travel between planets.</li>
+</ul>
+
+<div data-widget="quiz">
+<script type="application/json">[
+ {"q":"Why is a ducted fan more efficient than the turbojet at converting energy into thrust?","o":["It runs hotter","It does not heat the air at all: electricity drives a fan that accelerates a large mass of air to a modest speed","It uses less air","It is lighter"],"a":1,"why":"Thrust per power ≈ 2/Vₑ: a slow, large jet is efficient. A combustion jet wastes most of its fuel heat as the thermal energy of a hot exhaust."},
+ {"q":"Despite that, the propane jet still beats a battery-powered fan on energy per thrust-second. Why?","o":["Propane is cheaper","Propane stores about 70 times more energy per kilogram than a battery, more than cancelling the fan’s 27× efficiency advantage","The fan is heavy","Batteries cannot make thrust"],"a":1,"why":"Efficiency × energy density: 27 / 70 ≈ 0.4, so the fuel jet needs about 2.6× less mass for the same run."},
+ {"q":"An ion thruster’s exhaust speed doubles (higher voltage ×4). What happens to thrust per kilowatt, for the same efficiency?","o":["It doubles","It halves","It stays the same","It quadruples"],"a":1,"why":"F/P = 2η/v: thrust per power is inversely proportional to exhaust speed. Voltage raises Isp at the cost of thrust per watt."},
+ {"q":"What limits the thrust of a given ion thruster most directly?","o":["The speed of light","The space-charge (Child–Langmuir) limit on current density through the grids","Gravity","The thickness of the spacecraft"],"a":1,"why":"Positive ions repel each other and shield the field: J_max ∝ V^{3/2}/d². More thrust needs a bigger grid, a smaller gap or a higher voltage, until it sparks."},
+ {"q":"Why do we leave the ground with chemical rockets and not ion thrusters?","o":["Ion thrusters are unreliable","Lifting a vehicle against gravity needs hundreds of megawatts of jet power at ion-thruster Isp; chemical rockets have that power built into the propellant","Ion thrusters need air","They are too loud"],"a":1,"why":"Jet power P = ½·F·Isp·g₀. A one-tonne craft hovering at Isp 3 000 s needs about 150 MW. Chemistry delivers gigawatts per engine; solar arrays cannot."}
+]</script>
+</div>
+
+</article>
+</main>
+</div>
+</body>
+</html>

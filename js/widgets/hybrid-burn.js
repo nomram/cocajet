@@ -49,7 +49,7 @@ export default function init(el) {
   const ro = { OF: readout('O/F: start → end', '', 'cool'), tb: readout('Burn time', 's', 'cool'), F: readout('Average thrust', 'N', 'fuel'), I: readout('Total impulse', 'N·s', 'hot'), isp: readout('Average Isp', 's', 'good'), P: readout('Chamber pressure: start → end', 'MPa', 'cool'), eff: readout('Performance lost to the O/F shift', '%', 'hot'), st: readout('Stop on command?', '', 'good') };
   body.append(h('div', {}, cvM), h('div', { class: 'wgrid even', style: { marginTop: '10px' } }, cvA, cvB),
     h('div', { class: 'wgrid', style: { marginTop: '12px' } }, h('div', { class: 'ctls' }, so.el, sf.el, sM.el, sD.el, sL.el, sTh.el, sLoad.el, sThr.el, blow.el, ab.el, h('div', { class: 'btn-row' }, auto, play)), h('div', { class: 'readouts' }, ...Object.values(ro).map(r => r.el))));
-  const pM = new Plot(cvM, { xmin: 0, xmax: 1, ymin: 0, ymax: 1, aspect: 5.0, margin: { l: 4, r: 4, t: 4, b: 4 }, grid: false });
+  const pM = new Plot(cvM, { xmin: 0, xmax: 1, ymin: 0, ymax: 1, aspect: 5.0, minHeight: 190, margin: { l: 4, r: 4, t: 4, b: 4 }, grid: false });
   const pA = new Plot(cvA, { xmin: 0, xmax: 10, ymin: 0, ymax: 20, aspect: 1.55, xlabel: 'time (s)', ylabel: 'O/F (oxidiser mass : fuel mass)', title: 'Oxygen-to-fuel ratio during the burn', margin: { l: 52, r: 12, t: 28, b: 40 } });
   const pB = new Plot(cvB, { xmin: 0, xmax: 10, ymin: 0, ymax: 500, aspect: 1.55, xlabel: 'time (s)', ylabel: 'thrust (N)', title: 'Thrust and port diameter', margin: { l: 52, r: 12, t: 28, b: 40 } });
   let res = null, playing = false, t0 = 0, tNow = 0;
@@ -83,12 +83,12 @@ export default function init(el) {
     const tankL = 0.40, tankR = 0.07, usedFrac = Math.min(1, (r.used ? r.t.slice(0, idx + 1).reduce((a, _, i) => a + (i ? r.mo[i] * (r.t[i] - r.t[i - 1]) : 0), 0) / sLoad.get() : 0));
     ctx.fillStyle = c.metal; ctx.globalAlpha = .8; ctx.beginPath(); ctx.roundRect(X(0), Y(tankR), tankL * s, 2 * tankR * s, 14); ctx.fill(); ctx.globalAlpha = 1;
     ctx.fillStyle = 'rgba(80,170,255,0.85)'; const lvl = 2 * (tankR - 0.008) * (1 - usedFrac); ctx.fillRect(X(0.02), Y(-tankR + 0.008 + lvl), (tankL - 0.04) * s, lvl * s);
-    ctx.fillStyle = c.strong; ctx.font = '600 11px ui-sans-serif, system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillText('oxidiser tank', X(tankL / 2), Y(tankR) - 16);
+    ctx.fillStyle = c.strong; ctx.font = '600 11px ui-sans-serif, system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillText(W < 600 ? 'tank' : 'oxidiser tank', X(tankL / 2), Y(tankR) - 16);
     // valve and injector line
     const gx = tankL + 0.08, valve = X(tankL + 0.04), open = mo > 0;
     ctx.strokeStyle = c.strong; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(X(tankL), oy); ctx.lineTo(X(gx), oy); ctx.stroke();
     ctx.fillStyle = open ? c.ok : c.bad; ctx.beginPath(); ctx.moveTo(valve - 8, oy - 9); ctx.lineTo(valve + 8, oy + 9); ctx.lineTo(valve + 8, oy - 9); ctx.lineTo(valve - 8, oy + 9); ctx.closePath(); ctx.fill();
-    ctx.fillStyle = c.muted; ctx.fillText('valve', valve, oy + 12);
+    ctx.fillStyle = c.muted; if (W >= 600) ctx.fillText('valve', valve, oy + 12);
     // combustion: grain, port, flame sheet
     const R = DGRAIN / 2, port = d / 2, x0 = gx, x1 = gx + L;
     ctx.fillStyle = c.metal; ctx.globalAlpha = .85; ctx.fillRect(X(x0), Y(R + 0.008), L * s, 2 * (R + 0.008) * s); ctx.globalAlpha = 1;
@@ -102,8 +102,8 @@ export default function init(el) {
     // plume
     const Fm = Math.max(...r.F, 1), len = act ? (0.12 * W) * (0.3 + 0.7 * F / Fm) * (1 + 0.05 * Math.sin(tNow * 80)) : 0;
     if (len > 3) { const xe = X(xc + 0.09), gr = ctx.createLinearGradient(xe, 0, xe + len, 0); gr.addColorStop(0, 'rgba(255,245,210,0.95)'); gr.addColorStop(0.3, 'rgba(255,170,70,0.8)'); gr.addColorStop(1, 'rgba(200,60,30,0)'); ctx.fillStyle = gr; ctx.beginPath(); ctx.moveTo(xe, oy - re * s); ctx.quadraticCurveTo(xe + len * 0.5, oy - re * s * 1.2, xe + len, oy); ctx.quadraticCurveTo(xe + len * 0.5, oy + re * s * 1.2, xe, oy + re * s); ctx.fill(); }
-    ctx.fillStyle = c.strong; ctx.textAlign = 'center'; ctx.fillText('fuel grain (port widens as it burns)', X((x0 + x1) / 2), Y(R + 0.008) - 16); ctx.fillText('nozzle', X(xc + 0.045), Y(R + 0.008) - 16);
-    ctx.textAlign = 'right'; ctx.font = '700 12px ui-sans-serif, system-ui, sans-serif'; ctx.fillText(`t = ${tNow.toFixed(1)} s    O/F = ${mo > 0 ? OF.toFixed(1) : '–'}    port Ø ${(d * 1000).toFixed(0)} mm    thrust = ${F.toFixed(0)} N`, W - 8, 8);
+    ctx.fillStyle = c.strong; ctx.textAlign = 'center'; ctx.fillText(W < 600 ? 'fuel grain' : 'fuel grain (port widens as it burns)', X((x0 + x1) / 2), Y(R + 0.008) - 16); if (W >= 600) ctx.fillText('nozzle', X(xc + 0.045), Y(R + 0.008) - 16);
+    ctx.textAlign = 'right'; ctx.font = '700 12px ui-sans-serif, system-ui, sans-serif'; ctx.fillText(W < 600 ? `t ${tNow.toFixed(1)} s   O/F ${mo > 0 ? OF.toFixed(1) : '–'}   F ${F.toFixed(0)} N` : `t = ${tNow.toFixed(1)} s    O/F = ${mo > 0 ? OF.toFixed(1) : '–'}    port Ø ${(d * 1000).toFixed(0)} mm    thrust = ${F.toFixed(0)} N`, W - 8, 8);
     if (!open && tNow > 0.1) { ctx.fillStyle = c.bad; ctx.textAlign = 'left'; ctx.fillText('valve closed: burn stopped', 10, H - 18); }
   }
   function frame(now) { if (playing && res) { const T = Math.max(3.5, res.tb * 0.6) * 1000, k = (now - t0) / T; tNow = Math.min(1, k) * res.tb; drawPlots(); draw(); if (k >= 1.15) playing = false; } requestAnimationFrame(frame); }

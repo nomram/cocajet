@@ -66,7 +66,7 @@ export class Plot {
 
   _size() {
     const c = this.c, w = Math.max(200, c.clientWidth || (c.parentElement ? c.parentElement.clientWidth : 0) || 400);
-    const h = this.o.height || Math.round(w / this.o.aspect);
+    const h = this.o.height || Math.max(this.o.minHeight || 0, Math.round(w / this.o.aspect));
     const dpr = Math.min(2.5, window.devicePixelRatio || 1);
     c.style.height = h + 'px';
     c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);

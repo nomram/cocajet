@@ -26,9 +26,9 @@ export default function init(el) {
   const kind = h('div', { class: 'widget-note', style: { marginTop: '6px' } });
   body.append(h('div', {}, cvM), h('div', { class: 'wgrid even', style: { marginTop: '10px' } }, cvF, cvP), kind,
     h('div', { class: 'wgrid', style: { marginTop: '12px' } }, h('div', { class: 'ctls' }, sel.el, fam.el, sD.el, sd.el, sL.el, sS.el, sT.el, sE.el, sA.el, sN.el, sB.el, sK.el, ero.el, h('div', { class: 'btn-row' }, size, play)), h('div', { class: 'readouts' }, ...Object.values(ro).map(r => r.el))));
-  const pM = new Plot(cvM, { xmin: 0, xmax: 1, ymin: 0, ymax: 1, aspect: 3.3, margin: { l: 4, r: 4, t: 4, b: 4 }, grid: false });
+  const pM = new Plot(cvM, { xmin: 0, xmax: 1, ymin: 0, ymax: 1, aspect: 3.3, minHeight: 200, margin: { l: 4, r: 4, t: 4, b: 4 }, grid: false });
   const pF = new Plot(cvF, { xmin: 0, xmax: 2, ymin: 0, ymax: 100, aspect: 1.55, xlabel: 'time (s)', ylabel: 'thrust (N)', title: 'Thrust curve', margin: { l: 52, r: 12, t: 28, b: 40 } });
-  const pP = new Plot(cvP, { xmin: 0, xmax: 2, ymin: 0, ymax: 10, aspect: 1.55, xlabel: 'time (s)', ylabel: 'chamber pressure (MPa)', title: 'Chamber pressure vs. what the case can take', margin: { l: 52, r: 12, t: 28, b: 40 } });
+  const pP = new Plot(cvP, { xmin: 0, xmax: 2, ymin: 0, ymax: 10, aspect: 1.55, xlabel: 'time (s)', ylabel: 'chamber pressure (MPa)', title: 'Chamber pressure vs case limit', margin: { l: 52, r: 12, t: 28, b: 40 } });
   let res = null, playing = false, t0 = 0, tNow = 0;
   const geo = () => ({ D: mm(sD.get()), d0: sel.get() === 'end' || sel.get() === 'rod' ? 0 : mm(Math.min(sd.get(), sD.get() - 4)), L: mm(sL.get()), N: sel.get() === 'bates' ? Math.round(sS.get()) : 1 });
   function autoSize() { const g = geo(), At = throatForPeakKn(sel.get(), g, 265); sT.set(Math.min(16, Math.max(1.5, Math.sqrt(4 * At / Math.PI) * 1000))); }
