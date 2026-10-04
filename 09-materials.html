@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>9 · Materials science — Jet Engines for Dummies</title>
+<meta name="description" content="Why the Coke can melts and what doesn't: strength vs temperature, centrifugal stress, creep, thermal expansion, film cooling and oxidation, and what metal to choose for every part of a small turbojet.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter">
+
+<span class="eyebrow">Chapter 9 · Level up</span>
+<h1>Materials science: why the can melts and what doesn’t</h1>
+<div class="meta"><span>~40 min</span><span>5 widgets</span><span>numbers you can check</span></div>
+<p class="lede">The thermodynamics of chapter 3 says: hotter inlet, more thrust. The reason a cheap engine doesn’t run hotter is not the compressor or the fuel: it is that every metal we can afford gets weak, stretches and oxidises long before the flame gets uncomfortable.</p>
+
+<h2 id="why" data-short="Four enemies">Four enemies of a hot, spinning part</h2>
+<div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(210px,1fr))">
+<div class="card"><span class="num">1 · STRENGTH</span><h3>Yield drops with heat</h3><p>Most metals lose half their strength by 500–700 °C; aluminium by 250 °C.</p></div>
+<div class="card"><span class="num">2 · CREEP</span><h3>Slow stretching</h3><p>Hot metal under constant load flows, even far below its yield, until it ruptures.</p></div>
+<div class="card"><span class="num">3 · OXIDATION</span><h3>Burning slowly</h3><p>Hot air eats the surface (scale). Chromium and nickel alloys grow a protective skin.</p></div>
+<div class="card"><span class="num">4 · FATIGUE</span><h3>Cycles &amp; vibration</h3><p>Every start-up, every blade resonance, every thermal cycle adds a tiny crack.</p></div>
+</div>
+
+<h2 id="map" data-short="Where it is hot">A temperature map of the engine</h2>
+<p>These are the metal temperatures from the simulator (full power, sea level). The drive: where it is hot <em>and</em> highly stressed (turbine blades), only a nickel superalloy will do; where it is hot but lightly loaded (flame tube, nozzle), stainless will do; where it is stressed but cool (compressor wheel, shaft), strong light or hard alloys.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Part</th><th class="num">Metal temp (°C)</th><th class="num">Stress</th><th>Typical choice</th><th>Why</th></tr>
+<tr><td>Impeller</td><td class="num">90–150</td><td class="num">130–250 MPa (spinning)</td><td>Forged 2618-T61 / 2014 Al, or a scrap-turbo wheel</td><td>Light, strong at low T, easy to machine</td></tr>
+<tr><td>Compressor housing, diffuser</td><td class="num">90–150</td><td class="num">low</td><td>Aluminium 6061 or cast A356</td><td>Cheap, easy; keep under 200 °C</td></tr>
+<tr><td>Shaft</td><td class="num">100–500</td><td class="num">torque + bending</td><td>Hardened steel (e.g. 4340, or a gauge pin); Inconel only for the hot end</td><td>Stiff, hard, cheap</td></tr>
+<tr><td>Bearing tunnel</td><td class="num">150–450</td><td class="num">low</td><td>Steel; stainless where it nears the turbine</td><td>Holds bearings; needs low expansion</td></tr>
+<tr><td>Combustor casing</td><td class="num">200–350</td><td class="num">5 MPa (pressure)</td><td>304 stainless, 2 mm</td><td>Cheap, welds well, rust-free</td></tr>
+<tr><td><strong>Flame-tube wall</strong></td><td class="num"><strong>500–750</strong></td><td class="num">tiny (thermal only)</td><td>Coke can (short runs), then 310S / 321 / Inconel 625</td><td>Thin sheet, film-cooled; oxidation resistance matters</td></tr>
+<tr><td>Nozzle guide vanes</td><td class="num">750–800</td><td class="num">gas bending, modest</td><td>310S or Inconel 625</td><td>Hot but stationary</td></tr>
+<tr><td><strong>Turbine wheel</strong></td><td class="num"><strong>700–780</strong></td><td class="num"><strong>250 MPa blade root, 430 MPa bore</strong></td><td><strong>Inconel 713 / 718 / 625</strong></td><td>Hot <em>and</em> highly stressed: the hardest job</td></tr>
+<tr><td>Turbine casing / nozzle</td><td class="num">650–760</td><td class="num">low</td><td>310S or 304 (321 if welded)</td><td>Hot, lightly stressed</td></tr>
+</table></div>
+
+<h2 id="strength" data-short="Strength vs temperature">Strength versus temperature</h2>
+<p>Tick the metals to compare. Move the red stress line and the temperature to read off safety factors. Try 190 MPa at 750 °C (the turbine blade root) and then try 5 MPa at 600 °C (a flame-tube wall).</p>
+<div data-widget="material-strength"></div>
+<p>Two things jump out: aluminium (can and 6061) collapses by 200–300 °C, so it can only live where cooled; stainless 304 and 310 hold a modest 100 MPa at 800 °C (not enough for a spinning blade); and the nickel alloys keep several hundred MPa to 800 °C.</p>
+
+<h2 id="spin" data-short="Spinning stress">Stress in the spinning rotor</h2>
+<p>A blade at radius $r$ is pulled outward by $m\omega^2r$. Add up the mass beyond each point and the root of a blade carries $\sigma\approx\tfrac12\rho\omega^2(r_t^2-r_h^2)$: it depends on the material <em>density</em> (heavy nickel alloys hurt) and on the <strong>square of the speed</strong>. A disc is loaded by its own mass (peak stress at the bore) plus the pull of the blades on its rim.</p>
+<div data-widget="rotor-stress"></div>
+<div class="callout fire"><span class="ct">What this says about CJ-1, honestly</span>
+<ul><li><strong>Turbine wheel at 115 000 rpm, ~750 °C:</strong> blade root ≈ 250 MPa. Inconel 718 (yield ~720 MPa hot) carries the blade root with a safety factor of 2.8; the disc bore is the limit, at 1.65 on yield and a burst margin of ~1.4× in speed: tight but proper. Stainless 310S (yield ~120 MPa hot) is far over its limit. Even 625 (300 MPa) is marginal. The “310 for a hobby build” advice you might read elsewhere applies to far slower, cooler wheels.</li>
+<li><strong>Compressor wheel:</strong> disc stress 130–250 MPa vs 6061’s ~240 MPa at 120 °C: no margin. Forged 2618 is the right alloy, and a scrap turbo wheel is already proven.</li>
+<li>Either way a <strong>speed limiter</strong> and a <strong>containment ring</strong> are not optional.</li></ul></div>
+
+<h2 id="creep" data-short="Creep">Creep: the slow failure</h2>
+<p>Yield tells you if a part gives way <em>now</em>. At high temperature a part under a steady load also gives way <em>later</em>: it creeps. The usual way to compare alloys is the <strong>Larson–Miller parameter</strong> $\text{LMP}=T\,(C+\log_{10}t)$ with $T$ in kelvin, $t$ in hours and $C\approx20$. For a given stress, LMP is a constant of the alloy, so you can trade time for temperature.</p>
+<div data-widget="creep"></div>
+<p>The 4× life change per 25 °C is why the turbine inlet temperature is controlled so tightly on real engines, and why a hot start (EGT 100 °C too high for a few seconds) uses up a chunk of the blade’s life.</p>
+
+<h2 id="expansion" data-short="Expansion">Thermal expansion and thermal stress</h2>
+<p>Heat a metal bar by ΔT and it grows by $\Delta L=\alpha L\,\Delta T$ (steel $\alpha\approx12$, stainless 16–17, aluminium 23 µm/m/K). If you stop it from growing, it pushes back with stress $\sigma=E\alpha\Delta T$: for steel that is 2.5 MPa per kelvin. A thin wall heated on one face and cold on the other (a start-up transient) feels about half of that.</p>
+<div data-widget="thermal-stress"></div>
+<div class="callout"><span class="ct">Design rule</span>Every hot–cold joint in the engine is a <em>floating</em> joint: the flame tube rests on its dome with a loose fit, the NGV ring slides inside the turbine casing, the nozzle flange is bolted with slotted holes. Rigidly bolting a hot part to a cold one makes it buckle, crack at the weld or loosen after the first heat cycle.</div>
+
+<h2 id="wall" data-short="The Coke can">Why the Coke can survives (for a while)</h2>
+<p>A flame tube sees a 2 000 K flame inside and 366 K air outside, and aluminium melts at 650 °C. Its wall temperature is a heat balance: hot gas heats it by convection and radiation; cool air (outside, and the film along the inside) carries the heat away. The knob is the <strong>cooling-film effectiveness</strong>: how much of the cooling air actually covers the wall.</p>
+<div data-widget="wall-temp"></div>
+<p>With a good film (η ≈ 0.5) the can sits just below its melting point: that’s why it lasts minutes but not hours. With η ≥ 0.6 or a stainless or Inconel wall, it lasts for hours or years. In the simulator, pick “Coke can” and run at full power; then pick “Stainless 310S”.</p>
+
+<h2 id="oxid" data-short="Oxidation">Oxidation, corrosion and fatigue</h2>
+<p>Hot air attacks metal. Iron alone forms a thick flaky scale that spalls off; chromium (and nickel) form a thin, sticky oxide skin that protects the metal underneath. That is what “stainless” and “Inconel” mean in practice. Typical maximum continuous service temperatures in air (approximate):</p>
+<table class="data">
+<tr><th>Alloy</th><th class="num">Max in air (°C)</th><th>Notes</th></tr>
+<tr><td>Aluminium 3004 (can)</td><td class="num">~250</td><td>Strength gone by 300; melts ~650</td></tr>
+<tr><td>Mild steel</td><td class="num">~500</td><td>Scales heavily above this</td></tr>
+<tr><td>Stainless 304 / 321</td><td class="num">~870</td><td>321 resists sensitisation after welding</td></tr>
+<tr><td>Stainless 310S</td><td class="num">~1 100</td><td>25 % Cr, 20 % Ni; great oxidation resistance, modest strength</td></tr>
+<tr><td>Inconel 625</td><td class="num">~980</td><td>Strong, excellent corrosion and fatigue resistance, expensive</td></tr>
+<tr><td>Inconel 718 / 713</td><td class="num">~650 / ~950</td><td>Age-hardened strength; 713 is a casting alloy</td></tr>
+<tr><td>Hastelloy X</td><td class="num">~1 150</td><td>The classic combustor-liner alloy</td></tr>
+<tr><td>Titanium Ti-6Al-4V</td><td class="num">~450</td><td>Never in the hot section: oxidises, and titanium fires are real</td></tr>
+</table>
+<p><strong>Fatigue</strong> is the other quiet killer: a blade is excited at multiples of the rotation speed (once per vane passing, 16× per rev for our NGV). If a blade’s natural frequency coincides with one of these “engine orders” in the operating range, it resonates and cracks. Real designs plot a <em>Campbell diagram</em>; hobby builders avoid it by (a) stiff, short blades, (b) a prime blade count (19) against an even vane count (16), and (c) passing quickly through any resonance.</p>
+
+<h2 id="choose" data-short="Choosing materials">Choosing materials on a budget</h2>
+<div class="table-wrap"><table class="data">
+<tr><th>Part</th><th>Cheapest that works</th><th>Best affordable upgrade</th><th class="num">Relative cost</th></tr>
+<tr><td>Flame tube</td><td>Coke can (minutes at full power)</td><td>0.5 mm 310S or 321 laser-cut; later Hastelloy X</td><td class="num">1 → 15 → 80</td></tr>
+<tr><td>Turbine wheel</td><td>Not applicable: don’t compromise here</td><td>Inconel 625 water-jet plate with 718/713 for life</td><td class="num">1 (only option)</td></tr>
+<tr><td>NGV ring</td><td>310S sheet</td><td>Inconel 625 sheet</td><td class="num">1 → 3</td></tr>
+<tr><td>Casing &amp; nozzle</td><td>304 exhaust tube</td><td>321 or 310S</td><td class="num">1 → 2</td></tr>
+<tr><td>Impeller</td><td>Scrap turbo wheel</td><td>CNC from forged 2618</td><td class="num">1 → 4</td></tr>
+<tr><td>Shaft</td><td>Hardened gauge pin / drill rod</td><td>Ground 4340 or Inconel 718 for the hot end</td><td class="num">1 → 5</td></tr>
+</table></div>
+
+<h2 id="takeaways" data-short="What you learned">What you now know</h2>
+<ul>
+<li>Metals lose strength with temperature; aluminium goes at 250 °C, steel/stainless at 600–800 °C, nickel alloys keep their strength to ~800 °C.</li>
+<li>Centrifugal stress goes as ρ(ωr)²: spinning parts need strong, <em>hot-strong</em> alloys; our turbine blade root sees ~250 MPa at ~750 °C: Inconel only.</li>
+<li>Creep life drops about 4× per 25 °C; one overtemperature start can eat a chunk of the blade’s life.</li>
+<li>Thermal expansion means every hot–cold joint must float.</li>
+<li>The Coke can lives on its film of cooling air; it is a teaching liner, not a long-life one.</li>
+</ul>
+
+<div data-widget="quiz">
+<script type="application/json">[
+ {"q":"At 750 °C and 190 MPa, which of these is first to fail by creep?","o":["Inconel 718","Inconel 625","Stainless 310S","They all last equally long"],"a":2,"why":"310S has a much lower creep-rupture strength than the nickel alloys: hours versus thousands of hours."},
+ {"q":"You spin a turbine 10 % faster. The centrifugal stress rises by about…","o":["10 %","21 %","33 %","100 %"],"a":1,"why":"σ ∝ ω², and 1.1² = 1.21."},
+ {"q":"Why is the Coke-can flame tube a “teaching liner”?","o":["It’s too heavy","Aluminium melts near 650 °C and loses strength by 250 °C, so only the cooling film saves it for short runs","It conducts heat too well to the casing","It rusts"],"a":1,"why":"The wall-temperature balance puts it right at the edge of melting."},
+ {"q":"A hot steel part is rigidly clamped and heated by 400 K. The stress it develops is roughly…","o":["10 MPa","100 MPa","1 000 MPa","none: steel doesn’t expand"],"a":2,"why":"σ = EαΔT = 210 000 MPa × 12×10⁻⁶ × 400 K ≈ 1 000 MPa. That is far above yield, so a real part would yield (warp) instead of carrying it: the reason hot joints must float."}
+]</script>
+</div>
+
+</article>
+</main>
+</div>
+</body>
+</html>

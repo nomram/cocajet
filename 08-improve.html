@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>8 · Make it better, cheaply — Jet Engines for Dummies</title>
+<meta name="description" content="Where a Coke-can turbojet wastes its fuel and how to fix it on a hobby budget: loss budget, upgrade planner, balancing, bearings, diffuser, combustor, turbine and nozzle tricks, afterburners, turbofans, instrumentation and manufacturing routes.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter">
+
+<span class="eyebrow">Chapter 8 · Level up</span>
+<h1>Make it better, cheaply</h1>
+<div class="meta"><span>~45 min</span><span>5 widgets</span><span>every upgrade priced</span></div>
+<p class="lede">Our engine works, but it is a wasteful one: it burns 10 kg of propane an hour to make 58 N. Almost every improvement from here on is a trade between money, machining skill and risk. This chapter ranks them so you spend where it pays.</p>
+
+<div class="callout warn"><span class="ct">Before you upgrade anything</span>Every item below that raises speed, pressure or temperature also raises the stored energy and the failure rate. Chapter 9 explains the metals, and the <a href="safety.html">safety page</a> explains why “one more step up” is how people get hurt. Upgrade efficiency first, <em>then</em> consider more power.</div>
+
+<h2 id="budget" data-short="Where the fuel goes">The loss budget: where does the fuel go?</h2>
+<p>Chapter 3 told us a perfect version of our cycle would have a thermal efficiency of 1 − 1/r<sup>0.286</sup> ≈ 18 % at pressure ratio 2.0. We get about 8 %. The gap is a pile of small imperfections: air that is not diffused cleanly, a turbine that wastes 20 % of the energy it is given, gas that leaks around the blade tips, a flame that does not burn every molecule, and bearings that drag.</p>
+<p>The cleanest way to rank them is to ask the engine model (the same one that drives the simulator): <em>fix just this one imperfection, leave everything else, and re-solve the engine at the same speed</em>. How much less fuel does each newton of thrust cost?</p>
+<div data-widget="loss-budget"></div>
+<p>Three things stand out:</p>
+<ul>
+<li><strong>The diffuser and turbine are worth more than the flame.</strong> A 12-point better diffuser recovers pressure we already paid for, and the turbine is a bottleneck because every joule it takes from the gas goes straight back into the compressor, so its inefficiency is paid twice.</li>
+<li><strong>Tip clearance is the best money-for-effect fix there is.</strong> It costs nothing but careful machining: 0.15 mm instead of 0.40 mm is 4 % less fuel.</li>
+<li><strong>No single fix is dramatic.</strong> It is the stack that matters. All eight together cut the fuel per newton by 28 %, <em>and</em> run the turbine 150 K cooler at the same speed, a big gain in blade life.</li>
+</ul>
+
+<h2 id="planner" data-short="Upgrade planner">Spend a budget: the upgrade planner</h2>
+<p>Here are ten upgrades with rough hobby prices. Tick a few, look at thrust, fuel per newton and turbine inlet temperature, and watch the cost.</p>
+<div data-widget="upgrade-planner"></div>
+<div class="callout tip"><span class="ct">The cheap and safe set</span>The button selects bearings, abradable shroud, bellmouth, liner and vaned diffuser: about USD 270 of parts and a lot of care. In the model it gives +14 % thrust, 17 % less fuel per newton <em>and</em> a turbine 90 K cooler, with no increase in rotor speed. This is how to get a much better engine with no extra risk.</div>
+<p>Notice the two <span style="color:var(--fuel);font-weight:600">orange</span> items. They are free, and they work. They are also exactly how engines are lost: they make the turbine hotter or faster, and both shorten life dramatically (chapter 9). Take them only with the right alloys, balance and containment.</p>
+
+<h2 id="balance" data-short="Balancing">Balance: the cheapest reliability upgrade</h2>
+<p>A perfectly built rotor still has a centre of mass a few microns off the shaft axis. That offset spins around at 1 900 Hz and shakes the bearings with a force that grows with the <em>square</em> of the speed:</p>
+<div class="eq">$$F = U\,\omega^2 \qquad\text{with}\qquad U = m\,e\ \text{(g·mm)}$$</div>
+<p>One g·mm of unbalance (a 0.1 g blob 10 mm from the axis) is 145 N at 115 000 rpm: 76 times the weight of our 195 g rotor. The ISO 1940 <em>balance grade</em> G is the speed of the centre of mass as it whirls, $G = e\,\omega$ in mm/s, and sets the allowed unbalance. Turbomachinery wants G2.5 or better.</p>
+<div data-widget="unbalance"></div>
+<p><strong>Worked example.</strong> Rotor 195 g at 115 000 rpm ($\omega = 12\,043$ rad/s). For G2.5:</p>
+<div class="eq">$$e=\frac{G}{\omega}=\frac{2.5\ \text{mm/s}}{12\,043\ \text{s}^{-1}}=0.21\ \mu\text{m},\qquad U=m\,e=195\ \text{g}\times 0.00021\ \text{mm}\approx 0.04\ \text{g·mm}$$</div>
+<p>So the whole rotor must balance to better than the weight of a grain of sand at 10 mm radius. That is why people with turbo shops do it on a two-plane dynamic balancer, and why you remove material by tiny grinding passes on the compressor nut and the turbine hub, never by drilling or filing on a blade.</p>
+<ul>
+<li><strong>Cheap route:</strong> take the rotor (wheel + shaft + nut) to a turbocharger shop. Balancing a turbo core is routine and costs the price of a pizza.</li>
+<li><strong>DIY route:</strong> balance each wheel on knife-edge rails or a magnetic balancer first, then trim the assembled rotor on its own bearings while watching a vibration sensor.</li>
+<li><strong>Never</strong> run a rotor you have not balanced <em>after</em> its last machining operation.</li>
+</ul>
+
+<h2 id="bearings" data-short="Bearings & oil">Bearings and lubrication</h2>
+<p>The two bearings on our 8 mm shaft run at 115 000 rpm: a surface speed of 48 m/s, and a DN value (bore in mm × rpm) of 0.9 million. Ordinary steel ball bearings, grease-packed and rated for 20 000 rpm, will not live.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Option</th><th class="num">Cost (USD)</th><th>Speed capability</th><th>Notes</th></tr>
+<tr><td>Standard steel ball, grease</td><td class="num">5</td><td>Poor</td><td>Fine for a bench test of a few seconds: the bearings will cook</td></tr>
+<tr><td>Steel ball, oil mist / drip feed</td><td class="num">15</td><td>Fair</td><td>Oil takes the heat away. Kerosene hobby turbines mix ~5 % oil into the fuel; a propane engine needs a small oil pump or a drip feed instead.</td></tr>
+<tr><td>Hybrid ceramic (Si₃N₄ balls)</td><td class="num">40–80</td><td>Good</td><td>Lighter balls, lower friction, survive brief oil starvation. The standard hobby choice.</td></tr>
+<tr><td>Turbocharger journal bearings</td><td class="num">10 (scrap)</td><td>Excellent</td><td>Floating-sleeve oil-fed bearings built for 200 000 rpm. If you use a scrap turbo cartridge, this is what you have.</td></tr>
+<tr><td>Air bearings</td><td class="num">200+</td><td>Excellent</td><td>No oil, no wear; hard to make.</td></tr>
+</table></div>
+<p>Whatever you choose, the bearing <em>must stay cool</em>: that is the job of the bearing tunnel in the STL, of the air gap between it and the flame tube, and of the cooling flow of oil. A bearing that reaches 150–200 °C loses its hardness and fails in a few seconds. Always keep the oil flowing for a minute after shutdown (heat soak).</p>
+
+<h2 id="parts" data-short="Part by part">Part-by-part tricks that cost little</h2>
+<div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+<div class="card"><span class="num">COMPRESSOR</span><h3>Shape, not size</h3><p>Backward-swept blades (25–30°) and a splitter blade between each pair (9 + 9) give about 10 % more thrust at the same speed (pressure ratio 1.94 → 2.02). Scrap turbo wheels already have it.</p></div>
+<div class="card"><span class="num">DIFFUSER</span><h3>Slow the air gently</h3><p>A vaneless plate recovers ~70 % of the exit velocity head. 12–16 wedge vanes at the right angle recover 80 % or more. Cut them from sheet and braze.</p></div>
+<div class="card"><span class="num">COMBUSTOR</span><h3>Hole pattern is everything</h3><p>Three rows of holes (primary, secondary, dilution) in the proportions of chapter 5. A swirl of primary air holds the flame; bend a few tabs to increase it.</p></div>
+<div class="card"><span class="num">TURBINE</span><h3>Twist the blades</h3><p>Hub-to-tip twist (chapter 4) matches the local flow angle. A cheap forming jig gives +4 points of efficiency.</p></div>
+<div class="card"><span class="num">NOZZLE</span><h3>Right-size the throat</h3><p>A smaller throat gives more thrust at a hotter turbine. Choose it by the engine’s EGT, not by the thrust target.</p></div>
+<div class="card"><span class="num">INLET</span><h3>A bellmouth is free thrust</h3><p>A smooth rounded entry avoids a 2–3 % pressure drop. Spin one from sheet or print it in resin.</p></div>
+</div>
+<details class="deep"><summary>More on diffusers, and why they are the biggest single lever</summary><div>
+<p>The impeller throws air out at about 280 m/s, a lot of kinetic energy that does not (yet) count as pressure. A diffuser that slows it to 70 m/s turns that kinetic energy into pressure, following Bernoulli: $\Delta P \approx \tfrac12\rho(V_2^2 - V_3^2)$. But air resists being decelerated: slow it too fast and the flow separates from the walls and the recovery vanishes. A vaned diffuser has a throat followed by a gently-opening passage with a total opening angle of at most 8–10°: faster than that and the flow separates. In our model, going from 70 % to 82 % recovery cuts fuel by 7 % and also drops the turbine temperature by 41 K at the same speed.</p>
+</div></details>
+
+<h2 id="speed" data-short="More power safely">More thrust: the honest options</h2>
+<p>All thrust upgrades fall into three families, and each pays in a different currency:</p>
+<ol>
+<li><strong>More air</strong> (bigger compressor, same speed). Costs machining time and a new, larger frame. At the same tip speed the air speeds stay the same and the flow scales with the inlet area, so thrust goes as $D^2$. A 70 mm impeller (1.25× larger) would give about 1.56 × 58 ≈ 90 N, at 92 000 rpm.</li>
+<li><strong>More pressure</strong> (faster or better-swept impeller). Thrust and efficiency both rise, but stress rises as $N^2$ and the material demands steepen quickly.</li>
+<li><strong>More temperature</strong> (richer, with a smaller nozzle). Thrust rises, but each 25 K costs ¾ of the turbine blade’s life (creep, chapter 9).</li>
+</ol>
+<div class="callout"><span class="ct">Rule of thumb</span>Make it more efficient before you make it more powerful. A more efficient engine makes the same thrust at a <em>lower</em> temperature and speed: more power and longer life from the same parts.</div>
+
+<h2 id="afterburner" data-short="Afterburner">Afterburner: thrust you can burn</h2>
+<p>Our exhaust is 650 °C, and it still has a lot of unused oxygen: the engine runs very lean. Spray fuel into the jet pipe and light it, and that oxygen burns to raise the exhaust temperature, say to 1 100 °C, with no turbine in the way to limit it. The nozzle exit velocity goes as $\sqrt{T}$, so thrust rises by $\sqrt{1\,373/943}\approx 1.21$, i.e. +21 %, for about 1.6 g/s of extra propane (+56 % fuel). Military jets do this for brief bursts. It is a fun experiment (a ring of fuel jets and a flameholder tab in the nozzle) but it needs a longer, heat-resistant nozzle tube with a larger throat (hotter gas flows less easily and would otherwise choke the turbine), makes it much louder, and makes a fireball in front of you. We don’t recommend it for a first engine.</p>
+
+<h2 id="fan" data-short="Turbofan">Adding a fan: the turbofan idea</h2>
+<p>Chapter 2 showed that thrust is cheaper when you accelerate lots of air gently. A turbofan does exactly that: leave the core as it is, but bolt a ducted fan in front and drive it with a second turbine behind the first. The bypass ratio B is the cold air through the fan divided by the hot air through the core.</p>
+<div data-widget="bypass"></div>
+<p>Set the flight speed to 100 m/s (a fast model aircraft) and look at the right-hand plot: the plain jet (B = 0) wastes more than half of its energy in the exhaust, while B = 6 lifts the propulsive efficiency to about 75 %. Airliners go to B = 10–12 for this reason. On a test stand there is no gain in efficiency (nothing moves), and the fan needs a second shaft, a second turbine and extra bearings: the turbofan only pays off for something that flies.</p>
+
+<h2 id="control" data-short="Instruments & control">Instruments and control</h2>
+<p>Every hobby turbine manufacturer’s secret is the controller, not the mechanics. A handful of parts turns our simulator’s “ECU” into reality:</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Sensor / part</th><th class="num">Cost (USD)</th><th>Why you need it</th></tr>
+<tr><td>K-type thermocouple + amplifier (EGT)</td><td class="num">8</td><td>The single most important instrument: it is your turbine temperature limiter.</td></tr>
+<tr><td>Hall sensor + magnet on the compressor nut (rpm)</td><td class="num">3</td><td>Start-up logic and over-speed protection.</td></tr>
+<tr><td>Fuel pressure transducer</td><td class="num">12</td><td>Know that fuel is actually flowing.</td></tr>
+<tr><td>Fuel solenoid valve (fail-closed) + needle valve</td><td class="num">25</td><td>Instant stop and fine control.</td></tr>
+<tr><td>Load cell on the test stand (thrust)</td><td class="num">10</td><td>Measure what you built, safely.</td></tr>
+<tr><td>Microcontroller (Arduino, ESP32, or similar)</td><td class="num">5–15</td><td>Runs the start sequence, the EGT limit, the rpm limit and a watchdog.</td></tr>
+<tr><td>Accelerometer on the bearing tunnel</td><td class="num">4</td><td>Warns you when the rotor starts to go out of balance.</td></tr>
+</table></div>
+<p>A good controller does five things: it follows a <em>start script</em> (starter → ignition → fuel ramp), it <em>limits EGT</em> by trimming fuel, it <em>limits rpm</em>, it <em>detects flame-out</em> (rpm falls with no fuel change) and it <em>kills the fuel</em> if anything is out of range. These are the same rules the simulator in chapter 7 runs: try breaking each of them there first.</p>
+
+<h2 id="make" data-short="Making the parts">Making the parts: three routes</h2>
+<div class="table-wrap"><table class="data">
+<tr><th>Route</th><th>Best for</th><th>Cost</th><th>Watch out for</th></tr>
+<tr><td><strong>Scavenged turbocharger</strong></td><td>Impeller, turbine wheel, shaft and bearings in one balanced cartridge</td><td class="num">USD 30–120</td><td>Pick a small automotive turbo (compressor wheel 50–60 mm, like CJ-1’s 56 mm). Check for blade damage and shaft play first.</td></tr>
+<tr><td><strong>Machined from billet</strong> (lathe, mill, waterjet)</td><td>Flame tube, nozzle, housings, diffuser plate, test stand</td><td class="num">USD 100–400</td><td>Tolerances ±0.05 mm on anything that spins or sets a clearance.</td></tr>
+<tr><td><strong>Cast / 3D-printed</strong></td><td>Patterns for housings, jigs, prototypes. Metal printing for a combustor.</td><td class="num">USD 20–800</td><td>Printed plastic is great for fit-checks and sand-casting patterns, <strong>never</strong> for hot or rotating parts. Printed metal (Inconel) turbine wheels exist but are expensive.</td></tr>
+</table></div>
+<p>The <a href="models.html">STL gallery</a> has per-part printing and casting notes. The STL files are for fit-checking, patterns, CNC programming, and for understanding; the real wheel must be a proper alloy part.</p>
+
+<h2 id="roadmap" data-short="A build roadmap">A sensible build roadmap</h2>
+<ol>
+<li><strong>Simulate first.</strong> Run every scenario in chapter 7 until the failure modes feel familiar.</li>
+<li><strong>Buy a scrap turbo</strong> and study it. Spin the wheel by hand and check for play.</li>
+<li><strong>Bench-test only the cold parts:</strong> spin the rotor with its electric starter to 10–20 % speed and measure the real pressure ratio and vibration. No flame yet.</li>
+<li><strong>Build the combustor</strong> and test it alone with a leaf-blower and a small fuel flow.</li>
+<li><strong>Assemble the engine</strong> on a test stand with a remote start and a fuel cut-off, behind a barrier.</li>
+<li><strong>Run short, cold-limited tests</strong> (30 s, EGT limit low). Log everything. Look for vibration, leaks and glowing parts.</li>
+<li><strong>Improve one thing at a time</strong> (this chapter’s list) and re-run the same test. If it got worse, you learned something.</li>
+</ol>
+
+<h2 id="takeaways" data-short="What you learned">What you now know</h2>
+<ul>
+<li>A modest engine wastes most of its fuel in a handful of places; model sensitivity ranks them: diffuser, turbine, flame, clearance, combustor pressure drop.</li>
+<li>The “cheap and safe set” (bearings, tip clearance, bellmouth, liner, diffuser) is worth +14 % thrust and −17 % fuel per newton for about USD 270, and makes the turbine cooler.</li>
+<li>Rotating unbalance force goes as $U\omega^2$; balancing to G2.5 means below 0.04 g·mm for our rotor.</li>
+<li>Making the turbine hotter or faster is free and dangerous; the careful path is efficiency first.</li>
+<li>A bypass fan raises thrust and efficiency, at the cost of a second turbine and shaft.</li>
+<li>The controller is the secret weapon: EGT limit, rpm limit, flame detection, fuel cut.</li>
+</ul>
+
+<div data-widget="quiz">
+<script type="application/json">[
+ {"q":"According to the loss budget, which improvement saves the most fuel per newton?","o":["Better bearings","A vaned diffuser","A larger nozzle","Higher octane fuel"],"a":1,"why":"Raising diffuser pressure recovery from 70 % to 82 % saves about 7 % fuel per newton, the largest single bar, followed by turbine efficiency."},
+ {"q":"You double the speed of an unbalanced rotor. The shaking force becomes…","o":["2×","4×","8×","unchanged"],"a":1,"why":"F = Uω²: doubling ω quadruples F."},
+ {"q":"For a 195 g rotor at 115 000 rpm, G2.5 balance requires unbalance of about…","o":["40 g·mm","4 g·mm","0.04 g·mm","0.0004 g·mm"],"a":2,"why":"U = G·m/ω = 2.5 × 195 / 12 043 ≈ 0.04 g·mm."},
+ {"q":"A bypass fan (turbofan) at flight speed mainly improves…","o":["Combustion efficiency","Propulsive efficiency, by moving more air more slowly","Compressor pressure ratio","Turbine blade temperature"],"a":1,"why":"η_p ≈ 2/(1 + Ve/V0): a slower, wider jet wastes less kinetic energy."},
+ {"q":"What is the first thing to do before making an engine hotter or faster?","o":["Make it more efficient","Add a bigger nozzle","Switch fuels","Run it indoors"],"a":0,"why":"Efficiency gives the same thrust at lower temperature and speed, so it adds margin instead of removing it."}
+]</script>
+</div>
+
+</article>
+</main>
+</div>
+</body>
+</html>
