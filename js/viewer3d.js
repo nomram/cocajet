@@ -266,8 +266,23 @@ export class EngineViewer {
     this._updateFlowAvailability();
   }
 
+  /** show one part on its own (null = back to the engine as set by setStep) */
+  solo(id, { frame = true } = {}) {
+    this.state.solo = id || null;
+    if (id) { this.state.explodeT = 0; if (this.btns.explode) this.btns.explode.classList.remove('on'); }
+    for (const part of this.parts.values()) {
+      const show = id ? part.id === id : (this.state.step == null || part.meta.step <= this.state.step);
+      part.vis = show; part.outer.visible = show; part.hlTarget = 0;
+    }
+    if (frame) {
+      if (id) this.frame([id], { pad: 1.5 });
+      else this.setStep(this.state.step, { animate: false });
+    }
+    this._updateFlowAvailability();
+  }
+
   _updateFlowAvailability() {
-    const all = this.state.step == null || (this.manifest && this.state.step >= Math.max(...this.manifest.parts.map(p => p.step)) - 1);
+    const all = !this.state.solo && (this.state.step == null || (this.manifest && this.state.step >= Math.max(...this.manifest.parts.map(p => p.step)) - 1));
     this._flowOK = all;
     if (this.flow) this.flow.setVisible(this.state.flow && all);
   }
@@ -476,7 +491,7 @@ export async function renderThumbnails(manifest, { size = 360 } = {}) {
     const g = new THREE.Group(); g.add(mesh); g.rotation.y = 0.0; scene.add(g);
     const rad = 0.5 * s.length();
     const dir = (meta.stand ? new THREE.Vector3(-0.8, 0.8, 1.2) : new THREE.Vector3(-0.75, 0.5, 1.0)).normalize();
-    cam.position.copy(dir.multiplyScalar(rad / Math.sin(THREE.MathUtils.degToRad(15)) * 0.72)); cam.lookAt(0, 0, 0);
+    cam.position.copy(dir.multiplyScalar(rad / Math.sin(THREE.MathUtils.degToRad(15)) * 0.9)); cam.lookAt(0, 0, 0);
     r.render(scene, cam);
     out[meta.id] = canvas.toDataURL('image/png');
     scene.remove(g); mat.dispose();

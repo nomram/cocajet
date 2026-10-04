@@ -6,7 +6,7 @@ import { CJ1 } from '../engine-model.js';
 const REF = [['Hand-thrown brick (2 kg at 8 m/s)', 64], ['.22 LR rifle bullet', 150], ['9 mm pistol bullet', 500], ['.45 ACP pistol bullet', 700], ['12-gauge slug', 2500], ['Small car crashing at 15 km/h (1 t)', 8700]];
 
 export default function init(el) {
-  const { body } = shell(el, { title: 'The energy locked in the rotor, and what a burst fragment carries', note: 'E = ½Iω². The assembly’s stored energy rises with rpm squared. A turbine wheel that fails is not a gentle event: pieces leave at rim speed (about 340 m/s for ours) and a 10 g fragment carries the energy of a pistol bullet. Containment, distance and balance are not optional.' });
+  const { body } = shell(el, { title: 'The energy locked in the rotor, and what a burst fragment carries', note: 'E = ½Iω². The assembly’s stored energy rises with rpm squared. A turbine wheel that fails is not a gentle event: pieces leave at rim speed (about 360 m/s at our turbine tips) and a 10 g fragment carries the energy of a pistol bullet. Containment, distance and balance are not optional.' });
   const cv = h('canvas', { class: 'plot' });
   const sN = slider({ label: 'Rotor speed', min: 20000, max: 140000, step: 1000, value: 115000, unit: 'rpm', fmt: v => v.toFixed(0), onInput: upd });
   const sI = slider({ label: 'Rotor inertia  I', min: 100, max: 800, step: 5, value: 340, unit: 'g·cm²', fmt: v => v.toFixed(0), onInput: upd });

@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STL files &amp; 3D gallery — Jet Engines for Dummies</title>
+<meta name="description" content="Download the whole Coke-can turbojet or each of its 14 parts as binary STL files, inspect them in 3D, and read printing, casting and machining notes for every part.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter" style="max-width:1100px">
+
+<span class="eyebrow">Resources</span>
+<h1>STL files &amp; the 3D gallery</h1>
+<div class="meta"><span>14 parts + 1 assembly</span><span>binary STL, millimetres</span><span>watertight meshes</span></div>
+<p class="lede">Every part of the CJ-1 engine is generated from one parameter table, so the files agree with each other and with every number in this guide. Rotate the engine, slice it, pull it apart, click any part to study it alone, and download it.</p>
+
+<div class="viewer" id="mviewer" style="height:clamp(380px,56vw,580px)"></div>
+<div class="btn-row" style="margin:12px 0 0" id="vctl">
+  <button class="btn small" id="b-all" type="button" disabled>◉ Whole engine</button>
+  <button class="btn small" id="b-stand" type="button" title="Show the steel test stand">▭ Test stand</button>
+  <span id="vinfo" style="font-size:.84rem;color:var(--muted);align-self:center">Click a part in the 3D view, or use “View” on a card below.</span>
+</div>
+
+<h2 id="download" data-short="Download">Download</h2>
+<div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr))">
+  <div class="card"><span class="num">00 · ASSEMBLY</span><h3>The whole engine, one mesh</h3><p id="asm-info">All parts merged (no stand) for quick viewing, scaling and fit checks.</p>
+    <div class="btn-row" style="margin-top:auto;padding-top:8px"><a class="btn fire" id="dl-asm" href="models/00-cj1-full-assembly.stl" download>⬇ cj1-full-assembly.stl</a></div></div>
+  <div class="card"><span class="num">01–14 · PARTS</span><h3>All parts, one ZIP</h3><p id="zip-info">Fourteen STL files, the manifest and a README, zipped in your browser: nothing is uploaded anywhere.</p>
+    <div class="btn-row" style="margin-top:auto;padding-top:8px"><button class="btn primary" id="dl-zip" type="button">⬇ Download all parts (ZIP)</button></div></div>
+  <div class="card"><span class="num">DATA</span><h3>Manifest &amp; parameters</h3><p>The JSON the website itself reads: part list, materials, masses, bounding boxes and every design parameter.</p>
+    <div class="btn-row" style="margin-top:auto;padding-top:8px"><a class="btn" href="models/manifest.json" download>⬇ manifest.json</a><a class="btn" href="img/cj1-section.svg" download>⬇ section drawing (SVG)</a></div></div>
+</div>
+<div class="callout warn"><span class="ct">Read this before you cut metal</span>The files describe the <em>shape</em> of the parts. They are an educational design, not a tested one: nobody has run this exact engine. A rotating part that is printed, cast or machined badly can fail violently. Read the <a href="safety.html">safety page</a> and the materials chapter first, and never run a printed part.</div>
+
+<h2 id="parts" data-short="Parts gallery">The parts</h2>
+<p>The step number is the stage of the <a href="06-build.html">layer-by-layer build</a> where the part appears. <em>Rotor</em> parts spin at up to 125 000 rpm: they are the ones that must be balanced.</p>
+<div class="stl-grid" id="grid"></div>
+
+<h2 id="facts" data-short="File facts">File facts</h2>
+<ul>
+<li><strong>Format:</strong> binary STL, units <strong>millimetres</strong>, right-handed coordinates.</li>
+<li><strong>Axes:</strong> the engine axis is <strong>+Z</strong>, from the air inlet (z = 0) to the exhaust (z ≈ 255 mm); +Y is up. Rotating parts turn about the Z axis in the positive (right-hand) direction: clockwise when you look into the inlet. All parts share one origin, so you can load them together and they assemble themselves.</li>
+<li><strong>Quality:</strong> every part comes from a boolean solid-modelling kernel, so the meshes are closed (watertight), manifold and have outward-facing normals. They slice cleanly without “repair”. The impeller and turbine blades are smooth-faceted; scale or re-export at finer tolerance if you need smoother surfaces for casting patterns.</li>
+<li><strong>Size:</strong> 14 MB for everything. The viewer on this page loads them directly.</li>
+<li><strong>Mass</strong> in the table is volume × the density of the listed material; the whole engine comes to about 2.4 kg without the stand.</li>
+</ul>
+<div class="table-wrap"><table class="data" id="facts-table">
+<tr><th>#</th><th>Part</th><th>Material</th><th class="num">Size X × Y × Z (mm)</th><th class="num">Volume (cm³)</th><th class="num">Mass (g)</th><th class="num">Triangles</th></tr>
+</table></div>
+
+<h2 id="print" data-short="Printing & casting">Printing, casting or machining each part</h2>
+<p>Home <em>3D printing</em> is great for checking that parts fit and for making casting patterns. It is <strong>not</strong> suitable for any part that gets hot or spins. The table says what to use instead.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Part</th><th>Make it by</th><th>Printing the STL is…</th><th>Tips</th></tr>
+<tr><td>Main shaft</td><td>Cut and turn hardened steel rod (Ø8, ground)</td><td>Pointless</td><td>Buy a ground pin gauge or drill rod; concentricity to 0.01 mm matters.</td></tr>
+<tr><td>Bearing tunnel</td><td>Stainless tube + turned flange</td><td>For fit-checks only</td><td>The two 8×16×5 bearing seats must be coaxial: bore both in one set-up.</td></tr>
+<tr><td>Impeller</td><td>Scrap turbocharger wheel, 5-axis machining, or investment casting</td><td>A resin pattern for lost-wax casting is the only good use</td><td>Scale the pattern 101.3–101.5 % for aluminium shrinkage. Balance it after casting and after final machining.</td></tr>
+<tr><td>Diffuser plate + vanes</td><td>Machined aluminium, or laser-cut vanes brazed or bolted to a plate</td><td>OK as a prototype; cold part but close to the hot impeller</td><td>Vane edge and throat width control the pressure recovery: print, test with a hair-dryer, then make it in metal.</td></tr>
+<tr><td>Inlet bellmouth + housing</td><td>Spun or hand-beaten aluminium, or cast</td><td>Good for sand-casting patterns</td><td>Keep a 0.4 mm gap over the blade tips. Print a 1:1 gap gauge and use it.</td></tr>
+<tr><td>Combustor casing</td><td>Stainless pipe (Ø100 × 2) + welded flanges</td><td>No: use it to plan the weld jig</td><td>It is a pressure vessel at ~1 bar gauge and 200–350 °C: weld it well.</td></tr>
+<tr><td>Flame tube</td><td>A Coke can with the ends cut off + a Ø35 tube</td><td>Don’t print. Print the paper hole template instead</td><td>Drill the three hole rows from the template (chapter 6). Deburr every hole.</td></tr>
+<tr><td>Fuel ring + lances</td><td>Stainless tube, bent and brazed or welded</td><td>No</td><td>Leak-test with soapy water before every run.</td></tr>
+<tr><td>Igniter</td><td>A standard glow or spark plug</td><td>No</td><td>Buy one.</td></tr>
+<tr><td>Nozzle guide vanes</td><td>Laser/waterjet-cut 310S sheet, formed and welded in a ring</td><td>A jig is a good print</td><td>Print the forming jig from the STL profile to bend the vanes.</td></tr>
+<tr><td>Turbine wheel</td><td>Waterjet Inconel plate, scrap turbo wheel, or professional casting</td><td><strong>Never.</strong> Resin patterns for investment casting at a foundry only</td><td>Spins at about 360 m/s at the tips with 750 °C blades. Inconel only, balanced, and behind a containment ring.</td></tr>
+<tr><td>Turbine casing</td><td>Rolled and welded 310S stainless</td><td>No</td><td>The 0.2–0.4 mm tip gap is set here; machine the bore last.</td></tr>
+<tr><td>Exhaust nozzle + cone</td><td>Rolled 304/321 stainless</td><td>No</td><td>The throat area (1 119 mm²) sets the engine’s operating point: check it with calipers.</td></tr>
+<tr><td>Test stand</td><td>Steel plate, tube and strap</td><td>Optional (a scale model is fun)</td><td>Bolt it to a heavy base. Measure thrust with a load cell, never by hand.</td></tr>
+</table></div>
+<details class="deep"><summary>Lost-PLA / lost-resin casting in brief</summary><div>
+<ol>
+<li>Print the part (castable resin, or PLA with thick walls) at the scale that includes shrinkage and add sprues and a vent.</li>
+<li>Coat it in a ceramic slurry or plaster-silica investment and let it set.</li>
+<li>Burn out the plastic in a kiln or oven (follow the investment maker’s schedule; ventilate well; the fumes are toxic).</li>
+<li>Pour aluminium A356 (or have the casting made at a foundry) at ~720 °C into the hot mould.</li>
+<li>Break out, cut off the sprues, heat-treat to T6, machine the bores and faces, then balance.</li>
+</ol>
+<p>Molten metal and a damp mould can explode. Casting is a skill to learn from someone who does it, not from a paragraph. For the turbine wheel, order the casting from a foundry.</p>
+</div></details>
+
+<h2 id="modify" data-short="Change the design">Change the design yourself</h2>
+<p>The files come from a script, not from a CAD session. Every dimension lives in one table at the top of <code>tools/build-stl.mjs</code>: impeller diameter, blade counts and angles, can diameter, hole sizes, nozzle area, and so on. To make your own variant:</p>
+<pre><code>git clone https://github.com/nomram/cocajet.git
+cd cocajet/tools
+npm install                 # manifold-3d, three, katex
+node build-stl.mjs          # rewrites ../models/*.stl and manifest.json
+node section-svg.mjs        # redraws the cross-section drawing
+node build-stl.mjs --check  # sanity checks (watertight, sizes, clearances)</code></pre>
+<p>Then reload this page: the gallery, the 3D builder and the simulator all read the new manifest. The physics model (<code>js/engine-model.js</code>) uses its own copy of the key dimensions, listed at the top of that file, so change both if you want the simulator to follow your new design.</p>
+
+</article>
+</main>
+</div>
+
+<script type="module">
+import { h } from './js/ui.js';
+import { EngineViewer, loadManifest, renderThumbnails } from './js/viewer3d.js';
+
+const manifest = await loadManifest();
+const byId = new Map(manifest.parts.map(p => [p.id, p]));
+const kb = (n) => n > 1e6 ? (n / 1e6).toFixed(1) + ' MB' : Math.round(n / 1000) + ' kB';
+const stlSize = (t) => 84 + 50 * t;
+const dim = (p) => p.bbox.max.map((v, i) => v - p.bbox.min[i]);
+
+/* ---------- 3D viewer ---------- */
+const viewer = new EngineViewer(document.getElementById('mviewer'), {
+  tools: ['spin', 'explode', 'cut', 'xray', 'view', 'rotate', 'reset'], interactive: true, showStand: true,
+  caption: 'CJ-1 turbojet · click a part', onSelect: (m) => { if (m) select(m.id, false); },
+});
+const bAll = document.getElementById('b-all'), bStand = document.getElementById('b-stand'), info = document.getElementById('vinfo');
+let standOn = false, current = null;
+function select(id, scroll = true) {
+  current = id; viewer.solo(id);
+  const p = byId.get(id);
+  viewer.setCaption(`${p.name} · ${p.materialName} · ${p.mass_g.toFixed(0)} g`);
+  info.innerHTML = `<b>${p.name}</b>: ${p.note}`; bAll.disabled = false;
+  document.querySelectorAll('.stl-card').forEach(c => c.classList.toggle('sel', c.dataset.id === id));
+  if (scroll) document.getElementById('mviewer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+bAll.onclick = () => { current = null; viewer.solo(null); setStand(); viewer.setCaption('CJ-1 turbojet · click a part'); info.textContent = 'Click a part in the 3D view, or use “View” on a card below.'; bAll.disabled = true; document.querySelectorAll('.stl-card.sel').forEach(c => c.classList.remove('sel')); };
+function setStand() { const s = viewer.parts.get('test-stand'); if (s && !current) { s.vis = standOn; s.outer.visible = standOn; } }
+bStand.onclick = () => { standOn = !standOn; bStand.classList.toggle('on', standOn); setStand(); };
+viewer.load().then(() => { setStand(); viewer.setStep(null); });
+
+/* ---------- download card text ---------- */
+const sumTri = manifest.parts.filter(p => !p.stand).reduce((a, p) => a + p.tris, 0);
+document.getElementById('asm-info').textContent = `All 13 engine parts merged into one solid (no stand): ${manifest.assembly.tris.toLocaleString('en')} triangles, ${kb(stlSize(manifest.assembly.tris))}. Good for scaling, slicing and fit checks.`;
+document.getElementById('zip-info').textContent = `Fourteen STL files (${kb(manifest.parts.reduce((a, p) => a + stlSize(p.tris), 0))}), the manifest and a README, zipped in your browser: nothing is uploaded anywhere.`;
+
+/* ---------- cards ---------- */
+let thumbPromise = null;
+const liveThumbs = () => thumbPromise || (thumbPromise = renderThumbnails(manifest, { size: 480 }));
+const grid = document.getElementById('grid');
+for (const p of manifest.parts) {
+  const d = dim(p);
+  const img = h('img', { src: `img/parts/${p.id}.png`, alt: p.name, loading: 'lazy', width: 480, height: 360 });
+  img.addEventListener('error', async () => { try { const t = await liveThumbs(); img.src = t[p.id]; } catch (e) { /* no thumbnail: leave the card plain */ } }, { once: true });
+  grid.append(h('div', { class: 'stl-card', 'data-id': p.id },
+    h('div', { class: 'thumb', style: { cursor: 'pointer' }, onclick: () => select(p.id), title: 'View in 3D' }, img),
+    h('div', { class: 'body' },
+      h('div', {}, h('span', { class: 'sw', style: { background: p.color } }), h('span', { class: 'chip' }, 'step ' + p.step), ' ', p.rotor ? h('span', { class: 'chip fire' }, 'rotor') : '', p.stand ? h('span', { class: 'chip' }, 'stand') : ''),
+      h('h3', {}, p.name),
+      h('p', { style: { margin: 0, fontSize: '.82rem', color: 'var(--muted)' } }, p.note),
+      h('dl', {},
+        h('dt', {}, 'Material'), h('dd', {}, p.materialName),
+        h('dt', {}, 'Size'), h('dd', {}, d.map(v => v.toFixed(0)).join(' × ') + ' mm'),
+        h('dt', {}, 'Mass'), h('dd', {}, p.mass_g.toFixed(0) + ' g'),
+        h('dt', {}, 'Triangles'), h('dd', {}, p.tris.toLocaleString('en') + ' · ' + kb(stlSize(p.tris)))),
+      h('div', { class: 'btn-row' },
+        h('button', { class: 'btn small', type: 'button', onclick: () => select(p.id) }, '◉ View'),
+        h('a', { class: 'btn small primary', href: 'models/' + p.file, download: p.file }, '⬇ STL')))));
+}
+
+/* ---------- facts table ---------- */
+const tb = document.getElementById('facts-table');
+manifest.parts.forEach((p, i) => {
+  const d = dim(p);
+  tb.append(h('tr', {}, h('td', {}, String(i + 1)), h('td', {}, h('span', { class: 'sw', style: { background: p.color } }), p.name), h('td', {}, p.materialName),
+    h('td', { class: 'num' }, d.map(v => v.toFixed(1)).join(' × ')), h('td', { class: 'num' }, (p.volume_mm3 / 1000).toFixed(1)), h('td', { class: 'num' }, p.mass_g.toFixed(1)), h('td', { class: 'num' }, p.tris.toLocaleString('en'))));
+});
+
+/* ---------- client-side ZIP ("stored", no compression) ---------- */
+const crcT = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(u8) { let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = crcT[(c ^ u8[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function makeZip(files) {
+  const enc = new TextEncoder(), parts = [], central = [], now = new Date();
+  const dt = (now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1), dd = ((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate();
+  let offset = 0;
+  for (const f of files) {
+    const name = enc.encode(f.name), crc = crc32(f.data), size = f.data.length;
+    const lh = new DataView(new ArrayBuffer(30));
+    lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true); lh.setUint16(8, 0, true); lh.setUint16(10, dt, true); lh.setUint16(12, dd, true);
+    lh.setUint32(14, crc, true); lh.setUint32(18, size, true); lh.setUint32(22, size, true); lh.setUint16(26, name.length, true); lh.setUint16(28, 0, true);
+    parts.push(lh, name, f.data);
+    const ch = new DataView(new ArrayBuffer(46));
+    ch.setUint32(0, 0x02014b50, true); ch.setUint16(4, 20, true); ch.setUint16(6, 20, true); ch.setUint16(8, 0x0800, true); ch.setUint16(10, 0, true); ch.setUint16(12, dt, true); ch.setUint16(14, dd, true);
+    ch.setUint32(16, crc, true); ch.setUint32(20, size, true); ch.setUint32(24, size, true); ch.setUint16(28, name.length, true); ch.setUint32(42, offset, true);
+    central.push(ch, name);
+    offset += 30 + name.length + size;
+  }
+  const cdSize = central.reduce((a, c) => a + c.byteLength, 0);
+  const end = new DataView(new ArrayBuffer(22));
+  end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true); end.setUint32(12, cdSize, true); end.setUint32(16, offset, true);
+  return new Blob([...parts, ...central, end], { type: 'application/zip' });
+}
+const README = `CJ-1 "Coke-can" turbojet: STL files
+====================================
+Source: Jet Engines for Dummies (this guide's STL page).
+
+Format  : binary STL, units = millimetres, right-handed.
+Axes    : engine axis = +Z (inlet at z = 0, exhaust at z ~ 255); +Y is up.
+          Rotor parts turn about +Z (clockwise when you look into the inlet).
+Origin  : all parts share one origin, so loading them together re-assembles the engine.
+Meshes  : closed, manifold, outward normals (produced by a solid-modelling kernel).
+
+Files   : NN-part.stl for the 14 parts, manifest.json lists materials, masses and bounding boxes.
+
+SAFETY  : these files describe shapes for education, fit-checks and casting patterns.
+          They are not a tested, certified design. Never run a 3D-printed part. Rotating parts
+          must be proper alloys, balanced, and run behind containment. Read the safety page first.
+
+Licence : see the repository the files come from.
+`;
+const zbtn = document.getElementById('dl-zip');
+zbtn.onclick = async () => {
+  zbtn.disabled = true; const label = zbtn.textContent;
+  try {
+    const files = []; let n = 0;
+    for (const p of manifest.parts) {
+      zbtn.textContent = `Fetching ${++n}/${manifest.parts.length}…`;
+      const r = await fetch('models/' + p.file); if (!r.ok) throw new Error(p.file + ' ' + r.status);
+      files.push({ name: 'cj1-stl/' + p.file, data: new Uint8Array(await r.arrayBuffer()) });
+    }
+    files.push({ name: 'cj1-stl/manifest.json', data: new TextEncoder().encode(JSON.stringify(manifest, null, 1)) });
+    files.push({ name: 'cj1-stl/README.txt', data: new TextEncoder().encode(README) });
+    zbtn.textContent = 'Zipping…';
+    const url = URL.createObjectURL(makeZip(files));
+    const a = h('a', { href: url, download: 'cj1-stl-parts.zip' }); document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 20000);
+    zbtn.textContent = '✓ Downloaded';
+  } catch (e) { zbtn.textContent = 'Failed: ' + e.message; }
+  setTimeout(() => { zbtn.textContent = label; zbtn.disabled = false; }, 3500);
+};
+
+/* dev hook for tools/thumbs.mjs: models.html#thumbs renders PNG thumbnails of all parts */
+if (location.hash === '#thumbs') window.__thumbs = renderThumbnails(manifest, { size: 480 });
+</script>
+</body>
+</html>
