@@ -81,7 +81,7 @@ export function rrect(ctx, x, y, w, hh, r) { ctx.beginPath(); if (ctx.roundRect)
 export const slowRot = om => { const w0 = 2.5, wm = 6; return om <= w0 ? om : w0 + (wm - w0) * (1 - Math.exp(-(om - w0) / (wm - w0))); };
 
 /** Draw a 3/4 view of a horizontal-axis turbine (tower, nacelle, hub, B tapered+twisted blades from the real design). ang = rotor angle, clockwise seen from upwind. */
-export function drawTurbine(ctx, w, hh, { B, lamD, ang, t = theme(), cx = 0.45 * w, cy = 0.4 * hh, R = Math.min(0.37 * w, 0.33 * hh), yaw = 0.9 }) {
+export function drawTurbine(ctx, w, hh, { B, lamD, ang, t = theme(), cx = 0.45 * w, cy = 0.42 * hh, R = Math.min(0.37 * w, 0.31 * hh), yaw = 0.9 }) {
   const g = blade(B, lamD), gy = hh * 0.93;
   ctx.fillStyle = t.p3; ctx.globalAlpha = 0.55; ctx.fillRect(0, gy, w, hh - gy); ctx.globalAlpha = 1;
   ctx.strokeStyle = t.line; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
@@ -140,7 +140,7 @@ export default function init(el) {
     ro.cp.set(cpv.toFixed(3)); ro.pk.set(`${cur.peak.toFixed(3)} @ ${cur.lamOpt.toFixed(1)}`); ro.pct.set((cpv / BETZ * 100).toFixed(0)); ro.gain.set(prev == null ? '–' : (cur.peak - prev >= 0 ? '+' : '') + (cur.peak - prev).toFixed(3));
     ro.sol.set((blade(B, lamD).sol * 100).toFixed(blade(B, lamD).sol < 0.1 ? 1 : 0)); ro.P.set(fmtW(P)); ro.Q.set(om > 0 ? fmtQ(P / om) : '–'); ro.rpm.set((om * 60 / (2 * Math.PI)).toFixed(om * 9.55 < 10 ? 1 : 0));
     ro.tip.set((lam * W).toFixed(0), lam * W > 100 ? 'bad' : 'hot'); ro.q0.set(fmtQ(Q0)); ro.qr.set(cqRun > 1e-4 ? (cq0 / cqRun).toFixed(cq0 / cqRun < 0.1 ? 2 : 1) : '–', cq0 / cqRun < 0.15 ? 'bad' : cq0 / cqRun < 0.6 ? 'hot' : 'good');
-    info = `λ = ${lam.toFixed(1)}   ${(om * 60 / (2 * Math.PI)).toFixed(om * 9.55 < 10 ? 1 : 0)} rpm` + (om > 1.1 * slowRot(om) ? `   (animation slowed ×${(om / slowRot(om)).toFixed(0)})` : '');
+    info = `λ = ${lam.toFixed(1)}   ${(om * 60 / (2 * Math.PI)).toFixed(om * 9.55 < 10 ? 1 : 0)} rpm` + (om > 1.25 * slowRot(om) ? `   (animation slowed ×${(om / slowRot(om)).toFixed(om > 10 * slowRot(om) ? 0 : 1)})` : '');
     drawPlots(); lazy();
   }
   function drawPlots() {

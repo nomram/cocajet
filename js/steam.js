@@ -122,7 +122,7 @@ export function isobar(p, s0, s1, n = 60) {
    Reheat:     1 HP inlet → 2 HP exit → 3 LP inlet (reheated to T1) → 4 LP exit → 5 condenser exit → 6 pump exit    */
 export function rankine({ pb, T1, pc, etaT = 0.85, etaP = 0.85, reheat = false, prhFrac = 0.2 }) {
   const st = [], mk = (n, s, note) => { s.n = n; s.note = note; st.push(s); return s; };
-  const s1 = mk(1, statePT(pb, T1), 'boiler exit');
+  const s1 = mk(1, statePT(pb, T1), 'boiler');
   let prh = null, exits = [], wT = 0, qIn = 0, last = s1, paths = [];
   const expand = (a, p2) => {
     const h2s = hps(p2, a.s), b = statePH(p2, a.h - etaT * (a.h - h2s));
@@ -131,16 +131,16 @@ export function rankine({ pb, T1, pc, etaT = 0.85, etaP = 0.85, reheat = false, 
   };
   if (reheat) {
     prh = clamp(pb * prhFrac, pc * 1.5, pb * 0.9);
-    const s2 = mk(2, expand(s1, prh), 'HP turbine exit'); paths.push([s1, s2]);
-    const s3 = mk(3, statePT(prh, T1), 'reheater exit'); qIn += s3.h - s2.h;
-    const s4 = mk(4, expand(s3, pc), 'LP turbine exit'); paths.push([s3, s4]); exits = [s2, s4]; last = s4;
+    const s2 = mk(2, expand(s1, prh), 'HP turbine'); paths.push([s1, s2]);
+    const s3 = mk(3, statePT(prh, T1), 'reheater'); qIn += s3.h - s2.h;
+    const s4 = mk(4, expand(s3, pc), 'LP turbine'); paths.push([s3, s4]); exits = [s2, s4]; last = s4;
   } else {
-    const s2 = mk(2, expand(s1, pc), 'turbine exit'); paths.push([s1, s2]); exits = [s2]; last = s2;
+    const s2 = mk(2, expand(s1, pc), 'turbine'); paths.push([s1, s2]); exits = [s2]; last = s2;
   }
   const q = sat(pc), nf = st.length + 1;
-  const sf = mk(nf, { p: pc, T: q.T, h: q.hf, s: q.sf, x: 0 }, 'condenser exit');
+  const sf = mk(nf, { p: pc, T: q.T, h: q.hf, s: q.sf, x: 0 }, 'condenser');
   const wP = q.vf * (pb - pc) * 1000 / etaP;
-  const sp = mk(nf + 1, statePH(pb, q.hf + wP), 'pump exit');
+  const sp = mk(nf + 1, statePH(pb, q.hf + wP), 'pump');
   qIn += s1.h - sp.h;
   const qOut = last.h - sf.h, wNet = wT - wP;
   const xs = exits.map((e) => e.x), Tc = q.T;

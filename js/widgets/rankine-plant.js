@@ -24,26 +24,27 @@ export default async function init(el) {
   const cv = h('canvas', { class: 'plot' }), cvB = h('canvas', { class: 'plot' });
   const sP = slider({ label: 'Boiler pressure', min: 1, max: 25, step: 0.5, value: 10, unit: 'MPa', fmt: (v) => v.toFixed(1), onInput: upd });
   const sT = slider({ label: 'Steam temperature', min: 300, max: 620, step: 5, value: 500, unit: '°C', fmt: (v) => v.toFixed(0), onInput: upd });
-  const sC = slider({ label: 'Condenser pressure', min: 5, max: 100, step: 1, value: 10, unit: 'kPa', log: true, fmt: (v) => v.toFixed(v < 10 ? 1 : 0), onInput: upd });
+  const snapC = (v) => (v < 10 ? Math.round(v * 10) / 10 : Math.round(v));
+  const sC = slider({ label: 'Condenser pressure', min: 5, max: 100, step: 1, value: 10, unit: 'kPa', log: true, fmt: (v) => snapC(v).toFixed(v < 10 ? 1 : 0), onInput: upd });
   const sEt = slider({ label: 'Turbine isentropic efficiency', min: 0.7, max: 1, step: 0.01, value: 0.85, fmt: (v) => (v * 100).toFixed(0) + ' %', onInput: upd });
   const sEp = slider({ label: 'Pump efficiency', min: 0.6, max: 0.95, step: 0.01, value: 0.85, fmt: (v) => (v * 100).toFixed(0) + ' %', onInput: upd });
   const tR = toggle({ label: 'Reheat: send the steam back to the boiler halfway', checked: false, onChange: upd });
   const sR = slider({ label: 'Reheat pressure (fraction of boiler pressure)', min: 0.1, max: 0.5, step: 0.01, value: 0.2, fmt: (v) => (v * 100).toFixed(0) + ' %', onInput: upd });
-  const sMW = slider({ label: 'Electrical output wanted', min: 50, max: 1000, step: 10, value: 500, unit: 'MW', log: true, fmt: (v) => f0(v), onInput: upd });
+  const sMW = slider({ label: 'Electrical output wanted', min: 50, max: 1000, step: 10, value: 500, unit: 'MW', fmt: (v) => f0(v), onInput: upd });
   const PRE = [
     ['Small old plant', 4, 400, 10, 0.8, false], ['Subcritical', 10, 500, 10, 0.85, false],
     ['Reheat 16.5 MPa', 16.5, 540, 8, 0.88, true], ['Supercritical', 25, 600, 5, 0.9, true],
   ];
   const presets = h('div', { class: 'btn-row' }, PRE.map(([n, p, T, c, e, r]) => button(n, () => { sP.set(p); sT.set(T); sC.set(c); sEt.set(e); tR.set(r); upd(); }, 'small')));
   const ro = {
-    eta: readout('Thermal efficiency', '%', 'good'), id: readout('Ideal (η = 100 %)', '%', 'cool'), car: readout('Carnot ceiling', '%', 'cool'),
+    eta: readout('Thermal efficiency', '%', 'good'), id: readout('Ideal cycle', '%', 'cool'), car: readout('Carnot ceiling', '%', 'cool'),
     wn: readout('Net work', 'kJ/kg', 'good'), qi: readout('Heat in', 'kJ/kg', 'fuel'), bwr: readout('Pump ÷ turbine work', '%', 'cool'),
     x: readout('Exit quality x', '', 'good'), mdot: readout('Steam flow', 'kg/s', 'hot'),
     qo: readout('Waste heat', 'MW', 'bad'), cw: readout('River water (ΔT 10 K)', 'm³/s', 'cool'),
   };
   const warn = h('div', { class: 'callout', style: { margin: '10px 0 0', padding: '10px 14px', fontSize: '.86rem' } });
-  const tbody = h('tbody'), table = h('div', { class: 'table-wrap' }, h('table', { class: 'data', style: { fontSize: '.8rem' } }, h('thead', {}, h('tr', {}, ...['#', 'State', 'p (MPa)', 'T (°C)', 'h (kJ/kg)', 's (kJ/kg·K)', 'x'].map((t, i) => h('th', { class: i > 1 ? 'num' : '', style: { padding: '6px 7px' } }, t)))), tbody));
-  const lgd = legend([['var(--fire)', 'heat in (boiler, reheater)'], ['var(--air)', 'turbine (dashed: ideal)'], ['var(--violet)', 'condenser (heat out)'], ['var(--ok)', 'area = net work']]);
+  const tbody = h('tbody'), table = h('div', { class: 'table-wrap' }, h('table', { class: 'data', style: { fontSize: '.74rem' } }, h('thead', {}, h('tr', {}, ...['#', 'State', 'p MPa', 'T °C', 'h kJ/kg', 's kJ/kgK', 'x'].map((t, i) => h('th', { class: i > 1 ? 'num' : '', style: { padding: '5px 4px' } }, t)))), tbody));
+  const lgd = legend([['var(--fire)', 'heat in (boiler, reheater)'], ['var(--air)', 'turbine (dashed: ideal)'], ['var(--violet)', 'condenser (heat out)'], ['var(--ok)', 'area = net work'], ['var(--muted)', 'dotted: constant pressure, MPa']]);
 
   /* ---------- compare view ---------- */
   const sGT = slider({ label: 'Gas turbine efficiency η_gt', min: 0.3, max: 0.42, step: 0.005, value: 0.38, fmt: (v) => (v * 100).toFixed(1) + ' %', onInput: updB });
@@ -52,14 +53,14 @@ export default async function init(el) {
   const link = toggle({ label: 'Use the steam cycle I designed', checked: true, onChange: updB });
   const rb = { cc: readout('Combined cycle', '%', 'good'), add: readout('Steam adds', 'points', 'cool'), waste: readout('Still wasted', '%', 'bad') };
   const formula = h('p', { style: { fontSize: '.85rem', color: 'var(--muted)', margin: '4px 0 0' } }, 'η_cc = η_gt + (1 − η_gt) · ε · η_st : the gas turbine converts η_gt of the fuel energy; the exhaust holds the remaining (1 − η_gt); the heat-recovery boiler hands a share ε of that to a steam cycle, which converts η_st of it.');
-  const viewC = h('div', {}, h('div', { class: 'wgrid' }, h('div', {}, cv, lgd), h('div', { class: 'ctls' }, presets, sP.el, sT.el, sC.el, sEt.el, sEp.el, tR.el, sR.el, sMW.el)),
-    h('div', { class: 'readouts' }, ...Object.values(ro).map((r) => r.el)), warn, h('h6', { style: { margin: '14px 0 0', fontSize: '.78rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--muted)' } }, 'The state points'), table);
-  const viewB = h('div', {}, h('div', { class: 'wgrid' }, cvB, h('div', { class: 'ctls' }, sGT.el, sEps.el, link.el, sST.el, h('div', { class: 'readouts' }, ...Object.values(rb).map((r) => r.el)), formula)));
+  const viewC = h('div', {}, h('div', { class: 'wgrid' }, h('div', { style: { minWidth: '0' } }, cv, lgd, h('div', { style: { marginTop: '10px' } }, presets)), h('div', { class: 'ctls', style: { minWidth: '0' } }, sP.el, sT.el, sC.el, sEt.el, sEp.el, tR.el, sR.el, sMW.el)),
+    h('div', { class: 'readouts' }, ...Object.values(ro).map((r) => r.el)), warn, table);
+  const viewB = h('div', {}, h('div', { class: 'wgrid' }, h('div', { style: { minWidth: '0' } }, cvB, legend([['var(--bad)', 'dashed: Carnot ceiling at your steam plant’s temperatures'], ['var(--ok)', 'steam adds to the gas turbine']])), h('div', { class: 'ctls', style: { minWidth: '0' } }, sGT.el, sEps.el, link.el, sST.el, h('div', { class: 'readouts' }, ...Object.values(rb).map((r) => r.el)), formula)));
   const vb = { cycle: button('Design the plant', () => show('cycle'), 'small'), cmp: button('Compare plants: steam, gas, combined', () => show('cmp'), 'small') };
   body.append(h('div', { class: 'btn-row', style: { marginBottom: '12px' } }, vb.cycle, vb.cmp), viewC, viewB);
 
   /* ---------- the cycle plot ---------- */
-  const pl = new Plot(cv, { xmin: 0, xmax: 10.5, ymin: 0, ymax: 700, xlabel: 'entropy s (kJ/kg·K)', ylabel: 'temperature T (°C)', aspect: 1.1, minHeight: 300, margin: { l: 48, r: 10, t: 12, b: 42 }, xticks: [0, 2, 4, 6, 8, 10], yticks: [0, 100, 200, 300, 400, 500, 600, 700] });
+  const pl = new Plot(cv, { xmin: 0, xmax: 10.5, ymin: 0, ymax: 700, xlabel: 'entropy s (kJ/kg·K)', ylabel: 'temperature T (°C)', aspect: 1.0, minHeight: 320, margin: { l: 48, r: 10, t: 12, b: 42 }, xticks: [0, 2, 4, 6, 8, 10], yticks: [0, 100, 200, 300, 400, 500, 600, 700] });
   let R = null, view = 'cycle';
   const expPath = (a, p2, eta, n = 28) => {
     const ss = [], TT = [];
@@ -70,7 +71,7 @@ export default async function init(el) {
     const pb = sP.get(), Tmin = minSteamT(pb);
     let T1 = sT.get(), bumped = null;
     if (T1 < Tmin) { T1 = Math.ceil(Tmin / 5) * 5; sT.set(T1); bumped = T1; }
-    const args = { pb, T1, pc: sC.get() / 1000, etaT: sEt.get(), etaP: sEp.get(), reheat: tR.get(), prhFrac: sR.get() };
+    const args = { pb, T1, pc: snapC(sC.get()) / 1000, etaT: sEt.get(), etaP: sEp.get(), reheat: tR.get(), prhFrac: sR.get() };
     R = rankine(args); R.args = args; R.bumped = bumped;
     R.ideal = rankine({ ...args, etaT: 1, etaP: 1 });
     const MW = sMW.get() * 1000;
@@ -92,9 +93,9 @@ export default async function init(el) {
     warn.className = 'callout ' + (xOK ? 'tip' : 'danger'); warn.innerHTML = msg.join('');
     tbody.innerHTML = '';
     for (const s of S) {
-      const xs = s.x == null ? '–' : s.x <= 0.0005 ? 'liquid' : s.x >= 0.9995 ? 'vapour' : s.x.toFixed(3);
-      tbody.append(h('tr', {}, h('td', { class: 'num', style: { padding: '5px 7px' } }, s.n), h('td', { style: { padding: '5px 7px' } }, s.note),
-        ...[pf(s.p), s.T.toFixed(0), f0(s.h), s.s.toFixed(3), xs].map((t) => h('td', { class: 'num', style: { padding: '5px 7px' } }, t))));
+      const xs = s.x == null ? '–' : s.x <= 0.0005 ? 'water' : s.x >= 0.9995 ? 'steam' : s.x.toFixed(3);
+      tbody.append(h('tr', {}, h('td', { class: 'num', style: { padding: '5px 4px' } }, s.n), h('td', { style: { padding: '5px 4px' } }, s.note),
+        ...[pf(s.p), s.T.toFixed(0), f0(s.h), s.s.toFixed(3), xs].map((t) => h('td', { class: 'num', style: { padding: '5px 4px' } }, t))));
     }
     drawTS(); updB();
   }
@@ -122,7 +123,6 @@ export default async function init(el) {
       pl.line(iso.s, iso.T, { color: c.muted, width: 1, dash: [3, 4], alpha: .75 });
       pl.ptext(X(send), Y(650) - 5, pf(p), { color: c.muted, align: 'center', base: 'bottom', size: 10.5, weight: 600 });
     }
-    pl.ptext(pl.m.l + pl.iw - 4, pl.m.t + 2, 'dotted: constant pressure (MPa)', { color: c.muted, align: 'right', size: 10.5, weight: 500 });
     // Carnot window
     const Th = args.T1, Tc = R.Tc;
     pl.hline(Th, { color: c.muted, alpha: .8, dash: [2, 4], width: 1 }); pl.hline(Tc, { color: c.muted, alpha: .8, dash: [2, 4], width: 1 });
@@ -151,7 +151,7 @@ export default async function init(el) {
   }
 
   /* ---------- the comparison bars ---------- */
-  const pb = new Plot(cvB, { xmin: 0, xmax: 80, ymin: 0, ymax: 1, xlabel: 'thermal efficiency (% of fuel energy turned into work)', aspect: 0.95, minHeight: 360, margin: { l: 12, r: 12, t: 14, b: 44 }, grid: true });
+  const pb = new Plot(cvB, { xmin: 0, xmax: 80, ymin: 0, ymax: 1, xlabel: 'thermal efficiency (% of fuel energy → work)', aspect: 0.9, minHeight: 380, margin: { l: 12, r: 12, t: 14, b: 44 }, grid: true });
   function updB() {
     if (!R) return;
     const eta = R.eta;
@@ -174,11 +174,15 @@ export default async function init(el) {
       { n: 'CJ-1 turbojet (jet power ÷ fuel power)', v: cjEta * 100, col: c.fire },
     ];
     const top = pb.m.t + 20, rowH = (pb.ih - 20) / rows.length, bh = Math.min(22, rowH * .4);
+    // Carnot ceiling of the designed steam plant (drawn first, so labels sit on top)
+    const cx = pb.X(R.carnot * 100);
+    ctx.save(); ctx.setLineDash([5, 4]); ctx.strokeStyle = c.bad; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(cx, pb.m.t + 14); ctx.lineTo(cx, pb.m.t + pb.ih); ctx.stroke(); ctx.restore();
+    const say = (txt, x, y) => { ctx.lineWidth = 3.5; ctx.lineJoin = 'round'; ctx.strokeStyle = c.bg; ctx.strokeText(txt, x, y); ctx.fillText(txt, x, y); };
     ctx.save(); ctx.textBaseline = 'middle';
     rows.forEach((r, i) => {
       const y0 = top + i * rowH + rowH - bh - 6, x0 = pb.X(0), x1 = pb.X(r.v);
       ctx.font = '600 11.5px ui-sans-serif, system-ui, sans-serif'; ctx.fillStyle = r.big ? c.strong : c.text; ctx.textAlign = 'left';
-      ctx.fillText(r.n, x0 + 4, y0 - 9);
+      say(r.n, x0 + 4, y0 - 9);
       if (r.split != null) {
         const xm = pb.X(r.split);
         ctx.fillStyle = r.col; ctx.globalAlpha = .9; ctx.fillRect(x0, y0, xm - x0, bh); ctx.fillStyle = r.col2; ctx.fillRect(xm, y0, x1 - xm, bh); ctx.globalAlpha = 1;
@@ -187,13 +191,11 @@ export default async function init(el) {
       } else { ctx.fillStyle = r.col; ctx.globalAlpha = .88; ctx.fillRect(x0, y0, x1 - x0, bh); ctx.globalAlpha = 1; }
       let xe = x1;
       if (r.lo != null) { ctx.strokeStyle = c.strong; ctx.lineWidth = 1.5; const a = pb.X(r.lo), b = pb.X(r.hi), ym = y0 + bh / 2; ctx.beginPath(); ctx.moveTo(a, ym); ctx.lineTo(b, ym); ctx.moveTo(a, ym - 5); ctx.lineTo(a, ym + 5); ctx.moveTo(b, ym - 5); ctx.lineTo(b, ym + 5); ctx.stroke(); xe = b; }
-      ctx.font = '700 12px ui-sans-serif, system-ui, sans-serif'; ctx.fillStyle = r.big ? c.ok : c.strong; ctx.textAlign = 'left'; ctx.fillText(r.v.toFixed(r.lo != null ? 0 : 1) + ' %', xe + 6, y0 + bh / 2);
+      ctx.font = '700 12px ui-sans-serif, system-ui, sans-serif'; ctx.fillStyle = r.big ? c.ok : c.strong; ctx.textAlign = 'left'; say(r.v.toFixed(r.lo != null ? 0 : 1) + ' %', xe + 6, y0 + bh / 2);
     });
-    // Carnot ceiling of the designed steam plant
-    const cx = pb.X(R.carnot * 100);
-    ctx.setLineDash([5, 4]); ctx.strokeStyle = c.bad; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.moveTo(cx, pb.m.t + 14); ctx.lineTo(cx, pb.m.t + pb.ih); ctx.stroke(); ctx.setLineDash([]);
-    ctx.font = '600 11px ui-sans-serif, system-ui, sans-serif'; ctx.fillStyle = c.bad; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
-    ctx.fillText(`Carnot ceiling of your steam plant ${(R.carnot * 100).toFixed(0)} %`, Math.min(cx + 4, pb.m.l + pb.iw), pb.m.t + 6);
+    ctx.font = '700 11px ui-sans-serif, system-ui, sans-serif'; ctx.fillStyle = c.bad; ctx.textBaseline = 'middle';
+    const ct = `Carnot ${(R.carnot * 100).toFixed(0)} %`, room = pb.m.l + pb.iw - cx > ctx.measureText(ct).width + 10;
+    ctx.textAlign = room ? 'left' : 'right'; say(ct, cx + (room ? 5 : -5), pb.m.t + 6);
     ctx.restore();
   }
   function show(v) {
