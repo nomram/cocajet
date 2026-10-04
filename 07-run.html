@@ -32,6 +32,10 @@
 .scen { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
 .scen .btn { text-align: left; justify-content: flex-start; flex-direction: column; align-items: flex-start; gap: 3px; height: 100%; }
 .scen .btn small { font-weight: 500; color: var(--muted); font-size: .76rem; line-height: 1.35; }
+.sysrow { display: grid; grid-template-columns: 112px 1fr 64px; gap: 8px; align-items: center; font-size: .78rem; margin-top: 7px; color: var(--text-2); }
+.sysrow .bar { height: 9px; border-radius: 6px; background: var(--line); overflow: hidden; } .sysrow .bar > i { display: block; height: 100%; width: 0; background: var(--air); transition: width .25s; }
+.sysrow output { font-family: var(--mono); text-align: right; color: var(--text); font-size: .76rem; }
+.sysrow.warn .bar > i { background: var(--fuel); } .sysrow.bad .bar > i { background: var(--bad); } .sysrow.good .bar > i { background: var(--ok); }
 @media (max-width: 1100px) { .sim-layout { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -78,11 +82,25 @@
     </div>
 
     <div class="panel-card">
+      <h4>Systems</h4>
+      <div class="sysrow good" id="sFuelValve"><span>Fuel valve</span><div class="bar"><i></i></div><output>–</output></div>
+      <div class="sysrow" id="sBottleT"><span>Bottle temperature</span><div class="bar"><i></i></div><output>–</output></div>
+      <div class="sysrow" id="sBottleP"><span>Feed pressure</span><div class="bar"><i></i></div><output>–</output></div>
+      <div class="sysrow" id="sLiquid"><span>Propane left</span><div class="bar"><i></i></div><output>–</output></div>
+      <div class="sysrow good" id="sBatt"><span>Starter battery</span><div class="bar"><i></i></div><output>–</output></div>
+      <div class="sysrow" id="sPhi"><span>Primary-zone φ</span><div class="bar"><i></i></div><output>–</output></div>
+      <div class="sysrow good" id="sWheel"><span>Turbine wheel life used</span><div class="bar"><i></i></div><output>–</output></div>
+    </div>
+
+    <div class="panel-card">
       <h4>Conditions</h4>
       <div class="ctls">
         <div class="ctl"><label>Altitude</label><output id="altOut">0 m</output><input type="range" id="alt" min="0" max="6000" step="100" value="0"></div>
         <div class="ctl"><label>Hot / cold day</label><output id="dtOut">0 °C</output><input type="range" id="dT" min="-30" max="30" step="1" value="0"></div>
         <div class="ctl"><label>Flame-tube material</label><span></span><select id="liner"><option value="can">Coke can (aluminium)</option><option value="ss304">Stainless 304</option><option value="ss310">Stainless 310S</option><option value="inco">Inconel 625</option></select></div>
+        <div class="ctl"><label>Air humidity</label><output id="rhOut">0 %</output><input type="range" id="rh" min="0" max="100" step="5" value="0"></div>
+        <div class="ctl"><label>Propane bottle</label><span></span><select id="bottle"><option value="2">Small: 2 kg of liquid</option><option value="4" selected>BBQ bottle: 4 kg of liquid</option><option value="9">Large: 9 kg of liquid</option><option value="4w">BBQ bottle in a warm-water bath</option></select></div>
+        <label class="tgl"><input type="checkbox" id="noLim"> Disable the ECU’s EGT limiter (dangerous: the engine can cook itself)</label>
         <div class="ctl"><label>Time warp (cool-downs are long)</label><span></span><select id="warp"><option value="1">1× real time</option><option value="2">2×</option><option value="4">4×</option><option value="10">10×</option></select></div>
       </div>
     </div>
@@ -92,14 +110,20 @@
 <div style="max-width:1600px;margin:22px auto 0">
   <div class="wgrid even" style="grid-template-columns:repeat(4,minmax(0,1fr))"><canvas class="plot" id="cRpm"></canvas><canvas class="plot" id="cEgt"></canvas><canvas class="plot" id="cThr"></canvas><canvas class="plot" id="cFuel"></canvas></div>
   <div class="wgrid even" style="margin-top:16px">
+    <div><h4>Where the engine is on the compressor map</h4><canvas class="plot" id="cMap"></canvas><p style="font-size:.82rem;color:var(--muted);margin:6px 0 0">Grey curves are constant-speed lines of the compressor (from the same model as chapter 5); the red line is the surge limit; the dashed curve is where the engine settles at each speed (its <em>running line</em>). The dot is the engine right now, with the last few seconds as a trail. Crossing the red line is surge.</p></div>
     <div><h4>Event log</h4><div class="evlog" id="evlog"></div></div>
+  </div>
+  <div class="wgrid even" style="margin-top:16px">
+    <div><h4>The thrust calculation, live</h4><div class="panel-card" id="thrCalc" style="font-family:var(--mono);font-size:.84rem;line-height:1.7"></div><p style="font-size:.82rem;color:var(--muted);margin:6px 0 0">This is the thrust equation of chapter 2 evaluated on the model’s own numbers, once per frame. The load cell on a real stand lags behind it by about a tenth of a second.</p></div>
     <div><h4>Things to try (failure scenarios)</h4>
       <div class="scen">
         <button class="btn" data-sc="demo">▶ Full demo<small>Auto start, accelerate to full power, hold, chop, cool down.</small></button>
-        <button class="btn" data-sc="hot">🔥 Hot start<small>Manual: light it with 0.9 g/s at 25 000 rpm. Too much fuel for the airflow: EGT spikes past 1 000 °C.</small></button>
-        <button class="btn" data-sc="wet">💧 Wet start<small>Manual: dump 3 g/s on the igniter. Over-rich: the flame can’t light, or blows out.</small></button>
-        <button class="btn" data-sc="lean">💨 Lean flame-out<small>At full power, cut fuel to 0.5 g/s. The mixture is too weak to burn.</small></button>
-        <button class="btn" data-sc="block">🚧 Block 45 % of the nozzle<small>Closes the exit: pressure and temperature climb, flow falls: towards surge.</small></button>
+        <button class="btn" data-sc="hot">🔥 Hot start<small>Manual: light it with 0.9 g/s at 25 000 rpm. Far too much fuel for the airflow: EGT shoots past 1 000 °C and the turbine wheel starts to creep and rupture.</small></button>
+        <button class="btn" data-sc="wet">💧 Wet start<small>Manual: dump 3 g/s on the igniter. The primary zone is far richer than propane can burn (φ &gt; 2.6): no light.</small></button>
+        <button class="btn" data-sc="lean">💨 Lean flame-out<small>At full power, cut fuel to 0.5 g/s. The primary zone falls below φ ≈ 0.4 and the flame blows out.</small></button>
+        <button class="btn" data-sc="block">🚧 Dirty nozzle (−20 %)<small>The ECU’s EGT limiter fights the rising temperature and trades thrust away to protect the turbine. Tick “disable limiter” first to see what it was saving you from.</small></button>
+        <button class="btn" data-sc="surge">🌀 Make it surge<small>Limiter off, wheel made indestructible for the demo, 40 % of the nozzle blocked: the compressor stalls, pulses at ~8 Hz and flashes out of the intake.</small></button>
+        <button class="btn" data-sc="freeze">🧊 Freeze the bottle<small>Full power for a long time on a BBQ bottle (10× time warp): the propane cools itself by evaporating, the pressure falls and the engine starves.</small></button>
         <button class="btn" data-sc="burn">🥫 Burn the can<small>Run the aluminium liner at full power until it burns through; then swap to stainless.</small></button>
       </div>
       <p id="scenNote" style="font-size:.88rem;color:var(--text-2);margin-top:10px"></p>
@@ -147,7 +171,7 @@ import { EngineViewer, loadManifest } from './js/viewer3d.js';
 import { EngineSim, PHASES, LINERS } from './js/engine-sim.js';
 import { Plot } from './js/plot.js';
 import { drawGauge } from './js/sim-ui.js';
-import { CJ1 } from './js/engine-model.js';
+import { CJ1, compressorMap, steadyAt } from './js/engine-model.js';
 import { h } from './js/ui.js';
 
 const $ = (id) => document.getElementById(id);
@@ -165,7 +189,7 @@ const say = (t) => { $('scenNote').textContent = t; };
 $('bStart').onclick = () => { if ($('manual').checked) { $('manual').checked = false; setManual(false); } sim.start(); };
 $('bStop').onclick = () => sim.stop();
 $('bKill').onclick = () => { if ($('manual').checked) { manual.fuel = 0; $('fuel').value = 0; $('fuelOut').textContent = '0.00 g/s'; } sim.killFuel(); };
-$('bReset').onclick = () => { sim.reset(); sim.setParam({ ...CJ1 }); $('liner').value = 'can'; sim.liner = 'can'; clearCharts(); $('thr').value = 0; $('thrOut').textContent = '0 %'; sim.setThrottle(0); if ($('manual').checked) { $('manual').checked = false; setManual(false); } };
+$('bReset').onclick = () => { sim.reset(); sim.immortal = false; sim.setParam({ ...CJ1 }); sim.setFuelSystem({ liquid: parseFloat($('bottle').value), UA: $('bottle').value.endsWith('w') ? 45 : 4 }); $('liner').value = 'can'; sim.liner = 'can'; clearCharts(); $('thr').value = 0; $('thrOut').textContent = '0 %'; sim.setThrottle(0); if ($('manual').checked) { $('manual').checked = false; setManual(false); } };
 $('thr').oninput = () => { sim.setThrottle($('thr').value / 100); $('thrOut').textContent = $('thr').value + ' %'; };
 const manual = sim.manual;
 function setManual(on) {
@@ -181,6 +205,9 @@ $('mIgn').onclick = () => { manual.ignition = !manual.ignition; $('mIgn').textCo
 $('fuel').oninput = () => { manual.fuel = +$('fuel').value; $('fuelOut').textContent = manual.fuel.toFixed(2) + ' g/s'; };
 let ambT = 0; const ambUpd = () => { clearTimeout(ambT); ambT = setTimeout(() => sim.setAmbient({ altitude: +$('alt').value, dT: +$('dT').value }), 120); $('altOut').textContent = $('alt').value + ' m'; $('dtOut').textContent = ($('dT').value > 0 ? '+' : '') + $('dT').value + ' °C'; };
 $('alt').oninput = ambUpd; $('dT').oninput = ambUpd;
+$('rh').oninput = () => { $('rhOut').textContent = $('rh').value + ' %'; clearTimeout(ambT); ambT = setTimeout(() => sim.setAmbient({ rh: +$('rh').value / 100 }), 150); };
+$('bottle').onchange = () => { const v = $('bottle').value, w = v.endsWith('w'); sim.setFuelSystem({ liquid: parseFloat(v), UA: w ? 45 : 4 }); say(w ? 'Bottle in a warm-water bath: the water keeps the propane warm, so the vapour pressure holds and a long run no longer starves.' : 'New bottle fitted (' + parseFloat(v) + ' kg of liquid propane, in air).'); };
+$('noLim').onchange = () => { sim.egtLimit = $('noLim').checked ? 1e9 : 1110; say($('noLim').checked ? 'EGT limiter OFF: the ECU will no longer back the fuel off when the exhaust gets too hot.' : 'EGT limiter back on (837 °C).'); };
 $('liner').onchange = () => { sim.liner = $('liner').value; sim._burned = false; sim.linerDamage = 0; };
 $('warp').onchange = () => { if (viewer) viewer.timeWarp = +$('warp').value; };
 
@@ -193,14 +220,16 @@ const SC = {
   hot() { resetClean(); $('manual').checked = true; setManual(true); manual.starter = true; $('mStarter').click(); $('mStarter').click(); say('Hot start: the starter spins it up; at 25 000 rpm we light it with 0.9 g/s. The rotor is slow, the air weak, so the flame runs far too hot.'); wait(() => sim.N > 25000, () => { manual.ignition = true; manual.fuel = 0.9; $('fuel').value = 0.9; $('fuelOut').textContent = '0.90 g/s'; $('mIgn').textContent = 'Igniter: ON'; }); },
   wet() { resetClean(); $('manual').checked = true; setManual(true); manual.starter = true; say('Wet start: at 22 000 rpm we pour 3 g/s of propane onto the igniter. Far too rich to burn.'); wait(() => sim.N > 22000, () => { manual.ignition = true; manual.fuel = 3; $('fuel').value = 3; $('fuelOut').textContent = '3.00 g/s'; $('mIgn').textContent = 'Igniter: ON'; }); },
   lean() { say('Lean flame-out: starting normally, running at full power, then the fuel is cut back hard.'); resetClean(); sim.start(); wait(() => sim.phase === 'run', () => { $('thr').value = 100; $('thr').oninput(); wait(() => sim.N > 105000, () => { $('manual').checked = true; setManual(true); manual.fuel = 0.5; $('fuel').value = 0.5; $('fuelOut').textContent = '0.50 g/s'; manual.starter = false; }); }); },
-  block() { say('Blocked nozzle: 45 % of the exit area is closed off (A₅ 1 119 → 615 mm²). The ECU holds rpm, so fuel and TIT rise while flow collapses toward the surge line.'); resetClean(); sim.setParam({ A5: 615e-6 }); sim.start(); wait(() => sim.phase === 'run', () => { $('thr').value = 100; $('thr').oninput(); }); },
+  block() { say('Dirty nozzle: the exit area is closed by 20 % over six seconds (A₅ 1 119 → 895 mm²). A smaller nozzle raises the back-pressure, the turbine gets less expansion, and the ECU needs more fuel to hold speed. The EGT limiter protects the turbine and thrust drops.'); resetClean(); sim.start(); wait(() => sim.phase === 'run', () => { $('thr').value = 100; $('thr').oninput(); wait(() => sim.N > 112000, () => { let k = 0; const iv = setInterval(() => { k++; sim.setFault({ A5: CJ1.A5 * (1 - 0.20 * Math.min(1, k / 30)) }); if (k > 30) clearInterval(iv); }, 200); }); }); },
+  surge() { say('Surge demo: ECU limiter off, wheel indestructible, 40 % of the nozzle closes over ten seconds. Watch the operating point cross the red surge line on the compressor map, the thrust pulse at about 8 Hz and the flash out of the intake.'); resetClean(); $('noLim').checked = true; $('noLim').onchange(); sim.immortal = true; $('warp').value = 2; $('warp').onchange(); sim.start(); wait(() => sim.phase === 'run', () => { $('thr').value = 100; $('thr').oninput(); wait(() => sim.N > 112000, () => { let k = 0; const iv = setInterval(() => { k++; sim.setFault({ A5: CJ1.A5 * (1 - 0.40 * Math.min(1, k / 50)) }); if (k > 50) clearInterval(iv); }, 200); }); }); },
+  freeze() { say('Propane bottle test: full power on a 4 kg BBQ bottle at 10× time warp. Every kilogram of propane that leaves must evaporate, and that takes latent heat from the bottle: watch the temperature and the feed pressure fall until the valve is wide open and the engine starves.'); resetClean(); $('bottle').value = '4'; $('bottle').onchange(); $('warp').value = 10; $('warp').onchange(); sim.start(); wait(() => sim.phase === 'run', () => { $('thr').value = 100; $('thr').oninput(); }); },
   burn() { say('Aluminium liner at full power. Watch the liner-damage bar: it wears out in a couple of minutes (use 10× time warp). Then pick “Stainless 310S” in the material box and reset.'); resetClean(); $('liner').value = 'can'; sim.liner = 'can'; $('warp').value = 4; $('warp').onchange(); sim.start(); wait(() => sim.phase === 'run', () => { $('thr').value = 100; $('thr').oninput(); }); },
 };
 document.querySelectorAll('[data-sc]').forEach(b => b.onclick = () => SC[b.dataset.sc]());
 
 /* ---------- instruments + charts ---------- */
 const ros = {};
-[['thr', 'Thrust', 'N', 'hot'], ['fuel', 'Fuel', 'g/s', 'fuel'], ['pr', 'Pressure ratio', '', 'cool'], ['tit', 'TIT (calc)', '°C', 'hot'], ['m', 'Air flow', 'kg/s', 'cool'], ['used', 'Fuel used', 'g', 'fuel']].forEach(([k, l, u, c]) => {
+[['thr', 'Thrust', 'N', 'hot'], ['fuel', 'Fuel', 'g/s', 'fuel'], ['pr', 'Pressure ratio', '', 'cool'], ['tit', 'TIT (calc)', '°C', 'hot'], ['m', 'Air flow', 'kg/s', 'cool'], ['tsfc', 'Fuel per thrust', 'kg/(N·h)', 'fuel'], ['used', 'Fuel used', 'g', 'fuel']].forEach(([k, l, u, c]) => {
   const v = h('span', { class: 'v' }, '–'), uu = h('span', { class: 'u' }, u), el = h('div', { class: 'ro ' + c }, h('div', { class: 'k' }, l), h('div', {}, v, uu));
   ros[k] = { el, set: (t, cls) => { v.textContent = t; el.className = 'ro ' + (cls || c); } }; $('ros').append(el);
 });
@@ -220,8 +249,9 @@ function updateUI(force) {
   const rpmNow = N / 1000;
   drawGauge($('gRpm'), { value: rpmNow, min: 0, max: 140, label: 'Rotor', unit: '×1000 rpm', zones: [[0, 40, '--air'], [40, 118, '--ok'], [118, 128, '--fuel'], [128, 140, '--bad']], ticks: 7 });
   drawGauge($('gEgt'), { value: Math.max(0, egtC), min: 0, max: 1000, label: 'EGT', unit: '°C', zones: [[0, 600, '--air'], [600, 780, '--ok'], [780, 850, '--fuel'], [850, 1000, '--bad']], ticks: 5 });
-  ros.thr.set(g.thrust.toFixed(1)); ros.fuel.set((s.mf * 1000).toFixed(2)); ros.pr.set(g.PRc.toFixed(2)); ros.tit.set(s.lit ? titC.toFixed(0) : '–'); ros.m.set(g.m.toFixed(3)); ros.used.set((s.fuelUsed * 1000).toFixed(0));
+  ros.thr.set(s.thrust.toFixed(1)); ros.fuel.set((s.mf * 1000).toFixed(2)); ros.pr.set(s.PR.toFixed(2)); ros.tit.set(s.lit ? titC.toFixed(0) : '–'); ros.m.set(g.m.toFixed(3)); ros.tsfc.set(s.lit && g.thrust > 3 ? (g.tsfc * 3600).toFixed(3) : '–'); ros.used.set((s.fuelUsed * 1000).toFixed(0));
   const dmg = Math.round(s.linerDamage * 100); $('dmg').style.width = dmg + '%'; $('dmgPct').textContent = dmg + ' %';
+  updateSystems(s, v);
   // phase
   const manualMode = s.mode === 'manual';
   const pname = manualMode ? (s.lit ? 'Running · manual' : N > 3000 ? 'Spinning · manual' : 'Manual · stopped') : PHASES[s.phase];
@@ -230,11 +260,11 @@ function updateUI(force) {
   $('phaseText').textContent = manualMode ? 'Manual mode: you hold the starter, igniter and fuel valve. Light only with the starter above ~17 000 rpm and a small fuel flow. Watch EGT.' : TEXT[s.phase];
   // alarms
   const al = [];
-  if (g.T04 > 1120 && s.lit) al.push('OVER-TEMPERATURE'); if (N > CJ1.Nmax * 1.03) al.push('OVERSPEED'); if (g.surge && s.lit) al.push('COMPRESSOR SURGE'); if (s.linerDamage >= 1) al.push('LINER BURNT THROUGH');
+  if (g.T04 > 1120 && s.lit) al.push('OVER-TEMPERATURE'); if (N > CJ1.Nmax * 1.03) al.push('OVERSPEED'); if (s.surgeT > 0.05 && s.lit) al.push('COMPRESSOR SURGE'); if (s.starved) al.push('FUEL STARVATION'); if (s.destroyed) al.push('TURBINE WHEEL FAILED: press RESET'); if (s.linerDamage >= 1) al.push('LINER BURNT THROUGH');
   const ae = $('alarm'); ae.classList.toggle('on', al.length > 0); ae.textContent = '⚠ ' + al.join(' · ');
   // series
   if (s.t - lastSample >= 0.25) {
-    lastSample = s.t; D.t.push(s.t); D.rpm.push(rpmNow); D.egt.push(Math.max(0, egtC)); D.tit.push(s.lit ? titC : null); D.thr.push(g.thrust); D.fuel.push(s.mf * 1000);
+    lastSample = s.t; D.t.push(s.t); D.rpm.push(rpmNow); D.egt.push(Math.max(0, egtC)); D.tit.push(s.lit ? titC : null); D.thr.push(s.thrust); D.fuel.push(s.mf * 1000);
     while (D.t.length && D.t[0] < s.t - W - 1) for (const k of Object.keys(D)) D[k].shift();
   }
   // events
@@ -242,9 +272,52 @@ function updateUI(force) {
   const key = ev.map(e => e.t + e.msg).join('|');
   if (log.dataset.k !== key) { log.dataset.k = key; log.innerHTML = ''; ev.forEach(e => log.append(h('div', { class: e.kind === 'bad' ? 'bad' : '' }, h('b', {}, e.t.toFixed(0) + ' s'), e.msg))); }
 }
+/* ---------- systems card ---------- */
+function sys(id, frac, text, cls) { const r = $(id); r.querySelector('i').style.width = Math.max(0, Math.min(100, frac * 100)) + '%'; r.querySelector('output').textContent = text; r.className = 'sysrow ' + (cls || ''); }
+function updateSystems(s, v) {
+  const f = s.fuelSys, Pb = s.gp.P03;
+  sys('sFuelValve', f.open, (f.open * 100).toFixed(0) + ' %', s.starved ? 'bad' : f.open > 0.9 ? 'warn' : 'good');
+  const Tc = f.Tb - 273.15; sys('sBottleT', (Tc + 30) / 60, Tc.toFixed(1) + ' °C', Tc < -8 ? 'bad' : Tc < 2 ? 'warn' : 'good');
+  const Pf = f.feedPressure; sys('sBottleP', Pf / 6e5, (Pf / 1e5).toFixed(2) + ' bar', Pf < Pb * 1.15 ? 'bad' : Pf < 2.6e5 ? 'warn' : 'good');
+  sys('sLiquid', f.mL / f.liquid0, (f.mL * 1000).toFixed(0) + ' g', f.mL < 0.4 ? 'warn' : '');
+  sys('sBatt', s.batt.soc, s.batt.V.toFixed(1) + ' V' + (s.batt.I > 1 ? ' ' + s.batt.I.toFixed(0) + ' A' : ''), s.batt.soc < 0.25 ? 'bad' : 'good');
+  const phi = s.lit ? s.pzPhi(s.mf) : 0; sys('sPhi', phi / 3.2, s.lit ? phi.toFixed(2) : '–', !s.lit ? '' : phi < 0.55 || phi > 2.5 ? 'bad' : phi < 0.8 || phi > 1.9 ? 'warn' : 'good');
+  sys('sWheel', s.wheelDamage, (s.wheelDamage * 100).toFixed(s.wheelDamage < 0.01 ? 3 : 1) + ' %', s.wheelDamage > 0.5 ? 'bad' : s.wheelDamage > 0.02 ? 'warn' : 'good');
+  // the thrust calculation, term by term
+  const c = v.thrustCalc, f1 = (x, d) => x.toFixed(d);
+  $('thrCalc').innerHTML = `F = ṁ<sub>g</sub>·V<sub>e</sub> + (P<sub>e</sub> − P<sub>0</sub>)·A<sub>5</sub> − ṁ·V<sub>0</sub><br>`
+    + `&nbsp;&nbsp;= <b>${f1(c.mg, 4)}</b> kg/s × <b>${f1(c.Ve, 1)}</b> m/s + (<b>${f1(c.Pe / 1000, 1)}</b> − <b>${f1(c.P0 / 1000, 1)}</b>) kPa × <b>${f1(c.A5 * 1e6, 0)}</b> mm² − ṁ·<b>${f1(c.V0, 0)}</b> m/s<br>`
+    + `&nbsp;&nbsp;= ${f1(c.mom, 2)} N + ${f1(c.press, 2)} N − ${f1(c.ram, 2)} N = <b style="color:var(--fire);font-size:1.05em">${f1(c.F, 2)} N</b><br>`
+    + `<span style="color:var(--muted)">load cell (lagged): ${f1(c.meas, 2)} N · exit Mach ${f1(c.Mexit, 2)}${c.choked ? ' (choked)' : ' (not choked)'}${s.surgeT > 0.05 ? ' · <b style="color:var(--bad)">SURGING</b>' : ''}</span>`;
+}
+
+/* ---------- compressor map with the live operating point ---------- */
+const pmap = new Plot($('cMap'), { xmin: 0, xmax: 0.2, ymin: 1, ymax: 2.5, aspect: 1.5, xlabel: 'air mass flow (kg/s)', ylabel: 'pressure ratio', margin: { l: 52, r: 12, t: 14, b: 40 } });
+let mapData = null, mapKey = '', trail = [];
+function ensureMap() {
+  const key = sim.alt + '|' + sim.dT + '|' + sim.rh + '|' + sim.p.A5;
+  if (mapData && key === mapKey) return mapData;
+  mapKey = key;
+  const sp = [50000, 65000, 80000, 95000, 105000, 115000, 125000];
+  const lines = compressorMap(sim.p, sim.amb, sp, 22);
+  const run = []; for (let N = 40000; N <= 125000; N += 5000) { const g = steadyAt(sim.p, N, sim.amb, { V0: sim.V0 }); run.push([g.m, g.PRc]); }
+  mapData = { lines, run }; return mapData;
+}
+function drawMap() {
+  const d = ensureMap(), c = pmap.begin().col; pmap.axes();
+  for (const L of d.lines) { pmap.line(L.pts.map(q => q.m), L.pts.map(q => q.PR), { color: c.muted, width: 1.3, alpha: .8 }); const q = L.pts[7]; pmap.text(q.m, q.PR + 0.045, (L.N / 1000).toFixed(0) + 'k', { color: c.muted, size: 10, base: 'bottom' }); }
+  pmap.line(d.lines.map(L => L.pts[0].m), d.lines.map(L => L.pts[0].PR), { color: c.bad, width: 2.6 });
+  pmap.text(d.lines[3].pts[0].m - 0.004, d.lines[3].pts[0].PR + 0.14, 'surge', { color: c.bad, size: 11, weight: 700, align: 'right' });
+  pmap.line(d.run.map(q => q[0]), d.run.map(q => q[1]), { color: c.text, width: 2.2, dash: [7, 4] });
+  if (trail.length > 1) pmap.line(trail.map(q => q[0]), trail.map(q => q[1]), { color: c.fire, width: 2, alpha: .65 });
+  const g = sim.gp; if (sim.N > 3000) pmap.dot(g.m, sim.PR, { color: c.fire, r: 6.5 });
+}
+function trackMap() { const g = sim.gp; if (sim.N > 3000) { trail.push([g.m, sim.PR]); if (trail.length > 60) trail.shift(); } else trail = []; }
+pmap.onDraw(drawMap);
 let tick = 0;
 setInterval(() => {
   updateUI(); tick++;
+  trackMap(); if (tick % 3 === 0) drawMap();
   if (tick % 3 === 0) { drawChart(pl.rpm, 'rpm', 'air'); drawChart(pl.egt, 'egt', 'bad', 'tit'); drawChart(pl.thr, 'thr', 'fire'); drawChart(pl.fuel, 'fuel', 'fuel'); }
 }, 90);
 Object.values(pl).forEach(p => p.onDraw(() => { drawChart(pl.rpm, 'rpm', 'air'); drawChart(pl.egt, 'egt', 'bad', 'tit'); drawChart(pl.thr, 'thr', 'fire'); drawChart(pl.fuel, 'fuel', 'fuel'); }));
