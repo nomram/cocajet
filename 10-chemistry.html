@@ -19,11 +19,126 @@
 
 <span class="eyebrow">Chapter 10 · Fire and ignition</span>
 <h1>The chemistry of heat</h1>
-<div class="meta"><span>~50 min</span><span>8 widgets</span><span>from a hand-warmer to a rocket</span></div>
-<p class="lede">Every newton of thrust in this guide ultimately comes from one thing: atoms swapping partners and the energy difference leaving as heat. This chapter starts from the very beginning (why does anything get hot? why does a cold pack get cold?) and builds up to the problem every engine designer lives with: <em>a reaction that releases heat speeds itself up, so how do you stop it running away?</em></p>
+<div class="meta"><span>~90 min</span><span>12 widgets</span><span>from atoms to a rocket</span></div>
+<p class="lede">Every newton of thrust in this guide ultimately comes from one thing: atoms swapping partners and the energy difference leaving as heat. This chapter starts from the very beginning (what is a chemical formula? what does “balancing” mean? how many kilograms of air does one kilogram of fuel need?), then asks why anything gets hot and why a cold pack gets cold, and builds up to the problem every engine designer lives with: <em>a reaction that releases heat speeds itself up, so how do you stop it running away?</em></p>
+
+
+<div class="callout violet"><span class="ct">New to chemistry? Start here</span>The first five sections teach the language of chemistry from zero: <strong>what a formula says, how to balance an equation, how to turn an equation into kilograms, what happens to gas volumes, and what “oxidiser” really means</strong>. Everything after them (heat of reaction, rates, runaway, flames) uses that language. If you already know it, jump to <a href="#bonds">“Heat is atoms changing partners”</a>.</div>
+
+<h2 id="atoms" data-short="Atoms & formulas">Chemistry in five minutes: atoms, molecules and formulas</h2>
+<p>Everything is built from about ninety kinds of <strong>atoms</strong>, each with a one- or two-letter symbol and a mass. The few that matter in this book:</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Symbol</th><th>Element</th><th class="num">Atomic mass (g/mol)</th><th>Where you meet it</th></tr>
+<tr><td><strong>H</strong></td><td>hydrogen</td><td class="num">1.008</td><td>in every fuel and in water; the lightest atom</td></tr>
+<tr><td><strong>C</strong></td><td>carbon</td><td class="num">12.011</td><td>the backbone of every fuel; charcoal, soot, diamond</td></tr>
+<tr><td><strong>N</strong></td><td>nitrogen</td><td class="num">14.007</td><td>78 % of the air; fertiliser</td></tr>
+<tr><td><strong>O</strong></td><td>oxygen</td><td class="num">15.999</td><td>21 % of the air; the atom that makes things burn</td></tr>
+<tr><td><strong>Ar</strong></td><td>argon</td><td class="num">39.948</td><td>1 % of the air; completely inert</td></tr>
+<tr><td><strong>Al</strong></td><td>aluminium</td><td class="num">26.982</td><td>the Coke can; a metal fuel in fireworks and rockets</td></tr>
+<tr><td><strong>Fe</strong></td><td>iron</td><td class="num">55.845</td><td>steel; rust</td></tr>
+<tr><td><strong>Ni, Cr, Ti</strong></td><td>nickel, chromium, titanium</td><td class="num">58.69, 52.00, 47.87</td><td>the superalloys and stainless steels of chapter 9</td></tr>
+<tr><td><strong>Ca, Cl</strong></td><td>calcium, chlorine</td><td class="num">40.08, 35.45</td><td>lime and cement; salt</td></tr>
+</table></div>
+<p>Atoms join into <strong>molecules</strong> by sharing electrons (the bonds of the next section). A <strong>chemical formula</strong> is the shorthand for one molecule:</p>
+<ul>
+<li>The <strong>letters</strong> say which atoms. Capital letters start an element: <code>CO</code> is carbon + oxygen but <code>Co</code> is the metal cobalt.</li>
+<li>The small <strong>subscript</strong> after a symbol counts that atom. <code>H₂O</code> is 2 hydrogens and 1 oxygen (no number means 1). <code>C₃H₈</code> is 3 carbons and 8 hydrogens.</li>
+<li>A <strong>bracket</strong> multiplies what is inside it: <code>Ca(OH)₂</code> is 1 Ca, 2 O and 2 H, five atoms in all.</li>
+<li>A number in <em>front</em> of a formula is not part of the substance: <code>3 CO₂</code> means three separate CO₂ molecules (that number is a <strong>coefficient</strong>, and it is what balancing changes).</li>
+<li>Some elements travel in pairs: oxygen is <code>O₂</code>, nitrogen <code>N₂</code>, hydrogen <code>H₂</code>. Lone O atoms are very reactive and do not last.</li>
+</ul>
+<p>One extra atom can change everything: <code>CO</code> (carbon monoxide) is a poison, <code>CO₂</code> is the harmless gas you breathe out. <code>H₂O</code> is water, <code>H₂O₂</code> is bleaching, rocket-thruster peroxide. <code>N₂O</code> is laughing gas and an oxidiser; <code>NO</code> and <code>NO₂</code> are the brown smog gases. The widget counts the atoms and adds up the mass.</p>
+<div data-widget="formula-mass"></div>
+<h3>The family of fuels you will meet</h3>
+<p>Fuels like petrol, kerosene, propane and natural gas are <strong>hydrocarbons</strong>: chains of carbon atoms with hydrogens attached. Add one more CH₂ to the chain and you get the next member of the family:</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Name</th><th>Formula</th><th class="num">Carbons</th><th class="num">Boils at (°C)</th><th>At room temperature</th><th>Use</th></tr>
+<tr><td>Methane</td><td>CH₄</td><td class="num">1</td><td class="num">−162</td><td>gas</td><td>natural gas, hobs, some rockets</td></tr>
+<tr><td>Ethane</td><td>C₂H₆</td><td class="num">2</td><td class="num">−89</td><td>gas</td><td>chemical industry</td></tr>
+<tr><td><strong>Propane</strong></td><td>C₃H₈</td><td class="num">3</td><td class="num">−42</td><td>gas under pressure (a liquid in the bottle)</td><td><strong>our engine</strong>, barbecues</td></tr>
+<tr><td>Butane</td><td>C₄H₁₀</td><td class="num">4</td><td class="num">−1</td><td>gas (liquid in a lighter)</td><td>lighters, camping stoves</td></tr>
+<tr><td>Pentane</td><td>C₅H₁₂</td><td class="num">5</td><td class="num">36</td><td>very volatile liquid</td><td>solvents</td></tr>
+<tr><td>Octane</td><td>C₈H₁₈</td><td class="num">8</td><td class="num">126</td><td>liquid</td><td>petrol (gasoline)</td></tr>
+<tr><td>Dodecane</td><td>C₁₂H₂₆</td><td class="num">12</td><td class="num">216</td><td>liquid</td><td>kerosene and jet fuel are a mix of chains about this long</td></tr>
+</table></div>
+<p>The longer the chain, the higher it boils, which is why a propane engine needs no vaporiser and a kerosene engine does (chapter 8). Every one of them burns the same way, which the next section writes out.</p>
+<details class="deep"><summary>Try it: count the atoms</summary><div><p>How many atoms are in one molecule of butane, C₄H₁₀? <strong>14</strong> (4 + 10). Of ethanol, C₂H₅OH? <strong>9</strong> (2 C + 6 H + 1 O). Of calcium hydroxide, Ca(OH)₂? <strong>5</strong>. Of the average kerosene molecule C₁₂H₂₃ used by the engine model? <strong>35</strong> (an “average” formula, which is why it can have an odd number of hydrogens).</p></div></details>
+
+<h2 id="balance" data-short="Balancing equations">Balancing: atoms are never created or destroyed</h2>
+<p>A chemical <strong>equation</strong> is a sentence: <em>these substances (reactants) turn into those (products)</em>. Write propane burning in oxygen and you get the skeleton</p>
+<div class="eq">$$\mathrm{C_3H_8}+\mathrm{O_2}\;\longrightarrow\;\mathrm{CO_2}+\mathrm{H_2O}$$</div>
+<p>but it is wrong, because the left side has 3 carbons and the right side 1, and the left has 8 hydrogens and the right 2. A reaction only <em>rearranges</em> atoms (this is the law of conservation of mass, found by Lavoisier in the 1780s): every atom on the left must reappear on the right. We fix the counts by choosing <strong>coefficients</strong>. Step by step:</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Step</th><th>What you do</th><th>Equation so far</th></tr>
+<tr><td>1</td><td>Start with the most complicated molecule (propane, 1 of them). Carbon: 3 on the left, so we need <strong>3 CO₂</strong>.</td><td>C₃H₈ + O₂ → <strong>3</strong> CO₂ + H₂O</td></tr>
+<tr><td>2</td><td>Hydrogen: 8 on the left, each H₂O has 2, so we need <strong>4 H₂O</strong>.</td><td>C₃H₈ + O₂ → 3 CO₂ + <strong>4</strong> H₂O</td></tr>
+<tr><td>3</td><td>Oxygen last, because O₂ is alone and flexible. On the right: 3×2 + 4×1 = 10 O atoms, so we need <strong>5 O₂</strong>.</td><td>C₃H₈ + <strong>5</strong> O₂ → 3 CO₂ + 4 H₂O</td></tr>
+<tr><td>4</td><td>Check every atom: C 3 = 3, H 8 = 8, O 10 = 10. Balanced ✓</td><td>C₃H₈ + 5 O₂ → 3 CO₂ + 4 H₂O</td></tr>
+</table></div>
+<div class="callout"><span class="ct">The five rules of balancing</span><strong>1.</strong> Only change coefficients, never subscripts (changing C₃H₈ to C₃H₉ would be a different substance). <strong>2.</strong> Start with the most complicated molecule. <strong>3.</strong> Balance the elements that appear in one substance on each side first, usually C then H. <strong>4.</strong> Leave a free element such as O₂ for last. <strong>5.</strong> If you end up with a fraction, multiply the whole equation to clear it; then check every atom again.</div>
+<p>Rule 5 matters for most fuels. Butane gives $\mathrm{C_4H_{10}}+6\tfrac12\mathrm{O_2}\to4\mathrm{CO_2}+5\mathrm{H_2O}$, so double it: $2\,\mathrm{C_4H_{10}}+13\,\mathrm{O_2}\to8\,\mathrm{CO_2}+10\,\mathrm{H_2O}$. Ethanol already contains an oxygen, so it needs less from the air: $\mathrm{C_2H_5OH}+3\,\mathrm{O_2}\to2\,\mathrm{CO_2}+3\,\mathrm{H_2O}$. The “average kerosene” of the engine model, $\mathrm{C_{12}H_{23}}$, needs $17\tfrac34$ O₂ per molecule, so the whole-number version has four molecules: $4\,\mathrm{C_{12}H_{23}}+71\,\mathrm{O_2}\to48\,\mathrm{CO_2}+46\,\mathrm{H_2O}$. Now try it yourself: pick a reaction, use − and + until every row shows ✓, then try typing one of your own into the solver.</p>
+<div data-widget="balance-equation"></div>
+<h3>Complete and incomplete burning</h3>
+<p>The balanced equation above is the <em>complete</em> burn, where there is enough oxygen. With less oxygen, carbon stops half-way. The three possibilities for one propane molecule:</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Oxygen available</th><th>Equation (balanced)</th><th class="num">O₂ used</th><th class="num">Heat (kJ per mol propane)</th><th>What you see</th></tr>
+<tr><td>plenty</td><td>C₃H₈ + 5 O₂ → 3 CO₂ + 4 H₂O</td><td class="num">5</td><td class="num">2 044</td><td>blue flame, invisible exhaust</td></tr>
+<tr><td>short</td><td>2 C₃H₈ + 7 O₂ → 6 CO + 8 H₂O</td><td class="num">3.5</td><td class="num">1 195</td><td>yellowish flame, carbon monoxide (poisonous, odourless)</td></tr>
+<tr><td>very short</td><td>C₃H₈ + 2 O₂ → 3 C + 4 H₂O</td><td class="num">2</td><td class="num">864</td><td>smoky yellow flame, soot</td></tr>
+</table></div>
+<p>Notice what less oxygen costs: the fire gets cooler (down to 42 % of the heat), the exhaust gets poisonous, and you waste fuel as soot. That is why a rich engine smokes, why a camping stove in a closed tent can kill, and why the combustor of chapter 6 is designed to have air to spare.</p>
+<details class="deep"><summary>Try it: balance these on paper first</summary><div><p><code>Fe + O₂ → Fe₂O₃</code> (rusting): <strong>4 Fe + 3 O₂ → 2 Fe₂O₃</strong>. <code>Al + O₂ → Al₂O₃</code> (the Coke can burning, if it ever got hot enough): <strong>4 Al + 3 O₂ → 2 Al₂O₃</strong>. <code>H₂O₂ → H₂O + O₂</code> (peroxide decomposing): <strong>2 H₂O₂ → 2 H₂O + O₂</strong>. <code>NH₃ + O₂ → NO + H₂O</code>: <strong>4 NH₃ + 5 O₂ → 4 NO + 6 H₂O</strong>. Check each by counting atoms on both sides, then confirm in the widget above.</p></div></details>
+
+<h2 id="moles" data-short="Moles & kilograms">Counting by the mole: from an equation to kilograms</h2>
+<p>The equation <code>C₃H₈ + 5 O₂ → 3 CO₂ + 4 H₂O</code> counts <em>molecules</em>, but in a workshop we weigh kilograms. The bridge is the <strong>mole</strong>: 6.022 × 10²³ molecules (Avogadro’s number), chosen so that <em>one mole of any substance weighs its molar mass in grams</em>. One mole of water is 18.0 g, of propane 44.1 g, of oxygen gas O₂ 32.0 g. The equation then also reads: <em>1 mol of propane (44 g) needs 5 mol of oxygen (160 g)</em>. The method for any problem has three steps:</p>
+<div class="eq">$$\text{mass}\xrightarrow{\ \div M\ }\text{moles}\xrightarrow{\ \times\text{ ratio from the equation}\ }\text{moles of the other substance}\xrightarrow{\ \times M\ }\text{mass}$$</div>
+<p><strong>Worked example: 1 kg of propane.</strong> Moles of propane: $1000/44.097=22.68$ mol. Oxygen needed: $5\times22.68=113.4$ mol $\times31.998\ \text{g/mol}=3.63$ kg. CO₂ made: $3\times22.68\times44.01=2.99$ kg. Water: $4\times22.68\times18.015=1.63$ kg. Mass in $1+3.63=4.63$ kg; mass out $2.99+1.63=4.62$ kg: mass is conserved, as it must be. <strong>One kilogram of burnt propane makes three kilograms of CO₂.</strong></p>
+<h3>From oxygen to air</h3>
+<p>Air is 20.95 % oxygen <em>by number of molecules</em> (the same as by volume, see below), but oxygen is heavier than nitrogen, so by <em>mass</em> it is a bit more: weigh a mole of air: $0.7808\times28.01+0.2095\times32.00+0.0093\times39.95\approx28.96$ g, of which oxygen contributes $6.70$ g, so $6.70/28.96=23.1$ % oxygen by mass. Therefore burning 1 kg of propane needs $3.63/0.231=15.7$ kg of air: the <strong>stoichiometric air–fuel ratio</strong>. It is where “15.6–15.7 kg of air per kg of propane” in chapter 1 comes from.</p>
+<p>Our engine passes 0.151 kg of air for every 2.86 g of propane: that is $\varphi=(2.86/151)\big/(1/15.7)=0.30$. The <strong>equivalence ratio</strong> $\varphi$ is the fuel actually added divided by the fuel that would use up all the oxygen. The engine therefore uses only about 30 % of its oxygen; the other 70 % of the air cools the flame (chapter 6) and leaves unused.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Mixture</th><th>φ</th><th>Which one runs out first?</th><th>What is left over</th></tr>
+<tr><td><strong>Lean</strong></td><td>&lt; 1</td><td>the fuel (it is the <em>limiting reagent</em>)</td><td>spare oxygen and air; cooler flame</td></tr>
+<tr><td><strong>Stoichiometric</strong></td><td>= 1</td><td>both at once</td><td>nothing; the ideal “exact” mix</td></tr>
+<tr><td><strong>Rich</strong></td><td>&gt; 1</td><td>the oxygen (limiting reagent)</td><td>unburnt fuel, carbon monoxide, soot</td></tr>
+</table></div>
+<p>A <strong>limiting reagent</strong> is whatever runs out first and so decides how much reaction happens, like making sandwiches from 10 slices of bread and 3 slices of cheese: the cheese decides. Try the widget with different fuels and φ; press <em>The CJ-1 for one second</em> to see exactly what the engine eats and makes each second.</p>
+<div data-widget="stoichiometry"></div>
+<h3>The same idea in a rocket</h3>
+<p>A rocket does not take its oxygen from the air, so it quotes the oxidiser-to-fuel ratio <strong>by mass</strong>, <em>O/F</em>. The exact (stoichiometric) mass ratio comes straight from the balanced equation:</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Fuel + oxygen</th><th>Equation (per fuel molecule)</th><th class="num">Stoichiometric O/F (mass)</th><th class="num">Typical engine O/F</th><th>Why they differ</th></tr>
+<tr><td>Hydrogen</td><td>2 H₂ + O₂ → 2 H₂O</td><td class="num">7.9</td><td class="num">≈ 5 – 6</td><td>run fuel-rich: leftover H₂ is light and makes a faster exhaust (chapter 12)</td></tr>
+<tr><td>Methane</td><td>CH₄ + 2 O₂ → CO₂ + 2 H₂O</td><td class="num">4.0</td><td class="num">≈ 3.4 – 3.6</td><td>a little fuel-rich to keep the exhaust lighter and the walls cooler</td></tr>
+<tr><td>Kerosene (C₁₂H₂₃)</td><td>4 C₁₂H₂₃ + 71 O₂ → 48 CO₂ + 46 H₂O</td><td class="num">3.4</td><td class="num">≈ 2.3 – 2.6</td><td>same reason; also the engine would run too hot at 3.4</td></tr>
+</table></div>
+<p>The engine does not run at the exact ratio because the best <em>performance</em> comes from a different compromise than the best <em>burning</em>: exhaust speed depends on temperature and on the molar mass of the gas (chapter 12), and a fuel-rich exhaust is lighter. Chemistry tells you what is possible; engineering chooses.</p>
+<details class="deep"><summary>Try it: how much air for the CJ-1?</summary><div><p>The engine burns 2.86 g/s of propane. Oxygen needed for a perfect burn: $2.86\times3.63=10.4$ g/s; as air, $10.4/0.231=45$ g/s. The engine actually passes 151 g/s, so $45/151=0.30$: it uses 30 % of the air’s oxygen. CO₂ made: $2.86\times2.99=8.6$ g/s, about half a kilogram a minute.</p></div></details>
+
+<h2 id="gases" data-short="Gases by the mole">Gases by the mole: why volume and pressure change</h2>
+<p>For gases there is a lovely shortcut: <strong>equal volumes of any gas at the same pressure and temperature contain the same number of molecules</strong> (Avogadro). One mole of any gas occupies about 22.4 litres at 0 °C and 1 atm, and 23.6 L at 15 °C (the volume grows in proportion to the absolute temperature). So the coefficients of a gas reaction are also <em>volume ratios</em>: 1 litre of propane gas needs 5 litres of oxygen and makes 3 litres of CO₂ and 4 of steam.</p>
+<ul>
+<li><strong>The number of gas molecules changes.</strong> Propane + 5 O₂ (6 molecules) becomes 3 CO₂ + 4 H₂O (7 molecules): the count rises by 17 %, even before the heat. Where the products are <em>fewer</em> (hydrogen + oxygen: 3 → 2) the mixture shrinks.</li>
+<li><strong>Heat multiplies it.</strong> The gas leaves the flame at 2 000+ K, about seven times its starting absolute temperature, so at constant pressure its volume grows sevenfold more. Squeezed into a closed rocket chamber, that is the pressure of chapter 13.</li>
+<li><strong>Water as steam or liquid matters.</strong> Burning propane to <em>steam</em> releases 2 044 kJ/mol (the “lower heating value”, 46.35 MJ/kg, the figure engines use), but if the steam condenses to liquid, another 4 × 44 kJ = 176 kJ is released, giving the “higher heating value” of 2 220 kJ/mol. A jet engine’s exhaust never condenses inside the engine, so it uses the lower value.</li>
+</ul>
+<p>Combine with the ideal gas law $PV=nRT$ from chapter 1 and you can go from kilograms to cubic metres at any temperature and pressure: that is what the engine model does at every station.</p>
+
+<h2 id="redox" data-short="Oxidiser">What “oxidise” means (and what an oxidiser is)</h2>
+<p>Burning is one case of a bigger family: <strong>oxidation</strong>. The old definition is “combining with oxygen”: the fuel is oxidised, the oxygen is <strong>reduced</strong> (it ends up in CO₂ and H₂O). The modern definition is about electrons, summed up by <em>OIL RIG</em>: <strong>O</strong>xidation <strong>I</strong>s <strong>L</strong>oss of electrons, <strong>R</strong>eduction <strong>I</strong>s <strong>G</strong>ain. The two always go together, which is why chemists say <em>redox</em>: something has to take the electrons that something else gave up.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Example</th><th>Equation</th><th>What is oxidised</th><th>Speed</th></tr>
+<tr><td>A flame</td><td>C₃H₈ + 5 O₂ → 3 CO₂ + 4 H₂O</td><td>the fuel</td><td>milliseconds</td></tr>
+<tr><td>Rusting</td><td>4 Fe + 3 O₂ → 2 Fe₂O₃</td><td>the iron</td><td>years (seconds in a hand-warmer: iron powder, salt and water)</td></tr>
+<tr><td>Breathing / digesting sugar</td><td>C₆H₁₂O₆ + 6 O₂ → 6 CO₂ + 6 H₂O</td><td>the sugar</td><td>hours, with enzymes</td></tr>
+<tr><td>A metal burning</td><td>4 Al + 3 O₂ → 2 Al₂O₃</td><td>the aluminium</td><td>fast and white-hot as a powder; a solid sheet only melts</td></tr>
+<tr><td>Smelting iron</td><td>Fe₂O₃ + 3 CO → 2 Fe + 3 CO₂</td><td>the CO (and the iron oxide is <em>reduced</em>)</td><td>a furnace at 1 500 °C</td></tr>
+</table></div>
+<p>The same overall chemistry can run in milliseconds or in decades, with the same heat released in total: <em>the energy of a reaction and its speed are different questions</em>. The first is the subject of the next sections (ΔH); the second is the Arrhenius law and the runaway problem that follow it.</p>
+<p>An <strong>oxidiser</strong> is any substance that readily supplies the oxygen (or takes the electrons) that a fuel needs. Air is the free one. Rockets carry their own: liquid oxygen, nitrous oxide (which releases oxygen as it decomposes: $2\,\mathrm{N_2O}\to2\,\mathrm{N_2}+\mathrm{O_2}$), hydrogen peroxide, and oxygen-rich salts such as nitrates, chlorates and perchlorates that hold the oxygen inside a solid. Those salts are why a “harmless” white fertiliser or pool chemical needs respect, and why the care section below insists on keeping oxidisers and fuels apart.</p>
 
 <h2 id="bonds" data-short="Bonds make heat">Heat is atoms changing partners</h2>
-<p>Atoms in a molecule are held together by <strong>chemical bonds</strong>, and every bond stores energy, like a compressed spring. To <em>break</em> a bond you must put energy in. When atoms form a <em>new</em> bond, energy comes out. A chemical reaction is nothing but breaking some bonds and making others, so its heat is the difference:</p>
+<p>With formulas and balanced equations in hand we can ask the first real question: <em>where does the heat come from?</em> Atoms in a molecule are held together by <strong>chemical bonds</strong>, and every bond stores energy, like a compressed spring. To <em>break</em> a bond you must put energy in. When atoms form a <em>new</em> bond, energy comes out. A chemical reaction is nothing but breaking some bonds and making others, so its heat is the difference:</p>
 <div class="eq">$$\Delta H \;=\; \underbrace{\sum E_{\text{bonds broken}}}_{\text{energy you pay}} \;-\; \underbrace{\sum E_{\text{bonds made}}}_{\text{energy you get back}}$$</div>
 <ul>
 <li>If the new bonds are <strong>stronger</strong> overall, more energy comes out than went in: $\Delta H<0$, the reaction is <strong>exothermic</strong> (it gets hot). Burning, rusting, neutralising an acid.</li>
@@ -39,6 +154,7 @@
 <p><strong>Worked example, our fuel.</strong> $\mathrm{C_3H_8}+5\,\mathrm{O_2}\to3\,\mathrm{CO_2}+4\,\mathrm{H_2O(g)}$ with $\Delta H_f$ = −103.8 (propane), 0 (O₂), −393.5 (CO₂), −241.8 (H₂O vapour) kJ/mol:</p>
 <div class="eq">$$\Delta H=3(-393.5)+4(-241.8)-(-103.8)=-2043.9\ \text{kJ per mol}\;\Rightarrow\;\frac{2043.9\ \text{kJ}}{0.044097\ \text{kg}}=46.35\ \text{MJ/kg}$$</div>
 <p>That is the 46.35 MJ/kg the engine model uses as the “lower heating value” of propane.</p>
+<div class="callout"><span class="ct">Balancing and ΔH go together</span>$\Delta H$ belongs to the equation <em>as written</em>, so it scales with the coefficients and changes sign when you reverse the reaction. Hydrogen burning: $2\,\mathrm{H_2}+\mathrm{O_2}\to2\,\mathrm{H_2O}$ gives $\Delta H=-483.7$ kJ; written as $\mathrm{H_2}+\tfrac12\mathrm{O_2}\to\mathrm{H_2O}$ it is $-241.8$ kJ (the same reaction per mole of water; half-molecules are fine in thermochemistry because a coefficient counts <em>moles</em>); and the reverse, splitting water, $2\,\mathrm{H_2O}\to2\,\mathrm{H_2}+\mathrm{O_2}$, is $+483.7$ kJ. The balancing widget above shows ΔH for every equation, so you can see the heat double when you double the coefficients.</div>
 <div class="table-wrap"><table class="data">
 <tr><th>Process</th><th class="num">ΔH (kJ/mol)</th><th>Type</th><th>Where you meet it</th></tr>
 <tr><td>Methane burns (to liquid water)</td><td class="num">−890</td><td><span class="chip fire">exothermic</span></td><td>gas hob, natural-gas turbines</td></tr>
@@ -71,6 +187,15 @@
 <h2 id="energy" data-short="Energy per kilogram">How much energy per kilogram? (and why the oxygen matters)</h2>
 <p>Because oxygen sets the heat, the fair way to compare energy sources is per kilogram of <em>everything you have to carry</em>. Flip the switch in the chart: with the oxygen counted, petrol drops from 44 MJ/kg to about 10 MJ/kg, and a surprising fact appears: <strong>every conventional explosive carries <em>less</em> energy per kilogram than petrol</strong>. What makes them different is not <em>how much</em> energy they hold but <em>how fast</em> they let it go. Rate is the dangerous part, and controlling the rate is what the rest of this chapter is about.</p>
 <div data-widget="energy-density"></div>
+
+<h2 id="flametemp" data-short="How hot is the flame?">How hot does the flame get?</h2>
+<p>Now use the balanced equation to predict a temperature. The heat released has to go somewhere: into warming the products <em>and the nitrogen that came along</em>. For one kilogram of propane burnt exactly: 46.35 MJ of heat is shared by 1 kg of fuel plus 15.7 kg of air, almost 16.7 kg of gas whose average specific heat is about 1.3 kJ/(kg·K):</p>
+<div class="eq">$$\Delta T\approx\frac{Q}{m\,c_p}=\frac{46\,350\ \text{kJ}}{16.7\ \text{kg}\times1.3\ \text{kJ/(kg K)}}\approx2\,100\ \text{K}\ \Rightarrow\ T_{flame}\approx2\,400\ \text{K}\ (2\,100\ ^\circ\text{C})$$</div>
+<p>This is the <strong>adiabatic flame temperature</strong> (no heat lost). The same bookkeeping explains three facts at once. First, a <strong>lean</strong> flame is cooler because the same heat warms more air (at φ = 0.5 the gas reaches only ~1 500 K). Second, a <strong>rich</strong> flame is cooler too, because the missing oxygen means not all the heat is released. Third, the highest temperature sits near φ = 1, and it is not as high as the simple sum predicts, because of <strong>dissociation</strong>.</p>
+<p>Chemical reactions can run both ways. At everyday temperatures CO₂ is the stable end of the road, but a flame at 2 300 K is hot enough that some CO₂ splits back: $\mathrm{CO_2}\rightleftharpoons\mathrm{CO}+\tfrac12\mathrm{O_2}$, and some water too: $\mathrm{H_2O}\rightleftharpoons\mathrm{H_2}+\tfrac12\mathrm{O_2}$. That splitting is <em>endothermic</em>, so it soaks up heat and holds the flame about 100 K cooler. How far it goes is set by an <strong>equilibrium constant</strong> $K(T)$ that grows steeply with temperature (for the CO₂ split it is 0.0013 at 2 000 K and 0.036 at 2 500 K, 28 times larger) and is suppressed by pressure, as Le Chatelier’s principle says: a system squeezed from outside shifts toward the side with fewer molecules. The widget solves both the energy balance and these two equilibria.</p>
+<div data-widget="flame-temperature"></div>
+<h3>Why the combustor has so many holes</h3>
+<p>Look at the CJ-1 numbers in the widget (press <em>The CJ-1 primary zone</em>): the front of the flame tube burns at about φ = 1.1, near 2 340 K. The turbine wheel would not survive that for a second (chapter 9). So the burner keeps only <strong>about a quarter of the air</strong> in the flame, and the rest (secondary and dilution holes) is mixed in after the flame has done its burning: with the target set at the 1 066 K the engine really has at the turbine inlet, the widget says about 24 % may pass through the flame. The combustor design of chapter 6 follows from one line of chemistry. (The real engine uses 26 %, and a combustion efficiency of 91 % brings the overall φ to 0.30, as the ledger shows.)</p>
 
 <h2 id="rate" data-short="Why not instantly?">Why doesn’t everything burn at once? Activation energy</h2>
 <p>A tank of petrol and the air around it sit together all day. The reaction is hugely exothermic and still nothing happens. Why? Before bonds can re-form, the old ones have to be stretched and partly broken: the molecules must climb an <strong>energy hill</strong>, the <strong>activation energy</strong> $E_a$. Only the few molecules that collide hard enough at the right moment make it over. At temperature $T$ the fraction with enough energy is the <strong>Boltzmann factor</strong>:</p>
@@ -129,16 +254,28 @@
 
 <h2 id="takeaways" data-short="What you learned">What you now know</h2>
 <ul>
+<li>A formula counts atoms (subscripts); a coefficient counts molecules. A mole is 6.022 × 10²³ molecules and weighs the molar mass in grams.</li>
+<li>Balance an equation by changing coefficients only, one element at a time (C, then H, then O last), and clear fractions by doubling. Atoms, and therefore mass, are conserved.</li>
+<li>Equation → kilograms: mass ÷ M → moles → coefficient ratio → × M. Propane needs 3.63 kg of oxygen, 15.7 kg of air, and makes 3 kg of CO₂ per kilogram burnt. The engine runs at φ ≈ 0.30.</li>
+<li>Lean means spare oxygen, rich means spare fuel; the one that runs out first is the limiting reagent. Too little oxygen gives CO, soot and less heat.</li>
+<li>Oxidation is loss of electrons; an oxidiser supplies the oxygen. The heat of a reaction and its speed are different questions.</li>
 <li>Heat of reaction = bonds broken − bonds made. Exothermic reactions (ΔH &lt; 0) release heat; endothermic ones (ΔH &gt; 0) absorb it.</li>
 <li>Burning hydrocarbons gives ~400 kJ per mole of O₂: oxygen, not fuel, sets the heat. Count the oxidiser you carry and all chemical energy sources are within a factor of two.</li>
 <li>A reaction needs to climb an activation energy; the rate is $A\,e^{-E_a/RT}$ and doubles every ~10 K near room temperature. Catalysts lower the hill, not ΔH.</li>
 <li>Heat made grows exponentially with T, heat lost only linearly: if the loss line can’t catch the made-curve, you get thermal runaway. Five levers prevent it: limit the reactant, dilute, cool, negative feedback, relief path.</li>
 <li>A flame is a stabilised runaway: residence time versus burning speed gives ignition, blow-out and hysteresis. The CJ-1’s primary zone is held a few times above its blow-out limit.</li>
+<li>The flame temperature follows from an energy balance on the balanced equation (about 2 300 K for propane–air), held down by dissociation. The turbine limit forces the combustor to dilute: only about a quarter of the air goes through the flame.</li>
 <li>Surface area sets the burn rate: finer pieces burn faster (t ∝ d²). Burning (deflagration) and detonation are different physics; rockets are built for the first.</li>
 </ul>
 
 <div data-widget="quiz">
 <script type="application/json">[
+ {"q":"How many atoms are in one molecule of Ca(OH)₂?","o":["3","4","5","6"],"a":2,"why":"1 Ca + 2 × (1 O + 1 H) = 1 + 2 + 2 = 5. The bracket multiplies everything inside it."},
+ {"q":"What is the molar mass of CO₂ (C = 12, O = 16)?","o":["28 g/mol","32 g/mol","44 g/mol","60 g/mol"],"a":2,"why":"12 + 2 × 16 = 44 g/mol."},
+ {"q":"Balance: C₂H₆ + O₂ → CO₂ + H₂O. Smallest whole numbers?","o":["1, 3, 2, 3","2, 7, 4, 6","1, 2, 2, 3","2, 5, 4, 6"],"a":1,"why":"2 C₂H₆ + 7 O₂ → 4 CO₂ + 6 H₂O. Check: C 4 = 4, H 12 = 12, O 14 = 8 + 6 = 14."},
+ {"q":"1 kg of propane (44 g/mol) burns completely. About how much CO₂ is made? (C₃H₈ + 5 O₂ → 3 CO₂ + 4 H₂O; CO₂ = 44 g/mol)","o":["1 kg","1.5 kg","3 kg","5 kg"],"a":2,"why":"Moles of propane 1000/44 = 22.7; × 3 = 68 mol CO₂ × 44 g = 3.0 kg. Each kilogram of propane burnt makes three kilograms of CO₂."},
+ {"q":"An engine burns at φ = 0.3. What does that mean?","o":["It uses 30 % of the fuel","It adds 30 % of the fuel needed for the oxygen supplied: lean, with 70 % of the oxygen unused","The mixture is rich","The flame is at 30 % of its temperature"],"a":1,"why":"φ is the actual fuel/air ratio divided by the exact (stoichiometric) one. 0.3 is very lean: spare air that cools the flame."},
+ {"q":"Why is a propane flame at 2 300 K cooler than a simple energy sum predicts?","o":["The air is cold","CO₂ and H₂O dissociate at that temperature, and the splitting absorbs heat","Propane has no carbon","The pressure is too low"],"a":1,"why":"Dissociation (CO₂ ⇌ CO + ½O₂, H₂O ⇌ H₂ + ½O₂) is endothermic, so it holds the flame about 100 K below the complete-combustion value."},
  {"q":"A reaction breaks bonds worth 2 650 kJ and makes bonds worth 3 450 kJ. It is…","o":["Endothermic, ΔH = +800 kJ","Exothermic, ΔH = −800 kJ","Thermoneutral","Impossible"],"a":1,"why":"ΔH = broken − made = 2 650 − 3 450 = −800 kJ: more energy is released than was paid, so heat comes out."},
  {"q":"Why does an instant cold pack get cold?","o":["It contains ice","Dissolving the salt absorbs heat (ΔH_solution > 0)","It evaporates fuel","It is a hidden fridge"],"a":1,"why":"Dissolving ammonium nitrate is endothermic (+25.7 kJ/mol): it takes the heat from the water, and the water cools."},
  {"q":"Petrol holds 10× more energy per kg than TNT. Why is TNT still “stronger”?","o":["It is not stronger","TNT carries its own oxygen and releases the energy in microseconds","TNT is denser","TNT burns hotter"],"a":1,"why":"The petrol figure doesn’t count the air’s oxygen. Per kg of fuel + oxygen they are comparable. TNT is dangerous because of how fast it releases the energy (detonation), not how much it holds."},
