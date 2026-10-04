@@ -22,6 +22,7 @@ export const PAGES = [
   { file: '14-hybrid.html',   n: '14', title: 'Hybrid, liquid & air-breathing',  group: 'V · Rockets' },
   { file: '15-electric.html', n: '15', title: 'Electric propulsion',             group: 'V · Rockets' },
   { file: '16-classes.html',  n: '16', title: 'The rocket zoo: classes of rockets', group: 'V · Rockets' },
+  { file: '17-workbench.html',n: '17', title: 'The design workbench: pick your parts', group: 'VI · Design it' },
   { file: 'models.html',      n: '⬇',  title: 'STL files & 3D gallery',          group: 'Resources' },
   { file: 'reference.html',   n: '≡',  title: 'Formulas, glossary & sources',    group: 'Resources' },
 ];

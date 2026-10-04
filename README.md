@@ -26,6 +26,7 @@ An interactive, from-scratch guide to jet engines, written in plain HTML, CSS an
 | `14-hybrid.html` | Hybrid, liquid and air-breathing engines: O/F shift, propellant choice, hard starts, Isp vs Mach |
 | `15-electric.html` | Electric propulsion: ducted fan vs turbojet, ion thrusters, ion wind, one map of every engine |
 | `16-classes.html` | The rocket zoo: motor classes A–O, hobby certification levels, sounding rockets, small to super-heavy launchers, Δv budgets, thrust-to-weight |
+| `17-workbench.html` | The design workbench: pick a can or tin as the flame-tube donor, swap compressor wheel, turbine, bearings and fuel system, choose what to optimise (price, ease, thrust per size, speed, range, life) and see the ranked designs, single-swap suggestions and a trade-off frontier |
 | `models.html` | STL gallery: per-part downloads, whole assembly, one-click ZIP, printing and casting notes |
 | `reference.html` | Formula sheet, searchable glossary, bill of materials, FAQ, sources |
 

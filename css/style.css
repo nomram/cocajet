@@ -356,3 +356,28 @@ body.wide-page main { padding-inline: clamp(14px, 2.5vw, 40px); }
 .bridge { --c: var(--fire); max-width: 78ch; margin: 36px auto 0; padding: 12px 18px; border-radius: var(--radius); border: 1px dashed color-mix(in srgb, var(--c) 55%, var(--line)); background: color-mix(in srgb, var(--c) 5%, transparent); font-size: .95rem; }
 .bridge .thread-tag { margin-right: 8px; }
 @media (max-width: 640px) { .rail .dot { width: 20px; height: 20px; } .thread { padding: 12px 12px; } }
+
+/* ---------- design workbench ---------- */
+.wb-slot { display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: center; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-2); }
+.wb-slot .k { grid-column: 1 / -1; font-size: .66rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+.wb-slot select { min-width: 0; }
+.wb-slot .info { grid-column: 1 / -1; font-size: .76rem; color: var(--muted); line-height: 1.35; }
+.wb-slot.locked { border-color: color-mix(in srgb, var(--air) 55%, var(--line)); }
+.wb-weights { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px 18px; margin: 10px 0 0; }
+.wb-verdict { margin: 12px 0 0; padding: 10px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel-2); font-size: .88rem; color: var(--text-2); line-height: 1.5; }
+.wb-verdict.warn { border-color: color-mix(in srgb, var(--warn) 50%, var(--line)); }
+.wb-verdict.bad { border-color: color-mix(in srgb, var(--bad) 50%, var(--line)); }
+.wb-verdict ul { margin: 4px 0 0; padding-left: 1.2em; }
+.wb-verdict b { color: var(--text); }
+table.wb { border-collapse: collapse; width: 100%; font-size: .82rem; }
+table.wb th, table.wb td { padding: 6px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+table.wb th { font-size: .66rem; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+table.wb td.num, table.wb th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+table.wb tr.pick { cursor: pointer; }
+table.wb tr.pick:hover td { background: color-mix(in srgb, var(--air) 8%, transparent); }
+table.wb tr.cur td { background: color-mix(in srgb, var(--fire) 10%, transparent); }
+table.wb .pos { color: var(--ok); } table.wb .neg { color: var(--bad); }
+.wb-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
+.wb-h { margin: 18px 0 6px; font-size: .74rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 800; }
+
+.wb-slots { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 10px; }

@@ -215,18 +215,18 @@ export function turbineBladeSpeedRatio(p, N, dhIs) { return Math.PI * p.Dturb * 
    Efficiency rises with pressure and inlet temperature (faster chemistry) and falls with
    air flow (less residence time).  The curve is normalised so the design point gives p.etaB.  */
 const REF = { P02: 196.6e3, T02: 366, m: 0.151 };
-export function combustionLoading(P02, T02, m) {
-  return Math.pow(P02 / REF.P02, 1.75) * Math.exp((T02 - REF.T02) / 150) / (m / REF.m);
+export function combustionLoading(P02, T02, m, vol = 1) {
+  return Math.pow(P02 / REF.P02, 1.75) * Math.exp((T02 - REF.T02) / 150) * vol / (m / REF.m);   // vol: combustor volume relative to the CJ-1 (a bigger can gives the flame more time)
 }
 export function combustionEfficiency(p, P02, T02, m) {
   const F = (x) => 1 - 0.40 * Math.exp(-2.2 * x);
-  return Math.min(0.995, p.etaB * F(combustionLoading(P02, T02, m)) / F(1));
+  return Math.min(0.995, p.etaB * F(combustionLoading(P02, T02, m, p.vol || 1)) / F(1));
 }
 
 /* --- mechanical losses: bearings (viscous drag, ~N^1.5) + windage on the turbine disc (~rho N^3) ----- */
 export function mechLoss(p, N, P04) {
   const x = N / p.Ndesign;
-  return (1 - p.etaM) * 12.5e3 * (0.45 * Math.pow(x, 1.5) + 0.55 * Math.pow(x, 3) * Math.min(1.5, P04 / 1.40e5));
+  return (1 - p.etaM) * 12.5e3 * (p.mechScale || 1) * (0.45 * Math.pow(x, 1.5) + 0.55 * Math.pow(x, 3) * Math.min(1.5, P04 / 1.40e5));   // mechScale: friction power relative to the CJ-1 (it grows with size)
 }
 
 /* --- the full gas path at one (N, fuel flow) --------------------------------- */
@@ -259,7 +259,7 @@ export function gasPath(p, N, mf, amb, opts = {}) {
     let T03 = c.T02;
     if (lit) T03 = gP.Th((m * gA.h(c.T02) + etaB * Math.min(mf, 0.98 * m / fuel.AFR) * fuel.LHV) / mg, c.T02 + 600);   // cannot burn more fuel than the oxygen allows
     // combustor loss ~ (corrected flow)^2 : tiny when the engine is only being cranked
-    const dpEff = Math.min(0.30, p.dpB * Math.pow(mg / 0.15, 2) * (T03 / 1060) * Math.pow(190e3 / c.P02, 2));
+    const dpEff = Math.min(0.30, p.dpB * Math.pow(mg / (0.15 * (p.flowScale || 1)), 2) * (T03 / 1060) * Math.pow(190e3 / c.P02, 2));   // flowScale: area relative to the CJ-1
     const P03 = c.P02 * (1 - dpEff);
     // turbine orifice: find PRt so that flow(PRt) = mg
     const RP = gP.R, gt = gP.gamma(T03 - 40);

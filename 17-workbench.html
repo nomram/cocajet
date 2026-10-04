@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>17 · The design workbench: pick your parts — Jet Engines for Dummies</title>
+<meta name="description" content="Start from a soda can, a tin or a vacuum flask, swap the compressor wheel, turbine, bearings and fuel system, and let the optimiser re-rank 378 designs for price, ease of building, thrust per size, speed, range and life. Every number comes from the same engine model as the simulator.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter">
+
+<span class="eyebrow">Chapter 17 · Design it yourself</span>
+<h1>The design workbench: pick the parts, find the best engine</h1>
+<div class="meta"><span>~40 min</span><span>1 big widget</span><span>378 designs, one engine model</span></div>
+<p class="lede">Every chapter so far followed one engine, the CJ-1. But nobody builds <em>that</em> engine: they build whatever the scrap yard, the kitchen cupboard and the budget allow. This chapter turns the guide around. You pick a vessel to take the flame tube from (a soda can, a tin, a vacuum flask) and then swap the compressor wheel, the turbine wheel, the bearings and the fuel system. After every change the workbench recomputes the engine, re-ranks all 378 possible combinations for the goals you care about (price, ease of building, thrust per size, speed, range, life) and tells you which single swap would help most.</p>
+
+<h2 id="donor" data-short="Start from the can">Start from the can: the donor decides the size</h2>
+<p>In the CJ-1 the Coke can is the <strong>flame tube</strong>: it holds the fire, so its diameter fixes how much air can burn, and therefore how much thrust the engine can make. A compressor wheel has to sit in front of it with some clearance for the diffuser and the housing; the rule of thumb the workbench uses is that the <strong>wheel is at most 85 % of the inside diameter</strong> of the vessel. Pick the vessel and you have, in effect, picked the size of the engine, because everything else is scaled from the wheel.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Donor vessel</th><th class="num">Ø × length (mm)</th><th class="num">Wheel that fits: billet / scrap turbo / model wheel (mm)</th><th>Why you would, or would not</th></tr>
+<tr><td><strong>Soda can</strong> (Al)</td><td class="num">66 × 115</td><td class="num">56 / 52 / 50</td><td>free and easy to cut, but melts at 660 °C: a few minutes of full power (chapter 9)</td></tr>
+<tr><td><strong>Tall energy-drink can</strong> (Al)</td><td class="num">66 × 160</td><td class="num">56 / 52 / 50</td><td>same diameter, more length for the flame; same short life</td></tr>
+<tr><td><strong>Steel food tin</strong></td><td class="num">73 × 105</td><td class="num">62 / 58 / 56</td><td>a size up, and the steel outlasts aluminium</td></tr>
+<tr><td><strong>Vacuum flask liner</strong> (stainless)</td><td class="num">70 × 190</td><td class="num">59 / 58 / 56</td><td>a real liner material: hours, not minutes. Costs a flask</td></tr>
+<tr><td><strong>Paint tin</strong></td><td class="num">101 × 110</td><td class="num">85 / 82 / 80</td><td>2× the thrust of the can, 2× the fuel</td></tr>
+<tr><td><strong>Catering tin</strong></td><td class="num">155 × 175</td><td class="num">131 / 130 / 90</td><td>most thrust, but the wheel is a serious machining job</td></tr>
+<tr><td><strong>Stainless pipe</strong></td><td class="num">102 × 250</td><td class="num">85 / 82 / 80</td><td>long life, high price and weight: the engineer’s choice</td></tr>
+</table></div>
+<p>Notice how the wheel options differ: a <em>billet</em> wheel can be any diameter, so it fills the donor exactly; a <em>scrap turbocharger</em> wheel only comes in certain sizes; a ready-made <em>model-turbine wheel</em> is cheaper to fit but stops at 90 mm. That is the first design trade-off: the part you can get decides the size you can build.</p>
+
+<h2 id="slots" data-short="Five slots">Five slots, each a trade-off</h2>
+<p>Besides the donor there are four parts to choose. Each is a trade between three currencies: <strong>money</strong>, <strong>skill and hours</strong>, and <strong>performance and life</strong>.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Slot</th><th>Options</th><th>What you gain or give up</th></tr>
+<tr><td><strong>Compressor wheel</strong></td><td>billet · scrap turbo · model wheel</td><td>billet is cheap in material, dear in skill and hours (a lathe or CNC and a way to balance it); the scrap wheel is balanced and strong but its simple volute diffuser costs efficiency; the ready-made wheel arrives matched and tuned, at the highest price per millimetre (chapters 4 and 8)</td></tr>
+<tr><td><strong>Turbine wheel</strong></td><td>superalloy · laser-cut 310 stainless · scrap turbo</td><td>the superalloy wheel is the most efficient and the most durable above 900 °C, and the hardest to make; the flat stainless wheel is cheap but creeps; the scrap turbocharger turbine is the best value in the catalogue (chapter 9)</td></tr>
+<tr><td><strong>Bearings</strong></td><td>bronze bushings · steel balls · ceramic hybrids</td><td>bushings are free to make but limit the speed to about 60 % of design and run hot; steel balls handle the CJ-1’s 115 000 rpm; ceramic hybrids raise the speed limit and life for four times the price</td></tr>
+<tr><td><strong>Fuel system</strong></td><td>propane · kerosene</td><td>propane vapour needs a regulator and a valve; kerosene stores more energy per litre of tank (range!) but needs a pump, filter and vaporiser: more skill, more hours (chapters 7 and 10)</td></tr>
+</table></div>
+<p>Prices are typical hobby-market figures and the hours are honest guesses; they live in a plain data file, <code>js/catalog.js</code>, so you can put in your own supplier’s prices and your own workshop speed. The <em>performance</em> does not depend on the prices, only on the physics of the parts.</p>
+
+<h2 id="goals" data-short="What to optimise">What are you optimising for?</h2>
+<p>“Best” does not mean anything until you say what for. The workbench offers six goals; each one is a measurable number.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Goal</th><th>Measured as</th><th>What it favours</th></tr>
+<tr><td><strong>Lowest price</strong></td><td>sum of the parts, in dollars</td><td>scrap wheels, bushings, propane, a free can</td></tr>
+<tr><td><strong>Easiest to build</strong></td><td>hours of work and the skill level (0 hand tools … 3 CNC)</td><td>ready-made wheels, no machining, no fuel pump</td></tr>
+<tr><td><strong>Most thrust for its size</strong></td><td>newtons per litre of engine envelope</td><td>a small, high-power engine for a small airframe</td></tr>
+<tr><td><strong>Fastest</strong></td><td>top speed of a reference jet (2.5 kg airframe, 0.5 m² wing, aspect ratio 7), where thrust equals drag</td><td>the biggest thrust, whatever the cost</td></tr>
+<tr><td><strong>Longest range</strong></td><td>distance that jet flies on its 1.2-litre tank at 70 % of top speed</td><td>low fuel consumption per newton, dense fuel</td></tr>
+<tr><td><strong>Longest life</strong></td><td>minutes of full-power running before the weakest part gives up</td><td>stainless liner, ceramic bearings, a cooler turbine</td></tr>
+</table></div>
+<p>You rarely want one goal alone, so the workbench lets you mix them: each goal has a <strong>weight</strong>, each design gets a 0–100 score for each goal (the best design in the catalogue scores 100, the worst 0; price, time, life and range are compared on a logarithmic scale because a doubling matters more than an extra dollar), and the overall score is the weighted average. The preset buttons are common mixes, and you can open the fine-tune panel to set your own.</p>
+
+<div data-widget="workbench"></div>
+
+<div class="callout tip"><span class="ct">Things to try</span>
+<ul>
+<li><strong>Reproduce the CJ-1.</strong> Soda can, billet wheel, superalloy turbine, steel bearings, propane: about 58 N, 115 000 rpm, 794 °C at the turbine inlet, $400 and ~95 hours. The same engine as every other chapter, from the same model.</li>
+<li><strong>Press “Cheapest”.</strong> With the soda can locked, the optimiser reaches about $280 with a model wheel, a scrap turbo and bronze bushings, but the thrust falls to 14 N, a quarter of the CJ-1’s: the cheapest engine is not the one you want to fly.</li>
+<li><strong>Swap the soda can for the flask liner.</strong> With the CJ-1’s other parts the life jumps from about 4 minutes to hours and the weak link moves from the liner to the bearings. This is the “weakest link” rule of chapter 9.</li>
+<li><strong>Open the temperature slider.</strong> Run the CJ-1 25 K cooler (768 °C) and the can’s life rises from about 4 to 16 minutes for 12 % less thrust (58 to 51 N): the best trade in the whole guide, because life changes <em>exponentially</em> with temperature and thrust only roughly linearly.</li>
+<li><strong>Look at the trade-off plot.</strong> Put price on one axis and thrust on the other: only about a dozen of the 283 viable designs sit on the frontier. Everything below it is beaten by a cheaper or stronger design.</li>
+</ul></div>
+
+<h2 id="how" data-short="How it works">How the optimiser knows</h2>
+<p>The workbench is not a spreadsheet of opinions. For each of the 54 combinations of compressor, turbine, bearings and fuel it ran the <strong>same engine model as the simulator</strong> (the real-gas thermodynamics, the compressor map, the combustor, the turbine and the shaft power balance of chapters 3, 4, 5 and 7) at six wheel sizes and eight shaft speeds, and stored thrust, air flow, fuel flow, turbine-inlet temperature and pressure ratio. The page then interpolates between those 54 × 6 × 8 runs. That is why a change appears instantly: nothing is solved in your browser.</p>
+<h3>Scaling to the donor</h3>
+<p>Every size is the CJ-1 scaled by $s=D_2/56\ \text{mm}$ at the <em>same tip speed</em> (so the same Mach numbers and the same pressure ratio):</p>
+<div class="eq">$$N\propto \frac1s,\qquad F,\ \dot m_{air},\ \dot m_{fuel}\propto s^2,\qquad m_{engine}\propto s^3,\qquad \frac{F}{V}\propto \frac1s$$</div>
+<p>Double the wheel and you get four times the thrust at half the rpm and eight times the mass: <em>small engines are denser</em> (more newtons per litre) but spin fast, which is why bearings and balance dominate at the small end, while big engines spin slower, so cheaper bearings suffice but the metal is heavy. The model also includes the size effects that do <em>not</em> scale: the tip clearance shrinks only as $\sqrt{s}$ (so small engines lose efficiency), friction and bearing drag scale as $s^2$ and the combustor volume as $s^3$ (so small combustors are harder to run).</p>
+<h3>The operating point</h3>
+<p>Each design runs at the <strong>highest shaft speed that respects every limit</strong>: the turbine-inlet temperature you set with the slider (default 793 °C, the CJ-1 value), the bearing speed limit, and the wheel’s tip-speed limit. Whichever limit is reached first is reported as “speed is capped by…”. If a poor compressor/turbine pairing needs a hotter turbine than you asked for just to turn itself over, it still runs but is flagged: that is a bad match, and the life figure shows the price.</p>
+<h3>Life</h3>
+<p>Each weak link has a rated life at its reference condition and a temperature law: hot parts (liner, turbine) lose life by a factor four for every 25 K hotter and gain it back for every 25 K cooler (the creep and oxidation rule of chapter 9), and bearings lose life as the cube of speed. The workbench reports the shortest of the three.</p>
+<div class="eq">$$t_{life}=t_{ref}\cdot 4^{\,(T_{ref}-T)/25\,\mathrm{K}},\qquad t_{bearing}=t_{ref}\,x^{-3}$$</div>
+<h3>Speed and range</h3>
+<p>For the reference jet, the thrust falls with airspeed as $F(V)\approx F_0-0.72\,\dot m_0 V$ (calibrated from the model: the ram drag of the air you swallow), and the drag follows the parabolic polar of chapter 2: $D=\tfrac12\rho V^2 S\,C_{D0}+\dfrac{2W^2}{\pi\,AR\,e\,\rho V^2 S}$. The top speed is where the two cross; the range is $V\,m_{fuel}/\dot m_{fuel}$ at 70 % of top speed, with the part-throttle fuel penalty $\mathrm{TSFC}\,(1+0.9\,(1-\text{throttle}))$.</p>
+
+<h2 id="frontier" data-short="Reading the trade-off plot">Reading the trade-off plot: the frontier</h2>
+<p>The scatter at the bottom of the widget puts every design on two axes of your choice. A design is <strong>dominated</strong> if another design is at least as good on both axes and better on one: you would never choose it for those two goals. The designs that nobody dominates form the <strong>frontier</strong> (the dashed green line); everything else is a poorer deal. The frontier is where the real decisions are, because moving along it always costs one currency to buy another: dollars for newtons, hours for life, litres for range.</p>
+<p>It also shows why a single “best engine” does not exist. The designs on the frontier for price against thrust are not the ones on the frontier for life against thrust; the weights you chose decide where on the frontier your engine sits, and the colour of each dot shows its score for your mix.</p>
+
+<h2 id="limits" data-short="What it does not know">What the workbench does not know</h2>
+<ul>
+<li><strong>Prices and hours are yours to correct.</strong> They are plausible hobby figures, not a quote.</li>
+<li><strong>It trusts the engine model</strong> of chapters 3–5 and 7, which is accurate to the level of a good textbook calculation, not a test cell. Real small turbojets scatter ±15 % in thrust.</li>
+<li><strong>It scales a proven design</strong> over a factor of 4 in wheel diameter (31 to 134 mm). Outside that range, or for a very different layout, the similarity rules fail.</li>
+<li><strong>It knows nothing about workmanship.</strong> Balance quality, clearances, weld quality, vibration and resonance (chapters 4 and 9) decide whether a design that is optimal on paper actually runs. The score cannot see them.</li>
+<li><strong>Sea-level static, one fuel at a time.</strong> No altitude, no forward speed except in the speed and range estimate, no start-up or surge analysis (chapter 7).</li>
+</ul>
+<p>Treat the ranking as a way to see which questions matter (“is the bearing or the liner the limit?”) rather than as a verdict, and then build, test and measure.</p>
+<div class="callout danger"><span class="ct">This is still a machine at 100 000 rpm and 800 °C</span>A higher score never makes a design safer. Faster wheels, hotter turbines and bigger engines all raise the stored energy and the hazard (chapter 9 on containment, and the <a href="safety.html">safety page</a>). The workbench helps you choose parts; it does not replace the build and test discipline of chapters 6 and 7.</div>
+
+<h2 id="takeaways" data-short="What you learned">What you now know</h2>
+<ul>
+<li>The vessel you take the flame tube from sets the wheel size (at most 85 % of its inside diameter), and the wheel size sets the whole engine through similarity: thrust and flows as $s^2$, speed as $1/s$, mass as $s^3$.</li>
+<li>Four parts remain free: compressor wheel, turbine wheel, bearings and fuel system, each a trade between money, skill and performance or life.</li>
+<li>There are six honest goals (price, ease, thrust per size, speed, range, life); they conflict, so the answer depends on the weights.</li>
+<li>Running 25 K cooler quadruples the life of the hot parts at a cost of roughly 10 % of the thrust, the best trade in the guide.</li>
+<li>Designs on the frontier of two goals are the only ones worth choosing; the weakest link tells you which single swap helps most.</li>
+</ul>
+
+<div data-widget="quiz">
+<script type="application/json">[
+ {"q":"Why does the flame-tube donor fix the size of the whole engine?","o":["Because every donor has the same wheel","Because the compressor wheel must fit inside it with clearance, and the rest of the engine is scaled from the wheel","Because the shaft has to be as long as the can","Because propane only burns in cans"],"a":1,"why":"The wheel is limited to about 85 % of the inside diameter; thrust, flows, speed and mass then follow from the wheel diameter by the similarity rules."},
+ {"q":"You double the wheel diameter at the same tip speed. What happens?","o":["Thrust ×2, rpm ×2","Thrust ×4, rpm ÷2, mass ×8","Thrust ×8, rpm unchanged","Thrust ×4, rpm ×4"],"a":1,"why":"Flows and thrust scale as the area, $s^2$; rpm as $1/s$ at constant tip speed; mass as the volume, $s^3$."},
+ {"q":"A design is “dominated” on a price-versus-thrust plot. What does that mean?","o":["It is the cheapest","It is the strongest","Another design is at least as cheap and at least as strong, and better on one of the two","It has the most hours of build time"],"a":2,"why":"Dominated designs are never the right choice for those two goals; the ones left over form the frontier."},
+ {"q":"Why is running the turbine 25 K cooler such a good trade?","o":["It saves fuel","Life changes exponentially with temperature (×4 per 25 K) while thrust changes only about linearly","It makes the compressor more efficient","It lets you use a smaller can"],"a":1,"why":"The creep and oxidation rule: a factor of four in life for 25 K, against a few per cent of thrust."},
+ {"q":"The optimiser says your weakest link is the bearings. Which single swap addresses it?","o":["A thicker can","Ceramic hybrid bearings, or running at a lower shaft speed","A kerosene fuel system","A larger compressor wheel"],"a":1,"why":"Bearing life falls as the cube of speed; better bearings, or a lower speed, move the limit."}
+]</script>
+</div>
+
+</article>
+</main>
+</div>
+</body>
+</html>
