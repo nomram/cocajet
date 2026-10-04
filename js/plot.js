@@ -31,10 +31,9 @@ export function niceTicks(min, max, count = 6) {
   return out;
 }
 function logTicks(min, max) {
-  const out = [];
-  for (let e = Math.floor(Math.log10(min)); e <= Math.ceil(Math.log10(max)); e++) for (const m of [1, 2, 5]) {
-    const v = m * Math.pow(10, e); if (v >= min * 0.999 && v <= max * 1.001) out.push(v);
-  }
+  const out = [], dec = Math.log10(max / min), mults = dec > 3.2 ? [1] : [1, 2, 5], stepE = dec > 7 ? Math.ceil(dec / 6) : 1;
+  const e0 = Math.floor(Math.log10(min)), e1 = Math.ceil(Math.log10(max));
+  for (let e = e0; e <= e1; e++) { if (stepE > 1 && ((e - e0) % stepE)) continue; for (const m of mults) { const v = m * Math.pow(10, e); if (v >= min * 0.999 && v <= max * 1.001) out.push(v); } }
   return out;
 }
 const fmtTick = (v) => {

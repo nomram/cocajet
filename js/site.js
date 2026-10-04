@@ -15,6 +15,12 @@ export const PAGES = [
   { file: '07-run.html',      n: '7',  title: 'Run it: the simulator',           group: 'II · The engine' },
   { file: '08-improve.html',  n: '8',  title: 'Make it better, cheaply',         group: 'III · Level up' },
   { file: '09-materials.html',n: '9',  title: 'Materials science',               group: 'III · Level up' },
+  { file: '10-chemistry.html',n: '10', title: 'The chemistry of heat',           group: 'IV · Fire & ignition' },
+  { file: '11-ignition.html', n: '11', title: 'Ignition & spark plugs',          group: 'IV · Fire & ignition' },
+  { file: '12-rockets.html',  n: '12', title: 'Rockets: the other way to push',  group: 'V · Rockets' },
+  { file: '13-solid.html',    n: '13', title: 'Solid rockets & propellants',     group: 'V · Rockets' },
+  { file: '14-hybrid.html',   n: '14', title: 'Hybrid, liquid & air-breathing',  group: 'V · Rockets' },
+  { file: '15-electric.html', n: '15', title: 'Electric propulsion',             group: 'V · Rockets' },
   { file: 'models.html',      n: '⬇',  title: 'STL files & 3D gallery',          group: 'Resources' },
   { file: 'reference.html',   n: '≡',  title: 'Formulas, glossary & sources',    group: 'Resources' },
 ];

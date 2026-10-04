@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10 · The chemistry of heat — Jet Engines for Dummies</title>
+<meta name="description" content="Exothermic and endothermic reactions from the very basics: bond energies, enthalpy and Hess's law, activation energy, thermal runaway and how engines and rockets keep a violent reaction under control. Calorimeter, Arrhenius, Semenov and stirred-reactor widgets.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter">
+
+<span class="eyebrow">Chapter 10 · Fire and ignition</span>
+<h1>The chemistry of heat</h1>
+<div class="meta"><span>~50 min</span><span>7 widgets</span><span>from a hand-warmer to a rocket</span></div>
+<p class="lede">Every newton of thrust in this guide ultimately comes from one thing: atoms swapping partners and the energy difference leaving as heat. This chapter starts from the very beginning (why does anything get hot? why does a cold pack get cold?) and builds up to the problem every engine designer lives with: <em>a reaction that releases heat speeds itself up, so how do you stop it running away?</em></p>
+
+<h2 id="bonds" data-short="Bonds make heat">Heat is atoms changing partners</h2>
+<p>Atoms in a molecule are held together by <strong>chemical bonds</strong>, and every bond stores energy, like a compressed spring. To <em>break</em> a bond you must put energy in. When atoms form a <em>new</em> bond, energy comes out. A chemical reaction is nothing but breaking some bonds and making others, so its heat is the difference:</p>
+<div class="eq">$$\Delta H \;=\; \underbrace{\sum E_{\text{bonds broken}}}_{\text{energy you pay}} \;-\; \underbrace{\sum E_{\text{bonds made}}}_{\text{energy you get back}}$$</div>
+<ul>
+<li>If the new bonds are <strong>stronger</strong> overall, more energy comes out than went in: $\Delta H<0$, the reaction is <strong>exothermic</strong> (it gets hot). Burning, rusting, neutralising an acid.</li>
+<li>If the old bonds were stronger, the reaction <em>takes heat from its surroundings</em>: $\Delta H>0$, <strong>endothermic</strong> (it gets cold, or needs a heater). Melting, evaporating, splitting water with electricity, a cold pack.</li>
+</ul>
+<p>Try it: pick a reaction and count the bonds. Notice that burning always turns weak bonds (C–H, O=O) into very strong ones (C=O and O–H in CO₂ and water): that is where the fire comes from.</p>
+<div data-widget="bond-energy"></div>
+<div class="callout"><span class="ct">A rule worth remembering</span>Burning a hydrocarbon releases very nearly <strong>400 kJ for every mole of oxygen it consumes</strong>, whatever the hydrocarbon (methane −401, propane −409, octane −405 kJ per mole O₂). It means <em>oxygen</em>, not fuel, is what sets how much heat you get. That is why a rocket, which has to carry its own oxygen, is so much heavier than a jet engine, which takes it from the air for free.</div>
+
+<h2 id="enthalpy" data-short="Enthalpy & Hess">Enthalpy, and a table of examples</h2>
+<p>The heat of a reaction at constant pressure is called its <strong>enthalpy change</strong> $\Delta H$ (kJ per mole of the reaction as written). It can also be built from tabulated <em>heats of formation</em> $\Delta H_f$ of each substance (<strong>Hess’s law</strong>: the answer doesn’t depend on the route, only on start and end):</p>
+<div class="eq">$$\Delta H_{\text{reaction}}=\sum \Delta H_f(\text{products})-\sum \Delta H_f(\text{reactants})$$</div>
+<p><strong>Worked example, our fuel.</strong> $\mathrm{C_3H_8}+5\,\mathrm{O_2}\to3\,\mathrm{CO_2}+4\,\mathrm{H_2O(g)}$ with $\Delta H_f$ = −103.8 (propane), 0 (O₂), −393.5 (CO₂), −241.8 (H₂O vapour) kJ/mol:</p>
+<div class="eq">$$\Delta H=3(-393.5)+4(-241.8)-(-103.8)=-2043.9\ \text{kJ per mol}\;\Rightarrow\;\frac{2043.9\ \text{kJ}}{0.044097\ \text{kg}}=46.35\ \text{MJ/kg}$$</div>
+<p>That is the 46.35 MJ/kg the engine model uses as the “lower heating value” of propane.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Process</th><th class="num">ΔH (kJ/mol)</th><th>Type</th><th>Where you meet it</th></tr>
+<tr><td>Methane burns (to liquid water)</td><td class="num">−890</td><td><span class="chip fire">exothermic</span></td><td>gas hob, natural-gas turbines</td></tr>
+<tr><td>Propane burns (to liquid water)</td><td class="num">−2 220</td><td><span class="chip fire">exothermic</span></td><td>barbecues, this engine (−2 044 to steam)</td></tr>
+<tr><td>Hydrogen burns (per mol H₂, to liquid)</td><td class="num">−286</td><td><span class="chip fire">exothermic</span></td><td>rocket upper stages</td></tr>
+<tr><td>Carbon burns, C + O₂ → CO₂</td><td class="num">−394</td><td><span class="chip fire">exothermic</span></td><td>charcoal, coal</td></tr>
+<tr><td>Glucose burns or is respired</td><td class="num">−2 803</td><td><span class="chip fire">exothermic</span></td><td>your own body heat</td></tr>
+<tr><td>Rusting: 4 Fe + 3 O₂ → 2 Fe₂O₃ (per 2 Fe₂O₃)</td><td class="num">−1 648</td><td><span class="chip fire">exothermic</span></td><td>instant hand-warmers (iron powder + salt speeds it up)</td></tr>
+<tr><td>Acid + base: HCl + NaOH</td><td class="num">−57</td><td><span class="chip fire">exothermic</span></td><td>neutralising spills, drain cleaner</td></tr>
+<tr><td>Slaking lime: CaO + H₂O</td><td class="num">−65</td><td><span class="chip fire">exothermic</span></td><td>self-heating meal packs, mortar</td></tr>
+<tr><td>Hydrogen peroxide decomposes (per mol H₂O₂)</td><td class="num">−98</td><td><span class="chip fire">exothermic</span></td><td>monopropellant thrusters (chapter 14)</td></tr>
+<tr><td>Nitrous oxide decomposes (per mol N₂O)</td><td class="num">−82</td><td><span class="chip fire">exothermic</span></td><td>an oxidiser that also releases heat by itself (chapter 14)</td></tr>
+<tr><td>Ammonia synthesis N₂ + 3 H₂ → 2 NH₃</td><td class="num">−92</td><td><span class="chip fire">exothermic</span></td><td>fertiliser, and the nitrogen in many propellants</td></tr>
+<tr><td>Steam condenses to water</td><td class="num">−40.7</td><td><span class="chip fire">exothermic</span></td><td>why a steam burn is worse than a hot-water burn</td></tr>
+<tr><td>Water freezes</td><td class="num">−6.0</td><td><span class="chip fire">exothermic</span></td><td>orchard frost-protection sprays</td></tr>
+<tr><td>Calcium chloride dissolves</td><td class="num">−83</td><td><span class="chip fire">exothermic</span></td><td>hot packs, road de-icing</td></tr>
+<tr><td>Ice melts</td><td class="num">+6.0</td><td><span class="chip air">endothermic</span></td><td>a drink going cold</td></tr>
+<tr><td>Water evaporates</td><td class="num">+40.7</td><td><span class="chip air">endothermic</span></td><td>sweating, and <em>the propane bottle in chapter 6 freezing over</em></td></tr>
+<tr><td>Ammonium nitrate dissolves</td><td class="num">+25.7</td><td><span class="chip air">endothermic</span></td><td>instant cold packs</td></tr>
+<tr><td>Baking soda + vinegar (approx.)</td><td class="num">≈ +30</td><td><span class="chip air">endothermic</span></td><td>the fizz that feels cold</td></tr>
+<tr><td>Electrolysis: 2 H₂O → 2 H₂ + O₂ (per H₂O)</td><td class="num">+286</td><td><span class="chip air">endothermic</span></td><td>making hydrogen: you pay back all the heat as electricity</td></tr>
+<tr><td>Limestone: CaCO₃ → CaO + CO₂</td><td class="num">+178</td><td><span class="chip air">endothermic</span></td><td>making cement (a kiln at 900 °C)</td></tr>
+<tr><td>Steam reforming: CH₄ + H₂O → CO + 3 H₂</td><td class="num">+206</td><td><span class="chip air">endothermic</span></td><td>industrial hydrogen production</td></tr>
+<tr><td>N₂ + O₂ → 2 NO</td><td class="num">+181</td><td><span class="chip air">endothermic</span></td><td>lightning, and the NOx in every hot flame (including ours)</td></tr>
+<tr><td>Photosynthesis (per glucose)</td><td class="num">+2 803</td><td><span class="chip air">endothermic</span></td><td>the sun pays for every fuel on Earth</td></tr>
+</table></div>
+<p>Now do it yourself in a cup. The calorimeter below dissolves salts in water: dissolving is a small chemical reaction (breaking the crystal, wrapping the ions in water) and the heat shows up directly as a temperature change. This is how hand-warmers and cold packs work.</p>
+<div data-widget="calorimeter"></div>
+
+<h2 id="energy" data-short="Energy per kilogram">How much energy per kilogram? (and why the oxygen matters)</h2>
+<p>Because oxygen sets the heat, the fair way to compare energy sources is per kilogram of <em>everything you have to carry</em>. Flip the switch in the chart: with the oxygen counted, petrol drops from 44 MJ/kg to about 10 MJ/kg, and a surprising fact appears: <strong>every conventional explosive carries <em>less</em> energy per kilogram than petrol</strong>. What makes them different is not <em>how much</em> energy they hold but <em>how fast</em> they let it go. Rate is the dangerous part, and controlling the rate is what the rest of this chapter is about.</p>
+<div data-widget="energy-density"></div>
+
+<h2 id="rate" data-short="Why not instantly?">Why doesn’t everything burn at once? Activation energy</h2>
+<p>A tank of petrol and the air around it sit together all day. The reaction is hugely exothermic and still nothing happens. Why? Before bonds can re-form, the old ones have to be stretched and partly broken: the molecules must climb an <strong>energy hill</strong>, the <strong>activation energy</strong> $E_a$. Only the few molecules that collide hard enough at the right moment make it over. At temperature $T$ the fraction with enough energy is the <strong>Boltzmann factor</strong>:</p>
+<div class="eq">$$k = A\,e^{-E_a/RT}$$</div>
+<p>This one formula explains a lot: why a match is needed (it makes a tiny region hot enough for the factor to become large), why <em>every 10 K roughly doubles a reaction rate</em> near room temperature, why food keeps in a fridge, and why a flame at 2000 K is a million times quicker than the same mixture at 300 K. A <strong>catalyst</strong> doesn’t change the heat released ($\Delta H$ is fixed by start and end): it just lowers the hill.</p>
+<div data-widget="arrhenius"></div>
+
+<h2 id="runaway" data-short="Runaway & control">Runaway: when heat feeds the reaction that makes the heat</h2>
+<p>Now combine the two facts. An exothermic reaction makes heat. Heat raises the temperature. A higher temperature speeds the reaction <em>exponentially</em>, making more heat. That is a positive feedback loop. The only thing that can stop it is <strong>heat loss</strong> (conduction, convection, radiation, or being carried away by a flow), which grows only <em>linearly</em> with temperature. So there is a race, and the Russian chemist Nikolai Semenov drew it as two curves:</p>
+<ul>
+<li>if the heat-<strong style="color:var(--air)">loss</strong> line cuts the heat-<strong style="color:var(--fire)">made</strong> curve, the temperature settles at the first crossing: a stable, controlled reaction;</li>
+<li>if the made-curve stays above the loss line everywhere (not enough cooling, too much reactant, too high an ambient temperature), the temperature can only go up: <strong>thermal runaway</strong>, and then explosion, fire or melted hardware.</li>
+</ul>
+<div data-widget="semenov"></div>
+<p>Real examples of the same race: oily rags piling up in a warm garage, wet hay or grain, a damaged lithium battery, a chemical reactor that loses its cooling water, a rocket motor whose case is cracked. The common cure is always one of five levers:</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Lever</th><th>What it does to the Semenov diagram</th><th>In the CJ-1 turbojet</th><th>In a rocket</th></tr>
+<tr><td><strong>1. Limit the reactant</strong></td><td>lowers the made-curve</td><td>fuel is metered through a small valve: the engine can only burn what flows in (chapter 6)</td><td>the grain’s burning area and the oxidiser flow set how much burns per second</td></tr>
+<tr><td><strong>2. Dilute / add inert mass</strong></td><td>the heat has more material to warm: slower temperature rise</td><td>about three-quarters of the air goes round the flame and mixes in <em>after</em> it (secondary and dilution holes)</td><td>inert binder, coolant, and the large mass of propellant itself</td></tr>
+<tr><td><strong>3. Carry the heat away</strong></td><td>steeper loss line</td><td>exhaust flow, film cooling of the liner, bearing oil</td><td>regenerative cooling, ablative liners, the exhaust jet</td></tr>
+<tr><td><strong>4. Build in negative feedback</strong></td><td>the made-curve flattens at high temperature</td><td>the ECU cuts the fuel above 837 °C EGT (chapter 7)</td><td>a burn rate that rises <em>slowly</em> with pressure (chapter 13)</td></tr>
+<tr><td><strong>5. Provide a relief path</strong></td><td>takes pressure (and with it the made-curve) away</td><td>the nozzle is the relief path: the gas simply leaves</td><td>the nozzle throat; pressure-relief burst discs on tanks</td></tr>
+</table></div>
+<div class="callout danger"><span class="ct">Why this chapter belongs next to the safety page</span>The same physics that keeps a flame stable also turns a small mistake into a big one: a fuel leak that fills a space (too much reactant), a trapped hot spot (not enough cooling), a rich mixture meeting a spark. Every real accident with fuels, oxidisers or batteries is a Semenov diagram where the loss line lost.</div>
+
+<h2 id="flame" data-short="A flame is held in check">A flame is a runaway that is held in check</h2>
+<p>A combustor <em>wants</em> the reaction to run away, up to the flame temperature, and keeps it there. It does this with a trick: the gas flows through. Fresh cold mixture enters, burns, and leaves, carrying the heat out. In a simple model (a <strong>well-stirred reactor</strong>) the balance gives an S-shaped curve. If the gas lingers (long residence time $\tau$) the mixture burns completely. If the gas rushes through too fast, the reaction doesn’t have time to finish, the temperature falls, the reaction slows further, and the flame <strong>blows out</strong>: the same runaway, in reverse. In between is a region where both a lit and an unlit state exist: <strong>hysteresis</strong>. That is why lighting needs a spark but, once lit, the flame survives conditions that would never have ignited by themselves.</p>
+<div data-widget="stirred-reactor"></div>
+<p>Look at where the CJ-1 sits: the primary zone gives the mixture about 0.75 ms at full power and 1.5 ms at idle, roughly twice the blow-out limit at φ ≈ 1.1. That <em>margin</em> is what the swirl and the recirculating gas in the primary zone buy: they keep gas in the flame zone longer than the throughflow alone would. It also explains the lean-blow-out limit of the engine simulator: below φ ≈ 0.4 in the primary zone the curve’s upper branch disappears and the flame goes out. And it explains why we need a spark at all (next chapter).</p>
+
+<h2 id="surface" data-short="Surface area">Controlling the rate by the size of the pieces</h2>
+<p>Besides temperature, the second great control on a burn rate is <strong>surface area</strong>. A reaction between a solid or liquid fuel and air happens at the surface. Cut one cubic centimetre of fuel into ever smaller pieces and the surface explodes, the burn time collapses, and the same fuel goes from smouldering to flashing.</p>
+<div data-widget="particle-size"></div>
+<p>Two engineering consequences. In a jet engine, liquid fuel is sprayed into droplets of ~30 µm so that each burns in about a millisecond: the combustor is only a few centimetres long because of this (propane, being a gas, needs no droplets, which is why our engine is so simple). In solid-propellant rockets the burn rate is tuned by the particle size of the ingredients and by a pinch of catalyst, among other things (chapter 13).</p>
+
+<h2 id="burn" data-short="Burning vs detonation">Two ways to release the same energy</h2>
+<p>A reacting front moves through a material in one of two completely different ways:</p>
+<div class="table-wrap"><table class="data">
+<tr><th></th><th>Deflagration (a normal flame)</th><th>Detonation</th></tr>
+<tr><td>Front speed</td><td>millimetres to a few metres per second, <em>subsonic</em></td><td>1.5 to 9 kilometres per second, <em>supersonic</em></td></tr>
+<tr><td>What drives it</td><td>heat conducted and mixed ahead of the flame</td><td>a shock wave that compresses and ignites the material</td></tr>
+<tr><td>Pressure</td><td>nearly constant: the gas expands away from the flame</td><td>a violent spike, 15–30 times the starting pressure</td></tr>
+<tr><td>Used for</td><td>engines, burners, <strong>rocket motors</strong></td><td>mining and demolition (not propulsion, with rare research exceptions)</td></tr>
+</table></div>
+<p>Every propulsion system in this guide is a <em>deflagration held at a steady pressure inside a vessel with a hole in it</em>. A rocket motor is built to burn, never to detonate; the whole art is making the burn rate respond <em>gently</em> to pressure and giving the gas a way out. That is the topic of chapter 13.</p>
+
+<h2 id="care" data-short="Handling chemicals">Handling the chemistry sensibly</h2>
+<ul>
+<li><strong>Keep oxidisers and fuels apart.</strong> Many “harmless” solids (fertiliser nitrates, chlorates, perchlorates, pool chemicals, peroxide) are strong oxidisers. Mixed with fuel they can ignite from friction, heat or contamination. Store them dry, in their own containers, away from anything that burns.</li>
+<li><strong>Quantity matters.</strong> The heat released scales with the amount; the heat <em>lost</em> scales with the surface. A small pile cools itself; a big pile runs away. That is why laws set limits on how much you may store.</li>
+<li><strong>Never mix-and-see.</strong> Reactions you have not calculated or looked up are exactly the ones where the loss line loses. Use published data, work small, and work outdoors with eye protection.</li>
+<li><strong>Know the rules.</strong> Fuels, oxidisers and especially energetic materials are regulated almost everywhere. Chapters 13 and 14 describe how rockets work; they are not instructions for making propellants, and in this guide you will not find any.</li>
+</ul>
+
+<h2 id="takeaways" data-short="What you learned">What you now know</h2>
+<ul>
+<li>Heat of reaction = bonds broken − bonds made. Exothermic reactions (ΔH &lt; 0) release heat; endothermic ones (ΔH &gt; 0) absorb it.</li>
+<li>Burning hydrocarbons gives ~400 kJ per mole of O₂: oxygen, not fuel, sets the heat. Count the oxidiser you carry and all chemical energy sources are within a factor of two.</li>
+<li>A reaction needs to climb an activation energy; the rate is $A\,e^{-E_a/RT}$ and doubles every ~10 K near room temperature. Catalysts lower the hill, not ΔH.</li>
+<li>Heat made grows exponentially with T, heat lost only linearly: if the loss line can’t catch the made-curve, you get thermal runaway. Five levers prevent it: limit the reactant, dilute, cool, negative feedback, relief path.</li>
+<li>A flame is a stabilised runaway: residence time versus burning speed gives ignition, blow-out and hysteresis. The CJ-1’s primary zone is held a few times above its blow-out limit.</li>
+<li>Surface area sets the burn rate: finer pieces burn faster (t ∝ d²). Burning (deflagration) and detonation are different physics; rockets are built for the first.</li>
+</ul>
+
+<div data-widget="quiz">
+<script type="application/json">[
+ {"q":"A reaction breaks bonds worth 2 650 kJ and makes bonds worth 3 450 kJ. It is…","o":["Endothermic, ΔH = +800 kJ","Exothermic, ΔH = −800 kJ","Thermoneutral","Impossible"],"a":1,"why":"ΔH = broken − made = 2 650 − 3 450 = −800 kJ: more energy is released than was paid, so heat comes out."},
+ {"q":"Why does an instant cold pack get cold?","o":["It contains ice","Dissolving the salt absorbs heat (ΔH_solution > 0)","It evaporates fuel","It is a hidden fridge"],"a":1,"why":"Dissolving ammonium nitrate is endothermic (+25.7 kJ/mol): it takes the heat from the water, and the water cools."},
+ {"q":"Petrol holds 10× more energy per kg than TNT. Why is TNT still “stronger”?","o":["It is not stronger","TNT carries its own oxygen and releases the energy in microseconds","TNT is denser","TNT burns hotter"],"a":1,"why":"The petrol figure doesn’t count the air’s oxygen. Per kg of fuel + oxygen they are comparable. TNT is dangerous because of how fast it releases the energy (detonation), not how much it holds."},
+ {"q":"A reaction’s rate doubles for every 10 K. What does a 50 K rise do?","o":["×2","×5","×32","×100 000"],"a":2,"why":"Five doublings: 2⁵ = 32."},
+ {"q":"On a Semenov diagram, which change makes runaway MORE likely?","o":["More cooling surface","Lower ambient temperature","A larger heap of the same reactant (less surface per kg)","A catalyst that is removed"],"a":2,"why":"Heat made scales with the mass, heat lost with the surface. A bigger pile loses relatively less heat, so the loss line gets flatter."},
+ {"q":"What does the stirred-reactor model say happens when the gas flows through too fast?","o":["The flame burns hotter","The flame blows out","Nothing changes","The reaction becomes endothermic"],"a":1,"why":"Too short a residence time: the reaction cannot finish, the temperature drops, the rate drops further: blow-out."}
+]</script>
+</div>
+
+</article>
+</main>
+</div>
+</body>
+</html>
