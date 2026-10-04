@@ -8,14 +8,14 @@ export default function init(el) {
   const sR = slider({ label: 'Pressure ratio  r = P₂ / P₁', min: 1, max: 12, step: 0.05, value: 1.95, fmt: v => v.toFixed(2), onInput: upd });
   const sE = slider({ label: 'Compressor efficiency  ηc', min: 0.5, max: 1.0, step: 0.01, value: 0.78, fmt: v => v.toFixed(2), onInput: upd });
   const sT = slider({ label: 'Inlet temperature  T₁', min: 220, max: 330, step: 1, value: 288, unit: 'K', fmt: v => v.toFixed(0), onInput: upd });
-  const ro = { T2s: readout('Ideal outlet T', '°C', 'cool'), T2: readout('Real outlet T', '°C', 'hot'), dT: readout('Real rise', 'K', 'hot'), w: readout('Work per kg air', 'kJ/kg', 'fuel'), P: readout('Power at 0.152 kg/s', 'kW', 'fuel'), eq: readout('= electric kettles', '×')};
+  const ro = { T2s: readout('Ideal outlet T', '°C', 'cool'), T2: readout('Real outlet T', '°C', 'hot'), dT: readout('Real rise', 'K', 'hot'), w: readout('Work per kg air', 'kJ/kg', 'fuel'), P: readout('Power at 0.151 kg/s', 'kW', 'fuel'), eq: readout('= electric kettles', '×')};
   body.append(h('div', { class: 'wgrid' }, cv, h('div', { class: 'ctls' }, sR.el, sE.el, sT.el, h('div', { class: 'readouts' }, ...Object.values(ro).map(r => r.el)))));
   const p = new Plot(cv, { xmin: 1, xmax: 12, ymin: 0, ymax: 450, xlabel: 'pressure ratio r', ylabel: 'temperature rise ΔT (K)', aspect: 1.5 });
   const k = 0.4 / 1.4, cp = 1005;
   function upd() {
     const r = sR.get(), e = sE.get(), T1 = sT.get();
     const dTs = T1 * (Math.pow(r, k) - 1), dT = dTs / e, w = cp * dT;
-    ro.T2s.set((T1 + dTs - 273.15).toFixed(0)); ro.T2.set((T1 + dT - 273.15).toFixed(0)); ro.dT.set(dT.toFixed(0)); ro.w.set((w / 1000).toFixed(1)); ro.P.set((w * 0.152 / 1000).toFixed(1)); ro.eq.set((w * 0.152 / 2000).toFixed(1));
+    ro.T2s.set((T1 + dTs - 273.15).toFixed(0)); ro.T2.set((T1 + dT - 273.15).toFixed(0)); ro.dT.set(dT.toFixed(0)); ro.w.set((w / 1000).toFixed(1)); ro.P.set((w * 0.151 / 1000).toFixed(1)); ro.eq.set((w * 0.151 / 2000).toFixed(1));
     const c = p.begin().col; p.axes();
     p.fn(x => T1 * (Math.pow(x, k) - 1), 1, 12, { color: c.air, width: 2.4 });
     for (const ee of [0.9, 0.78, 0.65]) p.fn(x => T1 * (Math.pow(x, k) - 1) / ee, 1, 12, { color: c.fire, width: 1.6, dash: [5, 4], alpha: .8 });

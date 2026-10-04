@@ -4,7 +4,7 @@ import { Plot } from '../plot.js';
 import { CJ1, isa, steadyAt } from '../engine-model.js';
 
 export default function init(el) {
-  const { body } = shell(el, { title: 'Add a ducted fan: bypass ratio', note: 'Keep CJ-1’s core exactly as it is, but instead of throwing its 11 kW of jet power out of the nozzle at 376 m/s, use it to drive a ducted fan that accelerates (1 + B) times more air more gently. Ideal model: ½ṁ_total (Vₑ² − V₀²) = η_fan · P_core, same exit speed for both streams. More air, slower jet, much more thrust for the same fuel.' });
+  const { body } = shell(el, { title: 'Add a ducted fan: bypass ratio', note: 'Keep CJ-1’s core exactly as it is, but instead of throwing its 11 kW of jet power out of the nozzle at 377 m/s, use it to drive a ducted fan that accelerates (1 + B) times more air more gently. Ideal model: ½ṁ_total (Vₑ² − V₀²) = η_fan · P_core, same exit speed for both streams. More air, slower jet, much more thrust for the same fuel.' });
   const cv = h('canvas', { class: 'plot' }), cv2 = h('canvas', { class: 'plot' });
   const sB = slider({ label: 'Bypass ratio B (fan air ÷ core air)', min: 0, max: 12, step: 0.1, value: 4, fmt: v => v.toFixed(1), onInput: upd });
   const sV = slider({ label: 'Flight speed V₀', min: 0, max: 250, step: 5, value: 0, unit: 'm/s', fmt: v => v.toFixed(0), onInput: upd });

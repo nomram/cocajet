@@ -5,7 +5,7 @@ import { Plot } from '../plot.js';
 export default function init(el) {
   const { body } = shell(el, { title: 'Thrust calculator: F = ṁ (Vₑ − V₀) + (Pₑ − P₀) Aₑ', note: 'Static test stand: V₀ = 0. At speed the incoming air already carries momentum ṁV₀, so you subtract it: the faster you fly, the less thrust the same jet gives. The pressure term only matters when the nozzle is choked (exit pressure above ambient).' });
   const cv = h('canvas', { class: 'plot' });
-  const sM = slider({ label: 'Mass flow of air  ṁ', min: 0.02, max: 1.0, step: 0.01, value: 0.152, unit: 'kg/s', fmt: v => v.toFixed(3), onInput: upd });
+  const sM = slider({ label: 'Mass flow of air  ṁ', min: 0.02, max: 1.0, step: 0.01, value: 0.151, unit: 'kg/s', fmt: v => v.toFixed(3), onInput: upd });
   const sV = slider({ label: 'Exhaust speed  Vₑ', min: 50, max: 1200, step: 5, value: 380, unit: 'm/s', fmt: v => v.toFixed(0), onInput: upd });
   const sV0 = slider({ label: 'Flight speed  V₀', min: 0, max: 300, step: 5, value: 0, unit: 'm/s', fmt: v => v.toFixed(0), onInput: upd });
   const sP = slider({ label: 'Nozzle over-pressure  Pₑ − P₀', min: 0, max: 80, step: 1, value: 0, unit: 'kPa', fmt: v => v.toFixed(0), onInput: upd });
@@ -21,7 +21,7 @@ export default function init(el) {
     const c = p.begin().col;
     p.set({ ymax: Math.max(60, Math.ceil(Math.max(F, 1.2 * m * 1200) / 50) * 50) });
     p.axes();
-    for (const [mm, col] of [[0.05, c.muted], [0.152, c.air], [0.4, c.violet], [1.0, c.fuel]]) {
+    for (const [mm, col] of [[0.05, c.muted], [0.151, c.air], [0.4, c.violet], [1.0, c.fuel]]) {
       p.fn(v => Math.max(0, mm * (v - V0)), 0, 1200, { color: col, width: 1.8, dash: [4, 4], alpha: .9 });
       p.text(1190, mm * (1190 - V0), `ṁ = ${mm}`, { align: 'right', color: col, size: 11, base: 'bottom' });
     }

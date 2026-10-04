@@ -7,7 +7,7 @@ export default function init(el) {
   const c1 = h('canvas', { class: 'plot' }), c2 = h('canvas', { class: 'plot' });
   const sF = slider({ label: 'Thrust you need', min: 10, max: 200, step: 5, value: 58, unit: 'N', fmt: v => v.toFixed(0), onInput: upd });
   const sV0 = slider({ label: 'Flight speed', min: 10, max: 300, step: 5, value: 100, unit: 'm/s', fmt: v => v.toFixed(0), onInput: upd });
-  const sM = slider({ label: 'Air you accelerate  ṁ', min: 0.05, max: 5, step: 0.05, value: 0.152, unit: 'kg/s', fmt: v => v.toFixed(2), onInput: upd, log: true });
+  const sM = slider({ label: 'Air you accelerate  ṁ', min: 0.05, max: 5, step: 0.05, value: 0.151, unit: 'kg/s', fmt: v => v.toFixed(2), onInput: upd, log: true });
   const ro = { Ve: readout('Needed exhaust speed', 'm/s', 'cool'), eta: readout('Propulsive efficiency', '%', 'good'), jet: readout('Jet kinetic power', 'kW', 'fuel'), use: readout('Useful thrust power', 'kW', 'good'), waste: readout('Wasted in the jet', 'kW', 'hot') };
   body.append(h('div', { class: 'wgrid even' }, c1, c2), h('div', { class: 'wgrid', style: { marginTop: '12px' } }, h('div', { class: 'ctls' }, sF.el, sV0.el, sM.el), h('div', { class: 'readouts' }, ...Object.values(ro).map(r => r.el))));
   const p1 = new Plot(c1, { xmin: 0, xmax: 6, ymin: 0, ymax: 100, xlabel: 'jet speed ÷ flight speed  (Vₑ / V₀)', ylabel: 'propulsive efficiency (%)', aspect: 1.35, xticks: [0, 1, 2, 3, 4, 5, 6] });
