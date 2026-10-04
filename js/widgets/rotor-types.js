@@ -138,7 +138,7 @@ export default function init(el) {
   }
   function drawPlot() {
     const T = S.T, c = p.begin().col; p.axes(); p.hline(0, { color: c.muted, dash: [], alpha: 0.7, width: 1 }); p.hline(BETZ, { color: c.bad, label: 'Betz limit 0.593', align: 'right' });
-    p.hline(0.2, { color: c.muted, dash: [2, 4], alpha: 0.8 }); p.text(0.105, 0.222, 'drag-type limit ≈ 0.2', { color: c.muted, size: 11 });
+    p.hline(0.2, { color: c.muted, dash: [2, 4], alpha: 0.8 }); p.text(0.105, 0.222, 'drag limit ≈ 0.2', { color: c.muted, size: 11 });
     const colOf = X => cssVar(X.col);
     for (const X of TYPES) if (X !== T) p.fn(l => cpOf(X, l), 0.1, 20, { color: colOf(X), width: 1.7, alpha: 0.6 }, 240);
     p.fn(l => cpOf(T, l), 0.1, 20, { color: colOf(T), width: 4 }, 240);

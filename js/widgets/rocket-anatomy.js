@@ -33,7 +33,7 @@ export const VEH = [
     stages: [
       { id: 'sic', nm: 'S-IC (first stage)', sh: 'S-IC', col: 'fire', pair: 'lox-rp1', ofr: 2.27, prop: 2159, dry: 131, Fsl: 33.9, Fvac: 38.8, ispSl: 263, ispVac: 304, tb: 168, d: 10.1, hh: 42.1, g: { w: 10.1, h: 42.1, y0: 0, nf: 0.03 } },
       { id: 'sii', nm: 'S-II (second stage)', sh: 'S-II', col: 'fuel', pair: 'lox-lh2', ofr: 5.5, prop: 456, dry: 36.2, Fvac: 5.1, ispVac: 421, tb: 365, d: 10.1, hh: 24.9, top: 'fu', g: { w: 10.1, h: 24.9, y0: 42.1, nf: 0.03 } },
-      { id: 'sivb', nm: 'S-IVB (third stage)', sh: 'S-IVB', col: 'air', pair: 'lox-lh2', ofr: 5.0, prop: 109, use: 35, dry: 10.1, Fvac: 1.0, ispVac: 421, tb: 150, tbTxt: '≈ 150 (+ ≈ 350 later)', d: 6.6, hh: 17.8, top: 'fu', g: { w: 6.6, h: 18.7, y0: 67.0, nf: 0.04 } }] },
+      { id: 'sivb', nm: 'S-IVB (third stage)', sh: 'S-IVB', col: 'air', pair: 'lox-lh2', ofr: 5.0, prop: 109, use: 35, dry: 10.1, Fvac: 1.0, ispVac: 421, tb: 150, tbTxt: '150 (+ 350)', d: 6.6, hh: 17.8, top: 'fu', g: { w: 6.6, h: 18.7, y0: 67.0, nf: 0.04 } }] },
   { id: 'soyuz', name: 'Soyuz-2', short: 'Soyuz', H: 46.3, pl: 8.2, plName: 'Payload + adapter', plPub: 7.0, plNote: 'Soyuz-2.1a class', era: 'family flying since 1966',
     blurb: 'Parallel staging again, but with four small kerosene boosters clustered round a core stage. Boosters and core all light on the pad; the boosters drop after about two minutes and the core and third stage carry on. The design is a working classic: the same family has flown for sixty years.',
     drops: [{ nm: 'payload fairing', mass: 3.5, before: 2 }],
