@@ -1,7 +1,14 @@
 /* ==========================================================================
-   flow3d.js — airflow particles, combustor flame and exhaust plume for the 3D viewer.
+   flow3d.js — the gas path made visible: crisp velocity streaks, a ray-marched flame in the
+   combustor, a ray-marched exhaust jet and the flash of a compressor surge.
    Everything lives in STL coordinates (z = engine axis, flow toward +z, r = radius) and is
    attached to the viewer's `engine` group so it moves/rotates with the model.
+
+     streaks : instanced ribbons, one per air parcel, always >= ~1.25 px wide, oriented along the
+               local velocity and as long as the speed they stand for
+     flame   : volume shader in the annulus of the flame tube (swirling, noise-driven, blue core)
+     plume   : volume shader behind the nozzle, colour-coded by gas temperature (a real 650 C jet is
+               nearly invisible: this is a false-colour "schlieren" view of it)
    ========================================================================== */
 import * as THREE from 'three';
 import { gasTempProfile } from './engine-sim.js';
@@ -70,52 +77,165 @@ function buildRoutes() {
 
 /* ---------- colour ramps ---------- */
 function tempColor(T, out, o) {
-  // cold air (cyan) -> warm (pale) -> orange -> yellow-white
+  // cold air (cyan-white) -> warm (pale) -> orange -> yellow-white
   let r, g, b;
-  if (T < 330) { r = 0.30; g = 0.78; b = 0.96; }
-  else if (T < 520) { const t = (T - 330) / 190; r = 0.30 + 0.55 * t; g = 0.78 + 0.1 * t; b = 0.96 - 0.1 * t; }
-  else if (T < 900) { const t = (T - 520) / 380; r = 0.85 + 0.15 * t; g = 0.88 - 0.38 * t; b = 0.86 - 0.66 * t; }
-  else if (T < 1500) { const t = (T - 900) / 600; r = 1.0; g = 0.50 + 0.22 * t; b = 0.20 - 0.1 * t; }
-  else { const t = Math.min(1, (T - 1500) / 600); r = 1.0; g = 0.72 + 0.28 * t; b = 0.10 + 0.7 * t; }
+  if (T < 330) { r = 0.42; g = 0.82; b = 1.0; }
+  else if (T < 520) { const t = (T - 330) / 190; r = 0.42 + 0.50 * t; g = 0.82 + 0.08 * t; b = 1.0 - 0.14 * t; }
+  else if (T < 900) { const t = (T - 520) / 380; r = 0.92 + 0.08 * t; g = 0.90 - 0.36 * t; b = 0.86 - 0.66 * t; }
+  else if (T < 1500) { const t = (T - 900) / 600; r = 1.0; g = 0.54 + 0.22 * t; b = 0.20 - 0.08 * t; }
+  else { const t = Math.min(1, (T - 1500) / 600); r = 1.0; g = 0.76 + 0.24 * t; b = 0.12 + 0.68 * t; }
   out[o] = r; out[o + 1] = g; out[o + 2] = b;
 }
 
-const VERT = /* glsl */`
-  attribute vec3 aColor; attribute float aSize; attribute float aAlpha;
+/* ---------- shared GLSL: value-noise fbm and a clip-plane test ---------- */
+const GLSL_NOISE = /* glsl */`
+float hash31(vec3 p) { p = fract(p * 0.3183099 + vec3(0.71, 0.113, 0.419)); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
+float vnoise(vec3 x) {
+  vec3 i = floor(x), f = fract(x); f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(mix(hash31(i), hash31(i + vec3(1,0,0)), f.x), mix(hash31(i + vec3(0,1,0)), hash31(i + vec3(1,1,0)), f.x), f.y),
+             mix(mix(hash31(i + vec3(0,0,1)), hash31(i + vec3(1,0,1)), f.x), mix(hash31(i + vec3(0,1,1)), hash31(i + vec3(1,1,1)), f.x), f.y), f.z);
+}
+float fbm(vec3 p) { float a = 0.5, s = 0.0; for (int i = 0; i < 4; i++) { s += a * vnoise(p); p = p * 2.03 + vec3(1.7, 9.2, 3.1); a *= 0.5; } return s; }
+vec2 cylRange(vec3 ro, vec3 rd, float R, float z0, float z1) {
+  float a = dot(rd.xy, rd.xy), b = dot(ro.xy, rd.xy), c = dot(ro.xy, ro.xy) - R * R;
+  float t0 = -1e9, t1 = 1e9;
+  if (a < 1e-9) { if (c > 0.0) return vec2(1.0, 0.0); }
+  else { float D = b * b - a * c; if (D < 0.0) return vec2(1.0, 0.0); float s = sqrt(D); t0 = (-b - s) / a; t1 = (-b + s) / a; }
+  if (abs(rd.z) > 1e-6) { float ta = (z0 - ro.z) / rd.z, tb = (z1 - ro.z) / rd.z; t0 = max(t0, min(ta, tb)); t1 = min(t1, max(ta, tb)); }
+  else if (ro.z < z0 || ro.z > z1) return vec2(1.0, 0.0);
+  return vec2(max(t0, 0.0), t1);
+}`;
+
+/* ---------- streaks ---------- */
+const STREAK_VERT = /* glsl */`
+  attribute vec3 aPos; attribute vec3 aDir; attribute float aLen; attribute float aWid; attribute vec3 aCol; attribute float aAlpha;
   uniform float uPx; uniform vec4 uClip; uniform float uClipOn;
-  varying vec3 vColor; varying float vAlpha;
+  varying vec2 vUv; varying vec3 vCol; varying float vA;
   void main() {
-    vColor = aColor; vAlpha = aAlpha;
-    vec4 wp = modelMatrix * vec4(position, 1.0);
-    if (uClipOn > 0.5 && dot(uClip.xyz, wp.xyz) + uClip.w > 0.0) vAlpha = 0.0;
-    vec4 mv = viewMatrix * wp;
-    gl_PointSize = clamp(aSize * uPx / max(1.0, -mv.z), 1.0, 90.0);
-    gl_Position = projectionMatrix * mv;
+    vec3 wp = (modelMatrix * vec4(aPos, 1.0)).xyz;
+    vec3 d = normalize(mat3(modelMatrix) * aDir);
+    vec3 toCam = normalize(cameraPosition - wp);
+    vec3 side = cross(d, toCam); float sl = length(side);
+    side = sl > 1e-3 ? side / sl : normalize(cross(d, vec3(0.0, 1.0, 0.0)));
+    float pxMm = uPx / max(1.0, length(cameraPosition - wp));
+    float w = max(aWid, 1.3 / pxMm);                       // never thinner than ~1.3 px: stays crisp at any zoom
+    vec3 pos = wp + d * (position.x * aLen) + side * (position.y * w);
+    vUv = position.xy * 2.0; vCol = aCol;
+    vA = aAlpha * clamp(aWid / w * 1.6, 0.4, 1.0);
+    if (uClipOn > 0.5 && dot(uClip.xyz, wp) + uClip.w < 0.0) vA = 0.0;
+    gl_Position = projectionMatrix * viewMatrix * vec4(pos, 1.0);
   }`;
-const FRAG = /* glsl */`
-  varying vec3 vColor; varying float vAlpha;
+const STREAK_FRAG = /* glsl */`
+  varying vec2 vUv; varying vec3 vCol; varying float vA;
   void main() {
-    vec2 c = gl_PointCoord - 0.5; float d = length(c);
-    float a = smoothstep(0.5, 0.05, d) * vAlpha;
-    if (a < 0.01) discard;
-    gl_FragColor = vec4(vColor, a);
+    float across = 1.0 - smoothstep(0.35, 1.0, abs(vUv.y));
+    float tail = smoothstep(-1.0, 0.85, vUv.x) * (1.0 - smoothstep(0.85, 1.0, vUv.x));
+    float a = across * (0.12 + 0.88 * tail) * vA;
+    if (a < 0.015) discard;
+    gl_FragColor = vec4(vCol * (0.75 + 0.5 * tail), a);
   }`;
 
-function makePoints(n, additive, clipUniforms) {
-  const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
-  geo.setAttribute('aColor', new THREE.BufferAttribute(new Float32Array(n * 3), 3));
-  geo.setAttribute('aSize', new THREE.BufferAttribute(new Float32Array(n), 1));
-  geo.setAttribute('aAlpha', new THREE.BufferAttribute(new Float32Array(n), 1));
+function makeStreaks(n, u) {
+  const base = new THREE.PlaneGeometry(1, 1);
+  const geo = new THREE.InstancedBufferGeometry();
+  geo.index = base.index; geo.setAttribute('position', base.attributes.position);
+  const attr = (name, size) => { const a = new THREE.InstancedBufferAttribute(new Float32Array(n * size), size); a.setUsage(THREE.DynamicDrawUsage); geo.setAttribute(name, a); return a; };
+  attr('aPos', 3); attr('aDir', 3); attr('aLen', 1); attr('aWid', 1); attr('aCol', 3); attr('aAlpha', 1);
+  geo.instanceCount = n;
   const mat = new THREE.ShaderMaterial({
-    vertexShader: VERT, fragmentShader: FRAG, transparent: true, depthWrite: false,
-    blending: additive ? THREE.AdditiveBlending : THREE.NormalBlending,
-    uniforms: { uPx: clipUniforms.uPx, uClip: clipUniforms.uClip, uClipOn: clipUniforms.uClipOn },
+    vertexShader: STREAK_VERT, fragmentShader: STREAK_FRAG, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
+    uniforms: { uPx: u.uPx, uClip: u.uClip, uClipOn: u.uClipOn },
   });
-  const pts = new THREE.Points(geo, mat);
-  pts.frustumCulled = false;
-  return pts;
+  const mesh = new THREE.Mesh(geo, mat); mesh.frustumCulled = false; mesh.renderOrder = 3;
+  return mesh;
 }
+
+/* ---------- volume shaders (ray-march through a bounding cylinder, in engine-local coordinates) ---------- */
+const VOL_VERT = /* glsl */`varying vec3 vLocal; void main() { vLocal = position; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
+
+const FLAME_FRAG = /* glsl */`
+  precision highp float;
+  varying vec3 vLocal;
+  uniform vec3 uCam; uniform float uTime, uInt, uPulse, uSteps; uniform mat4 uModel; uniform vec4 uClip; uniform float uClipOn;
+  ${GLSL_NOISE}
+  vec3 flameRamp(float h, float blue) {
+    vec3 red = vec3(0.85, 0.12, 0.03), orange = vec3(1.0, 0.45, 0.07), yellow = vec3(1.0, 0.82, 0.30), white = vec3(1.0, 0.97, 0.80);
+    vec3 c = h < 0.35 ? mix(red, orange, h / 0.35) : h < 0.7 ? mix(orange, yellow, (h - 0.35) / 0.35) : mix(yellow, white, (h - 0.7) / 0.3);
+    return mix(c, vec3(0.28, 0.5, 1.0), blue);
+  }
+  void main() {
+    vec3 ro = uCam, rd = normalize(vLocal - uCam);
+    vec2 rg = cylRange(ro, rd, 33.5, 70.0, 168.0);
+    if (rg.y <= rg.x) discard;
+    const int STEPS = 34;
+    float dt = (rg.y - rg.x) / uSteps;
+    float jitter = hash31(vec3(gl_FragCoord.xy, uTime * 17.0));
+    vec3 col = vec3(0.0);
+    for (int i = 0; i < STEPS; i++) {
+      if (float(i) >= uSteps) break;
+      float t = rg.x + (float(i) + jitter) * dt;
+      vec3 p = ro + rd * t;
+      if (uClipOn > 0.5) { vec3 wp = (uModel * vec4(p, 1.0)).xyz; if (dot(uClip.xyz, wp) + uClip.w < 0.0) continue; }
+      float r = length(p.xy), z = p.z;
+      float ring = smoothstep(17.7, 19.5, r) * (1.0 - smoothstep(30.8, 32.6, r));        // the annulus between inner tube and can
+      float zf = smoothstep(76.0, 83.0, z) * (1.0 - smoothstep(108.0, 158.0, z));
+      if (ring * zf < 0.004) continue;
+      float ang = atan(p.y, p.x);
+      float sw = ang * 2.0 + z * 0.055 - uTime * 3.1;                                    // swirling flow around the shaft
+      vec3 q = vec3(cos(sw) * r * 0.11, sin(sw) * r * 0.11, z * 0.05 - uTime * 2.4);
+      float n = fbm(q);
+      float core = exp(-pow((z - 93.0) / 17.0, 2.0));
+      float d = ring * zf * smoothstep(0.26, 0.78, n * 0.95 + 0.50 * core * (0.85 + 0.15 * sin(uTime * 31.0 + ang * 3.0)));
+      float h = clamp(0.25 + 0.75 * core + 0.35 * (n - 0.5), 0.0, 1.0);
+      float blue = (1.0 - smoothstep(78.0, 92.0, z)) * 0.8;
+      col += flameRamp(h, blue) * d * dt * 0.04;
+    }
+    col *= uInt * (1.0 + 0.6 * uPulse);
+    col = vec3(1.0) - exp(-col * 1.15);                    // soft tone-map: no blown-out white blob
+    gl_FragColor = vec4(col, clamp(max(col.r, max(col.g, col.b)) * 1.1, 0.0, 1.0));
+  }`;
+
+const PLUME_FRAG = /* glsl */`
+  precision highp float;
+  varying vec3 vLocal;
+  uniform vec3 uCam; uniform float uTime, uInt, uLen, uAdv, uT5, uTamb, uPulse, uSteps; uniform mat4 uModel; uniform vec4 uClip; uniform float uClipOn;
+  ${GLSL_NOISE}
+  vec3 thermal(float T) {   // false colour: cool haze -> dull red -> orange -> pale yellow
+    float x = clamp((T - 300.0) / 800.0, 0.0, 1.0);
+    vec3 a = vec3(0.30, 0.45, 0.70), b = vec3(0.85, 0.20, 0.05), c = vec3(1.0, 0.55, 0.10), d = vec3(1.0, 0.92, 0.55);
+    return x < 0.33 ? mix(a, b, x / 0.33) : x < 0.66 ? mix(b, c, (x - 0.33) / 0.33) : mix(c, d, (x - 0.66) / 0.34);
+  }
+  void main() {
+    vec3 ro = uCam, rd = normalize(vLocal - uCam);
+    float Rb = 20.5 + 0.21 * uLen;
+    vec2 rg = cylRange(ro, rd, Rb, 253.0, 255.0 + uLen);
+    if (rg.y <= rg.x) discard;
+    const int STEPS = 44;
+    float dt = (rg.y - rg.x) / uSteps;
+    float jitter = hash31(vec3(gl_FragCoord.xy, uTime * 13.0));
+    vec3 col = vec3(0.0);
+    for (int i = 0; i < STEPS; i++) {
+      if (float(i) >= uSteps) break;
+      float t = rg.x + (float(i) + jitter) * dt;
+      vec3 p = ro + rd * t;
+      if (uClipOn > 0.5) { vec3 wp = (uModel * vec4(p, 1.0)).xyz; if (dot(uClip.xyz, wp) + uClip.w < 0.0) continue; }
+      float zz = max(0.0, p.z - 255.0), s = clamp(zz / uLen, 0.0, 1.0);
+      float r = length(p.xy);
+      float ro_ = 20.5 + 0.21 * zz;                                                       // the jet spreads at ~12 degrees
+      vec3 q = vec3(p.xy * 0.075, p.z * 0.05 - uTime * uAdv);
+      float n = fbm(q);                                                                    // eddies carried downstream
+      float rho = r / ro_ * (1.0 + 0.55 * (n - 0.5) * smoothstep(0.0, 0.35, s));
+      float prof = 1.0 - smoothstep(0.55, 1.08, rho);
+      float theta = pow(max(0.0, 1.0 - s), 1.15) * prof;                                   // temperature excess decays with distance
+      if (theta < 0.01) continue;
+      float T = uTamb + (uT5 - uTamb) * theta;
+      float edge = smoothstep(0.0, 0.12, s);
+      col += thermal(T) * theta * theta * dt * 0.045 * (0.55 + 0.9 * n) * (0.4 + 0.6 * edge);
+    }
+    col *= uInt * (1.0 + 0.5 * uPulse);
+    col = vec3(1.0) - exp(-col * 1.25);
+    gl_FragColor = vec4(col, clamp(max(col.r, max(col.g, col.b)) * 1.1, 0.0, 1.0));
+  }`;
 
 export class FlowSystem {
   constructor(engine, { count = 4200 } = {}) {
@@ -124,36 +244,45 @@ export class FlowSystem {
     this.routeList = Object.values(this.routes);
     this.u = { uPx: { value: 600 }, uClip: { value: new THREE.Vector4(0, 0, -1, 0) }, uClipOn: { value: 0 } };
     this.enabled = { air: true, flame: true, plume: true };
-    this.slow = 4.0e-4;                               // visual slow-motion factor
-    this.N = count;
-    this.air = makePoints(count, false, this.u);
-    this.flame = makePoints(520, true, this.u);
-    this.plume = makePoints(900, true, this.u);
-    engine.add(this.air, this.flame, this.plume);
-    // particle state
+    this.slow = 5.0e-4;                               // visual slow-motion factor (real velocity -> mm per second on screen)
+    this.N = this.Nmax = count;
+    this.quality = 1;
+    this.streaks = makeStreaks(count, this.u);
+    engine.add(this.streaks);
+    // volumes
+    const vu = () => ({ uCam: { value: new THREE.Vector3() }, uTime: { value: 0 }, uInt: { value: 0 }, uPulse: { value: 0 }, uSteps: { value: 34 }, uModel: { value: engine.matrixWorld }, uClip: this.u.uClip, uClipOn: this.u.uClipOn });
+    this.flameU = Object.assign(vu(), {});
+    this.plumeU = Object.assign(vu(), { uLen: { value: 330 }, uAdv: { value: 2.0 }, uT5: { value: 900 }, uTamb: { value: 288 } });
+    const volMat = (frag, u) => new THREE.ShaderMaterial({ vertexShader: VOL_VERT, fragmentShader: frag, uniforms: u, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.FrontSide });
+    const cyl = (r0, r1, z0, z1) => { const g = new THREE.CylinderGeometry(r1, r0, z1 - z0, 40, 1, false); g.rotateX(Math.PI / 2); g.translate(0, 0, (z0 + z1) / 2); return g; };
+    this.flame = new THREE.Mesh(cyl(34.5, 34.5, 70, 168), volMat(FLAME_FRAG, this.flameU));
+    this.plumeMesh = new THREE.Mesh(cyl(21.5, 21.5 + 0.21 * 360 + 4, 252, 255 + 360), volMat(PLUME_FRAG, this.plumeU));
+    this.flame.frustumCulled = this.plumeMesh.frustumCulled = false; this.flame.renderOrder = this.plumeMesh.renderOrder = 2;
+    engine.add(this.flame, this.plumeMesh);
+    // surge flash out of the intake
+    this.flash = new THREE.Mesh(new THREE.CircleGeometry(80, 40), new THREE.ShaderMaterial({
+      transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, uniforms: { uA: { value: 0 } },
+      vertexShader: 'varying vec2 vP; void main() { vP = position.xy / 80.0; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+      fragmentShader: 'varying vec2 vP; uniform float uA; void main() { float d = length(vP); float a = pow(max(0.0, 1.0 - d), 1.6) * uA; gl_FragColor = vec4(vec3(1.0, 0.62, 0.22) * a * 1.6, a); }',
+    }));
+    this.flash.position.set(0, 0, -6); this.flash.visible = false; engine.add(this.flash);
+    // parcels
     this.ps = [];
-    for (let i = 0; i < count; i++) {
-      const p = { rt: null, s: 0, lane: 0, th: 0, v: 1, jit: 0 };
-      this._spawn(p, true);
-      this.ps.push(p);
-    }
-    this.fl = [];
-    for (let i = 0; i < 520; i++) this.fl.push({ life: 0, max: 1, th: 0, r: 25, z: 90, vz: 0, size: 6 });
-    this.pl = [];
-    for (let i = 0; i < 900; i++) this.pl.push({ life: 0, max: 1, th: 0, r: 10, z: 255, vz: 0, vr: 0, size: 6 });
+    for (let i = 0; i < count; i++) { const p = { rt: null, s: 0, lane: 0, th: 0, v: 1, jit: 0, seg: 0, px: 0, py: 0, pz: 0, fresh: true }; this._spawn(p, true); this.ps.push(p); }
     // lights
     this.lightFlame = new THREE.PointLight(0xff7a30, 0, 300, 1.4);
     this.lightFlame.position.set(0, 0, 100);
     this.lightExit = new THREE.PointLight(0xff9a50, 0, 330, 1.4);
     this.lightExit.position.set(0, 0, 275);
     engine.add(this.lightFlame, this.lightExit);
-    this.t = 0;
+    this.t = 0; this._lastPhase = 0; this._flashA = 0;
   }
 
+  /** 1 = full detail; <1 draws fewer parcels and fewer volume steps (set by the viewer when the frame rate drops) */
+  setQuality(q) { this.quality = q; this.N = Math.max(600, Math.round(this.Nmax * q)); this.streaks.geometry.instanceCount = this.N; this.flameU.uSteps.value = Math.max(12, Math.round(34 * Math.pow(q, 0.7))); this.plumeU.uSteps.value = Math.max(14, Math.round(44 * Math.pow(q, 0.7))); }
+
   _pickRoute() {
-    let r = Math.random();
-    const e = Math.random();
-    // entry zone by air share, wall by hole-area share
+    const r = Math.random(), e = Math.random();
     let zone = 0, acc = 0;
     for (let i = 0; i < ENTRIES.length; i++) { acc += ENTRIES[i][2]; if (e <= acc) { zone = i; break; } }
     const name = ENTRIES[zone][0];
@@ -168,10 +297,10 @@ export class FlowSystem {
     p.th = Math.random() * Math.PI * 2;
     p.v = 0.85 + Math.random() * 0.3;
     p.jit = Math.random() * 6.28;
-    p.seg = 0;
+    p.seg = 0; p.fresh = true;
   }
 
-  /** place a particle on its route; returns {z, r, th, key, f} */
+  /** place a particle on its route; returns {z, r, key, f} */
   _locate(p, out) {
     const rk = p.rt.rakes;
     let i = p.seg;
@@ -184,7 +313,7 @@ export class FlowSystem {
     const zb = A.b[0] + (B.b[0] - A.b[0]) * t, rb = A.b[1] + (B.b[1] - A.b[1]) * t;
     const u = (p.lane + 1) / 2;
     out.z = za + (zb - za) * u; out.r = ra + (rb - ra) * u;
-    out.key = t < 0.5 ? A.key : B.key; out.sw = A.sw + (B.sw - A.sw) * t;
+    out.sw = A.sw + (B.sw - A.sw) * t;
     out.keyA = A.key; out.keyB = B.key; out.t = t;
     return out;
   }
@@ -201,116 +330,88 @@ export class FlowSystem {
   }
 
   setViewport(h, fov) { this.u.uPx.value = (h * 0.5) / Math.tan(THREE.MathUtils.degToRad(fov) / 2); }
-  setClip(on, plane) { this.u.uClipOn.value = on ? 1 : 0; if (plane) this.u.uClip.value.set(plane.normal.x, plane.normal.y, plane.normal.z, plane.constant); }
+  setClip(on, plane) { this.cutMode = on; this.u.uClipOn.value = on ? 1 : 0; if (plane) this.u.uClip.value.set(plane.normal.x, plane.normal.y, plane.normal.z, plane.constant); }
 
   update(dt, vis, camera) {
     this.t += dt;
-    const running = vis && vis.N > 600;
-    const pos = this.air.geometry.attributes.position.array, col = this.air.geometry.attributes.aColor.array;
-    const sz = this.air.geometry.attributes.aSize.array, al = this.air.geometry.attributes.aAlpha.array;
-    const loc = {};
-    const colArr = [0, 0, 0];
+    const running = !!vis && vis.N > 600;
+    const lit = !!vis && vis.lit;
+    const surgeMod = vis ? (vis.surgeMod ?? 1) : 1;
+    // ---- streaks ----
+    const g = this.streaks.geometry.attributes;
+    const P = g.aPos.array, D = g.aDir.array, L = g.aLen.array, W = g.aWid.array, C = g.aCol.array, A = g.aAlpha.array;
+    const loc = {}, tmp = [0, 0, 0];
     const Tprof = vis ? vis.T : null;
-    const lit = vis ? vis.lit : false;
-    const intensity = Math.min(1, vis ? vis.N / 60000 : 0);
+    const intensity = Math.min(1, vis ? vis.N / 50000 : 0);
     for (let i = 0; i < this.N; i++) {
       const p = this.ps[i];
-      if (!running || !this.enabled.air) { al[i] = 0; continue; }
+      if (!running || !this.enabled.air) { A[i] = 0; continue; }
       this._locate(p, loc);
-      // advance along the route; speed from the engine's real velocities, slowed down for the eye
-      let vA = this._speedFor(loc.keyA, vis), vB = this._speedFor(loc.keyB, vis);
-      let v = (vA + (vB - vA) * loc.t) * 1000 * this.slow * p.v;
-      v = Math.max(v, 2.5);
-      const ds = v * dt;
-      p.s += ds;
-      p.th += loc.sw * ds / Math.max(6, loc.r) * 1.0;
-      if (p.s >= p.rt.length) { this._spawn(p, false); al[i] = 0; continue; }
-      // gentle turbulence in the combustor, laminar elsewhere
+      const vA = this._speedFor(loc.keyA, vis), vB = this._speedFor(loc.keyB, vis), vReal = vA + (vB - vA) * loc.t;
+      const v = Math.max(vReal * 1000 * this.slow * p.v, 3.0);
+      p.s += v * dt;
+      p.th += loc.sw * v * dt / Math.max(6, loc.r);
+      if (p.s >= p.rt.length) { this._spawn(p, false); A[i] = 0; continue; }
       let r = loc.r, z = loc.z;
-      if (loc.keyA === 'can' || loc.keyA === 'hole') {
-        r += Math.sin(this.t * 7 + p.jit * 3) * 1.2;
-        p.th += Math.sin(this.t * 3 + p.jit) * 0.004;
+      if (loc.keyA === 'can' || loc.keyA === 'hole') {          // turbulent in the combustor, laminar elsewhere
+        r += Math.sin(this.t * 7 + p.jit * 3) * 1.2; p.th += Math.sin(this.t * 3 + p.jit) * 0.004;
       }
-      const th = p.th;
-      pos[i * 3] = r * Math.cos(th); pos[i * 3 + 1] = r * Math.sin(th); pos[i * 3 + 2] = z;
+      const x = r * (this.cutMode ? Math.abs(Math.cos(p.th)) : Math.cos(p.th)), y = r * Math.sin(p.th);   // in a cut-away every parcel is drawn in the half that is still there (the flow is symmetric)
+      let dx = x - p.px, dy = y - p.py, dz = z - p.pz; const dl = Math.hypot(dx, dy, dz);
+      if (p.fresh || dl < 1e-5) { dx = 0; dy = 0; dz = 1; p.fresh = false; } else { dx /= dl; dy /= dl; dz /= dl; }
+      p.px = x; p.py = y; p.pz = z;
+      P[i * 3] = x; P[i * 3 + 1] = y; P[i * 3 + 2] = z; D[i * 3] = dx; D[i * 3 + 1] = dy; D[i * 3 + 2] = dz;
       // temperature -> colour
       let T = Tprof.T01;
       if (z < 60) T = gasTempProfile(z, Tprof, lit);
       else if (loc.keyA === 'ann') T = Tprof.T02;
       else if (loc.keyA === 'hole') T = Tprof.T02 + (gasTempProfile(z, Tprof, lit) - Tprof.T02) * loc.t * 0.5;
       else T = gasTempProfile(z, Tprof, lit);
-      if (loc.keyA === 'plume' || (z > 255)) T = Tprof.T5 * (1 - 0.55 * Math.min(1, (z - 255) / 240));
-      tempColor(T, col, i * 3);
-      sz[i] = 1.55 + (T > 900 ? 0.5 : 0);
-      al[i] = (loc.keyA === 'amb' ? 0.35 : 0.8) * intensity * (loc.keyA === 'plume' ? Math.max(0, 1 - (z - 255) / 250) : 1);
+      if (loc.keyA === 'plume' || z > 255) T = Tprof.T5 * (1 - 0.55 * Math.min(1, (z - 255) / 240));
+      tempColor(T, C, i * 3);
+      L[i] = 1.8 + 0.42 * Math.sqrt(Math.max(vReal, 1) * p.v);           // longer streak = faster air (3 mm at the intake, ~9 mm in the nozzle)
+      W[i] = 0.42;
+      A[i] = (loc.keyA === 'amb' ? 0.40 : 0.85) * intensity * (loc.keyA === 'plume' ? Math.max(0, 1 - (z - 255) / 250) : 1) * (0.55 + 0.45 * surgeMod);
     }
-    this.air.geometry.attributes.position.needsUpdate = true; this.air.geometry.attributes.aColor.needsUpdate = true;
-    this.air.geometry.attributes.aSize.needsUpdate = true; this.air.geometry.attributes.aAlpha.needsUpdate = true;
-    this._updateFlame(dt, vis, lit);
-    this._updatePlume(dt, vis, lit);
+    for (const k of ['aPos', 'aDir', 'aLen', 'aWid', 'aCol', 'aAlpha']) g[k].needsUpdate = true;
+
+    // ---- volumes ----
+    camera.updateMatrixWorld();
+    this.engine.updateMatrixWorld(true);
+    const camLocal = this.engine.worldToLocal(camera.position.clone());
+    const fuelF = vis ? Math.min(1.2, 0.30 + vis.fuelFrac) : 0;
+    const flick = 0.9 + 0.1 * Math.sin(this.t * 43) * Math.sin(this.t * 17.3);
+    const pulse = vis && vis.surge ? 1 - surgeMod : 0;
+    this.flameU.uCam.value.copy(camLocal); this.flameU.uTime.value = this.t;
+    this.flameU.uInt.value = lit && this.enabled.flame ? fuelF * flick * (vis.surge ? 0.5 + 0.9 * surgeMod : 1) : 0;
+    this.flameU.uPulse.value = pulse;
+    this.flame.visible = this.flameU.uInt.value > 0.01;
+    const power = vis ? Math.min(1.15, Math.max(0, (vis.N - 20000) / 95000)) : 0;
+    this.plumeU.uCam.value.copy(camLocal); this.plumeU.uTime.value = this.t;
+    const ve = vis ? vis.v.noz : 0;
+    this.plumeU.uLen.value = 120 + 220 * Math.min(1.1, ve / 380);
+    this.plumeU.uAdv.value = Math.max(0.5, ve * 1000 * this.slow * 0.045);
+    this.plumeU.uT5.value = vis ? Math.max(vis.T.T5, vis.T.T01 + 1) : 600; this.plumeU.uTamb.value = vis ? vis.T.T01 : 288;
+    this.plumeU.uInt.value = lit && this.enabled.plume && power > 0.02 ? Math.min(1.4, 0.35 + power) * (vis.surge ? 0.6 + 0.8 * surgeMod : 1) : 0;
+    this.plumeU.uPulse.value = pulse;
+    this.plumeMesh.visible = this.plumeU.uInt.value > 0.01;
+    // surge flash through the intake: one burst each time the pressure collapses
+    if (vis && vis.surge) { if (vis.surgePhase < this._lastPhase) this._flashA = 1; this._lastPhase = vis.surgePhase; } else this._lastPhase = 0;
+    this._flashA = Math.max(0, this._flashA - dt * 7);
+    this.flash.material.uniforms.uA.value = this._flashA; this.flash.visible = this._flashA > 0.01;
+    if (this.flash.visible) { const qe = this._qe || (this._qe = new THREE.Quaternion()); this.engine.getWorldQuaternion(qe); this.flash.quaternion.copy(qe.invert().multiply(camera.quaternion)); }   // billboard
     // lights
-    const heat = lit ? Math.min(1, 0.3 + (vis.fuelFrac || 0)) : 0;
-    this.lightFlame.intensity = THREE.MathUtils.lerp(this.lightFlame.intensity, heat * 2600, 0.15);
+    const heat = lit ? Math.min(1, 0.3 + (vis.fuelFrac || 0)) * (vis.surge ? 0.5 + 0.8 * surgeMod : 1) : 0;
+    this.lightFlame.intensity = THREE.MathUtils.lerp(this.lightFlame.intensity, heat * 2600 * flick, 0.2);
     this.lightExit.intensity = THREE.MathUtils.lerp(this.lightExit.intensity, heat * 1500, 0.15);
   }
 
-  _updateFlame(dt, vis, lit) {
-    const g = this.flame.geometry.attributes;
-    const pos = g.position.array, col = g.aColor.array, sz = g.aSize.array, al = g.aAlpha.array;
-    const on = lit && this.enabled.flame;
-    const ff = vis ? Math.min(1.2, 0.35 + vis.fuelFrac) : 0;
-    for (let i = 0; i < this.fl.length; i++) {
-      const f = this.fl[i];
-      f.life -= dt;
-      if (f.life <= 0) {
-        if (!on) { al[i] = 0; continue; }
-        f.max = f.life = 0.35 + Math.random() * 0.55;
-        f.th = Math.random() * 6.283; f.r = 18.8 + Math.random() * 12.4; f.z = 79 + Math.random() * 14;
-        f.vz = 18 + Math.random() * 55; f.size = 3.2 + Math.random() * 4.2 * ff;
-      }
-      const k = 1 - f.life / f.max;
-      f.z += f.vz * dt * 0.8;
-      const wob = 1 + 0.06 * Math.sin(this.t * 40 + i);
-      pos[i * 3] = f.r * Math.cos(f.th) * wob; pos[i * 3 + 1] = f.r * Math.sin(f.th) * wob; pos[i * 3 + 2] = f.z;
-      // blue-white core fading to orange then red
-      if (k < 0.18) { col[i * 3] = 0.55; col[i * 3 + 1] = 0.7; col[i * 3 + 2] = 1.0; }
-      else if (k < 0.5) { col[i * 3] = 1.0; col[i * 3 + 1] = 0.82 - 0.35 * (k - 0.18) / 0.32; col[i * 3 + 2] = 0.3; }
-      else { col[i * 3] = 0.95; col[i * 3 + 1] = 0.35 - 0.2 * (k - 0.5) / 0.5; col[i * 3 + 2] = 0.08; }
-      sz[i] = f.size * (0.7 + 0.5 * Math.sin(Math.PI * Math.min(1, k * 1.4)));
-      al[i] = on ? 0.26 * Math.sin(Math.PI * k) * (0.5 + 0.5 * ff) : 0;
-    }
-    g.position.needsUpdate = g.aColor.needsUpdate = g.aSize.needsUpdate = g.aAlpha.needsUpdate = true;
+  setVisible(v) {
+    this.streaks.visible = v; this.lightFlame.visible = this.lightExit.visible = v;
+    if (!v) { this.flame.visible = false; this.plumeMesh.visible = false; this.flash.visible = false; }
   }
-
-  _updatePlume(dt, vis, lit) {
-    const g = this.plume.geometry.attributes;
-    const pos = g.position.array, col = g.aColor.array, sz = g.aSize.array, al = g.aAlpha.array;
-    const on = lit && this.enabled.plume && vis && vis.N > 20000;
-    const power = vis ? Math.min(1.1, Math.max(0, (vis.N - 20000) / 95000)) : 0;
-    for (let i = 0; i < this.pl.length; i++) {
-      const f = this.pl[i];
-      f.life -= dt;
-      if (f.life <= 0) {
-        if (!on) { al[i] = 0; continue; }
-        f.max = f.life = 0.8 + Math.random() * 0.9;
-        f.th = Math.random() * 6.283; f.r = 8.6 + Math.random() * 11.4; f.z = Z_NOZ_EXIT + Math.random() * 3;
-        f.vz = (230 + Math.random() * 120) * (0.35 + 0.65 * power); f.vr = (Math.random() - 0.3) * 9 * power;
-        f.size = 2.6 + Math.random() * 4.2;
-      }
-      const k = 1 - f.life / f.max;
-      f.z += f.vz * dt; f.r = Math.max(0.5, f.r + f.vr * dt * (0.6 + k));
-      pos[i * 3] = f.r * Math.cos(f.th); pos[i * 3 + 1] = f.r * Math.sin(f.th); pos[i * 3 + 2] = f.z;
-      const h = 1 - k;
-      col[i * 3] = 1.0; col[i * 3 + 1] = 0.30 + 0.45 * h * h; col[i * 3 + 2] = 0.06 + 0.25 * h * h * h;
-      sz[i] = f.size * (0.8 + 1.8 * k);
-      al[i] = on ? 0.085 * power * Math.sin(Math.PI * Math.min(1, k * 1.2)) * (0.6 + 0.4 * h) : 0;
-    }
-    g.position.needsUpdate = g.aColor.needsUpdate = g.aSize.needsUpdate = g.aAlpha.needsUpdate = true;
-  }
-
-  setVisible(v) { this.air.visible = this.flame.visible = this.plume.visible = v; this.lightFlame.visible = this.lightExit.visible = v; }
   dispose() {
-    for (const o of [this.air, this.flame, this.plume]) { o.geometry.dispose(); o.material.dispose(); this.engine.remove(o); }
+    for (const o of [this.streaks, this.flame, this.plumeMesh, this.flash]) { o.geometry.dispose(); o.material.dispose(); this.engine.remove(o); }
     this.engine.remove(this.lightFlame, this.lightExit);
   }
 }

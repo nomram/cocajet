@@ -273,7 +273,7 @@ loadManifest().then(m => {
 
 // lazy-start the viewer when the page is first scrolled near it
 (async function start() {
-  viewer = new EngineViewer(mount, { tools: ['spin', 'explode', 'cut', 'xray', 'flow', 'heat', 'view', 'reset'], flow: false, caption: 'Step 1 · loading…', onSelect: (m) => { if (m) cap.innerHTML = `<b>${m.name}</b> · ${m.materialName} · ${m.mass_g.toFixed(0)} g. ${m.note}`; } });
+  viewer = new EngineViewer(mount, { tools: ['spin', 'explode', 'cut', 'xray', 'flow', 'heat', 'view', 'quality', 'reset'], flow: false, thrustHUD: true, caption: 'Step 1 · loading…', onSelect: (m) => { if (m) cap.innerHTML = `<b>${m.name}</b> · ${m.materialName} · ${m.mass_g.toFixed(0)} g. ${m.note}`; } });
   await viewer.load();
   showStep(current);
 })().catch(err => { console.error(err); mount.innerHTML = '<div class="vloading">3D needs WebGL, which your browser blocked.</div>'; });

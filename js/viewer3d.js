@@ -110,6 +110,8 @@ export class EngineViewer {
     this.state = { explode: 0, explodeT: 0, cut: false, xray: false, flow: !!this.opts.flow, heat: 'real', spin: true, rotate: !!this.opts.autoRotate, step: null };
     this.spinAngle = 0; this.spinRate = 0.6;          // rad/s when no sim is attached
     this._anim = null; this._visible = true; this._raf = 0; this._hover = null;
+    this.perf = { ema: 16, slow: 0, level: 0, mode: 'auto' };
+    try { const q = localStorage.getItem('cj-quality'); if (q && ['auto', 'high', 'balanced', 'low'].includes(q)) { this.perf.mode = q; this.perf.level = { high: 0, balanced: 2, low: 3 }[q] || 0; } } catch (e) { /* private mode */ }
     this._buildDom();
     this._initThree();
     this._bindEvents();
@@ -127,7 +129,9 @@ export class EngineViewer {
     this.label = h('div', { class: 'vlabel' }, this.opts.caption || '');
     this.hint = h('div', { class: 'vhint' }, this.opts.interactive ? this.opts.hint : '');
     this.loading = h('div', { class: 'vloading' }, 'Loading 3D parts…');
+    this.hud = this.opts.thrustHUD ? h('div', { class: 'vhud', 'aria-live': 'off' }) : null;
     el.append(this.canvas, this.bar, this.label, this.hint, this.loading);
+    if (this.hud) el.append(this.hud);
     if (!this.opts.caption) this.label.style.display = 'none';
     this.btns = {};
     const mk = (id, text, fn, title) => {
@@ -143,6 +147,7 @@ export class EngineViewer {
     if (T.has('heat')) mk('heat', '🌡 Heat: glow', (b) => { this.cycleHeat(); }, 'Cycle: glow / thermal camera / off');
     if (T.has('view')) mk('view', '⌖ View', (b) => { this.cycleView(); }, 'Next camera angle');
     if (T.has('rotate')) mk('rotate', '↻ Orbit', (b) => { this.state.rotate = !this.state.rotate; b.classList.toggle('on', this.state.rotate); }, 'Auto-orbit');
+    if (T.has('quality')) mk('quality', '◈ Quality: auto', () => this.cycleQuality(), 'Graphics quality: auto / high / balanced / low');
     if (T.has('reset')) mk('reset', '⟲ Reset', () => this.setView('iso'), 'Reset camera');
     if (this.state.rotate && this.btns.rotate) this.btns.rotate.classList.add('on');
     if (this.state.flow && this.btns.flow) this.btns.flow.classList.add('on');
@@ -224,9 +229,11 @@ export class EngineViewer {
       this.loading.textContent = `Loading 3D parts… ${++done}/${list.length}`;
     }));
     this.loading.classList.add('done');
-    this.flow = new FlowSystem(this.engine, { count: (window.innerWidth < 700 || (navigator.hardwareConcurrency || 8) <= 4) ? 2400 : 4200 });
+    this.flow = new FlowSystem(this.engine, { count: (window.innerWidth < 700 || (navigator.hardwareConcurrency || 8) <= 4) ? 3200 : 7000 });
     this.flow.setViewport(this._h * this.renderer.getPixelRatio(), FOV);
     this.flow.setVisible(this.state.flow);
+    this._buildThrustArrow();
+    this._applyQuality();
     this.setStep(this.state.step);
     this._applyMaterialsState();
     return this;
@@ -264,6 +271,70 @@ export class EngineViewer {
       this.frame(step === total ? null : ids, { pad: step === total ? 1.18 : 1.35 });
     } else if (frame && step == null) this.frame(null, { pad: 1.18 });
     this._updateFlowAvailability();
+  }
+
+  /* ---------- the force the engine puts on its stand ---------- */
+  _buildThrustArrow() {
+    const g = new THREE.Group();
+    const mat = new THREE.MeshBasicMaterial({ color: 0xff6b35, depthTest: false, transparent: true, opacity: 0.95 });
+    const shaft = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.6, 1, 14), mat), head = new THREE.Mesh(new THREE.ConeGeometry(5.2, 14, 18), mat);
+    shaft.rotation.x = head.rotation.x = Math.PI / 2;           // along +z
+    shaft.renderOrder = head.renderOrder = 10;
+    const cv = document.createElement('canvas'); cv.width = 256; cv.height = 96;
+    const tex = new THREE.CanvasTexture(cv); tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 4;
+    const label = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, depthTest: false, transparent: true }));
+    label.scale.set(64, 24, 1); label.renderOrder = 11;
+    g.add(shaft, head, label); g.visible = false;
+    this.engine.add(g);
+    this.arrow = { g, shaft, head, label, cv, tex, last: '' };
+  }
+  _updateThrustArrow(vis) {
+    const a = this.arrow; if (!a) return;
+    const F = vis ? (vis.thrustCalc ? vis.thrustCalc.F : vis.thrust) : 0;
+    const on = !!vis && F > 0.3 && this.state.arrow !== false && !this.state.solo;
+    a.g.visible = on; if (!on) return;
+    const L = 22 + 2.4 * Math.min(F, 110), z0 = 224, y = 88;     // tail above the turbine, pointing toward the inlet (the engine is pushed forward)
+    a.shaft.scale.y = L; a.shaft.position.set(0, y, z0 - L / 2);
+    a.head.position.set(0, y, z0 - L - 4); a.head.rotation.x = -Math.PI / 2;
+    a.label.position.set(0, y + 22, z0 - L / 2);
+    const txt = F.toFixed(1) + ' N';
+    if (txt !== a.last) {
+      a.last = txt; const c = a.cv.getContext('2d'); c.clearRect(0, 0, 256, 96);
+      c.fillStyle = 'rgba(10,16,23,.82)'; c.beginPath(); c.roundRect(6, 10, 244, 76, 16); c.fill();
+      c.strokeStyle = '#ff6b35'; c.lineWidth = 3; c.stroke();
+      c.fillStyle = '#ffd9c7'; c.font = '700 20px sans-serif'; c.textAlign = 'center'; c.fillText('THRUST', 128, 36);
+      c.fillStyle = '#fff'; c.font = '800 36px ui-monospace, monospace'; c.fillText(txt, 128, 74);
+      a.tex.needsUpdate = true;
+    }
+  }
+  _updateHUD(vis) {
+    if (!this.hud) return;
+    const now = performance.now(); if (now - (this._hudT || 0) < 160) return; this._hudT = now;
+    const c = vis && vis.thrustCalc;
+    if (!c) { this.hud.innerHTML = ''; this.hud.style.display = 'none'; return; }
+    this.hud.style.display = '';
+    const f = (x, d) => x.toFixed(d), mg = c.mg, surge = vis.surge;
+    this.hud.innerHTML = `<div class="k">Net thrust · calculated</div><div class="v">${f(c.F, 1)}<small> N</small>${surge ? '<em> surging</em>' : ''}</div>`
+      + `<div class="q1">F = ṁ<sub>g</sub>·V<sub>e</sub> + (P<sub>e</sub> − P<sub>0</sub>)·A − ṁ·V<sub>0</sub></div>`
+      + `<div class="q2">= ${f(mg, 3)} kg/s × ${f(c.Ve, 0)} m/s ${c.press >= 0 ? '+' : '−'} ${f(Math.abs(c.press), 1)} N − ${f(c.ram, 1)} N<br>= ${f(c.mom, 1)} ${c.press >= 0 ? '+' : '−'} ${f(Math.abs(c.press), 1)} − ${f(c.ram, 1)}${surge ? ' (× pulse)' : ''} = <b>${f(c.F, 1)} N</b></div>`
+      + `<div class="q3">exit Mach ${f(c.Mexit, 2)}${c.choked ? ' · choked' : ' · not choked'}</div>`;
+  }
+
+  /* ---------- graphics quality: auto-adapts to the frame rate ---------- */
+  setQuality(mode) { this.perf.mode = mode; this.perf.level = mode === 'low' ? 3 : mode === 'balanced' ? 2 : mode === 'high' ? 0 : this.perf.level; this.perf.slow = 0; this._applyQuality(); try { localStorage.setItem('cj-quality', mode); } catch (e) { /* ignore */ } }
+  cycleQuality() { const o = ['auto', 'high', 'balanced', 'low']; this.setQuality(o[(o.indexOf(this.perf.mode) + 1) % 4]); }
+  _applyQuality() {
+    const lv = this.perf.level, dpr = window.devicePixelRatio || 1;
+    const pr = [Math.min(dpr, this.opts.pixelRatio), Math.min(dpr, 1.5), Math.min(dpr, 1.25), 1][lv];
+    if (this.renderer.getPixelRatio() !== pr) { this.renderer.setPixelRatio(pr); this._resize(); }
+    const q = [1, 0.75, 0.5, 0.3][lv];
+    if (this.flow) this.flow.setQuality(q);
+    if (this.btns.quality) this.btns.quality.textContent = '◈ Quality: ' + (this.perf.mode === 'auto' ? 'auto' + (lv ? ' (' + ['high', 'balanced', 'medium', 'low'][lv] + ')' : '') : this.perf.mode);
+  }
+  _watchPerf(raw) {
+    const P = this.perf; if (P.mode !== 'auto' || !this.flow || !this.state.flow || !this._visible) return;
+    P.ema += (Math.min(raw, 0.25) * 1000 - P.ema) * 0.05;
+    if (P.ema > 42 && P.level < 3) { if (++P.slow > 70) { P.level++; P.slow = 0; P.ema = 25; this._applyQuality(); } } else P.slow = Math.max(0, P.slow - 1);
   }
 
   /** show one part on its own (null = back to the engine as set by setStep) */
@@ -328,7 +399,7 @@ export class EngineViewer {
     }, 40);
   }
 
-  detachSim() { this.sim = null; this.vis = null; clearInterval(this._simTimer); }
+  detachSim() { this.sim = null; this.vis = null; clearInterval(this._simTimer); if (this.arrow) this.arrow.g.visible = false; if (this.hud) this.hud.style.display = 'none'; }
 
   /* ---------- camera ---------- */
   setView(name, animate = true) {
@@ -406,6 +477,7 @@ export class EngineViewer {
     if (!this._visible || document.hidden) return;
     this._update(dt, Math.min(0.35, raw));
     this.renderer.render(this.scene, this.camera);
+    this._watchPerf(raw);
   }
 
   _update(dt, simDt = dt) {
@@ -424,6 +496,7 @@ export class EngineViewer {
       this.camera.position.copy(this.controls.target).add(off);
     }
     this.controls.update();
+    if (this.vis && this.vis.surge) { const k = (1 - (this.vis.surgeMod ?? 1)) * 0.9; this.camera.position.x += (Math.random() - 0.5) * k; this.camera.position.y += (Math.random() - 0.5) * k; }
 
     // simulation
     let vis = this.vis;
@@ -450,6 +523,7 @@ export class EngineViewer {
       part.u.uThermal.value = this.state.heat === 'thermal' ? 1 : 0;
       part.u.uHeatOn.value = this.state.heat === 'off' ? 0 : 1;
     }
+    this._updateThrustArrow(vis); this._updateHUD(vis);
     if (this.flow && vis) {
       this.flow.enabled.air = this.state.flow; this.flow.enabled.flame = this.state.flow || true; this.flow.enabled.plume = true;
       this.flow.update(dt, vis, this.camera);

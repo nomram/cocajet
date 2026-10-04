@@ -155,8 +155,8 @@ const sim = new EngineSim();
 let viewer = null;
 
 /* ---------- 3D ---------- */
-viewer = new EngineViewer($('sv'), { tools: ['spin', 'explode', 'cut', 'xray', 'flow', 'heat', 'view', 'reset'], flow: true, caption: 'CJ-1 · live' });
-viewer.load().then(() => { viewer.attachSim(sim); viewer.setHeat('real'); updateUI(true); }).catch((e) => { console.error(e); $('sv').innerHTML = '<div class="vloading">3D needs WebGL, which your browser blocked. The gauges still work.</div>'; });
+viewer = new EngineViewer($('sv'), { tools: ['spin', 'explode', 'cut', 'xray', 'flow', 'heat', 'view', 'quality', 'reset'], flow: true, thrustHUD: true, caption: 'CJ-1 · live' });
+viewer.load().then(() => { viewer.attachSim(sim); viewer.setHeat('real'); viewer.setCut(true); viewer.setView('iso'); updateUI(true); }).catch((e) => { console.error(e); $('sv').innerHTML = '<div class="vloading">3D needs WebGL, which your browser blocked. The gauges still work.</div>'; });
 // when the viewer failed we still run the sim
 let fallbackTimer = setTimeout(() => { if (!viewer || !viewer.manifest) { /* no 3D: drive the sim ourselves */ let last = performance.now(); setInterval(() => { const n = performance.now(); sim.step((n - last) / 1000 * (+$('warp').value)); last = n; }, 50); } }, 8000);
 

@@ -104,8 +104,8 @@ const io = new IntersectionObserver(async ([e]) => {
   if (!e.isIntersecting) return; io.disconnect();
   try {
     const [{ EngineViewer }, { EngineSim }] = await Promise.all([import('./js/viewer3d.js'), import('./js/engine-sim.js')]);
-    const v = new EngineViewer(mount, { tools: ['explode', 'cut', 'xray', 'heat'], autoRotate: true, flow: true, caption: 'CJ-1 · running at partial power · hover a part' });
-    await v.load();
+    const v = new EngineViewer(mount, { tools: ['explode', 'cut', 'xray', 'heat', 'quality'], autoRotate: true, flow: true, thrustHUD: true, caption: 'CJ-1 · running · hover a part' });
+    await v.load(); v.setCut(true);
     const sim = new EngineSim(); v.attachSim(sim);
     sim.start(); for (let i = 0; i < 700; i++) sim.step(0.05);
     sim.setThrottle(0.7); for (let i = 0; i < 900; i++) sim.step(0.05);
