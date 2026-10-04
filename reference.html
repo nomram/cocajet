@@ -114,6 +114,8 @@
 <tr><td>Solid burn rate</td><td>$r=aP_c^{\,n}$</td><td>4 mm/s at 1 MPa, n = 0.35: 6 mm/s at 3.4 MPa</td></tr>
 <tr><td>Solid chamber pressure</td><td>$P_c=(\rho c^*aK_n)^{1/(1-n)}$, $K_n=A_b/A_t$</td><td>$K_n=219$: 3.35 MPa; stable only for $n<1$</td></tr>
 <tr><td>Hybrid regression</td><td>$\dot r=aG_{ox}^{\,n}$, $G_{ox}=\dot m_{ox}/A_p$, $\dot m_f\propto d^{1-2n}$</td><td>$n>0.5$: O/F rises as the port widens</td></tr>
+<tr><td>Gravity loss (vertical burn)</td><td>$\Delta v_g\approx g\,t_b$, $t_b=\dfrac{(1-1/R)\,I_{sp}}{T/W}$</td><td>$I_{sp}=300$ s, $R=4$: 1.7 km/s at $T/W=1.3$, 0.44 km/s at 5</td></tr>
+<tr><td>Motor class</td><td>each letter doubles the total impulse $I=\int F\,dt$ (A: 1.25–2.5 N·s)</td><td>C: 5–10 N·s; H: 160–320; O: 20 480–40 960</td></tr>
 <tr><td>Hard-start pressure jump</td><td>$\Delta P=(\gamma-1)\,m\,q/V$</td><td>10 g in 1 L, q = 3.5 MJ/kg: ≈ 9 MPa</td></tr>
 <tr><td>Ducted fan thrust (static)</td><td>$F=(4\rho A_e)^{1/3}P_{flow}^{2/3}$</td><td>90 mm fan, 2.5 kW of flow power: 55 N</td></tr>
 <tr><td>Jet power</td><td>$P=\tfrac12FV_e=\tfrac12F\,I_{sp}g_0$</td><td>1 tonne hovering at 3 000 s: 147 MW</td></tr>
@@ -216,6 +218,15 @@
 
 <script type="module">
 const G = [
+['Gravity loss','The speed a rocket loses to gravity while it is still burning, about g times the burn time. It is why launchers want a high thrust-to-weight ratio, and why they cannot afford a very high one.'],
+['High-power rocket','In the US a rocket with more than a model rocket’s limits, up to 40 960 N·s of impulse (motors H to O), flown after club certification Level 1, 2 or 3.'],
+['Launch vehicle classes','By payload to low Earth orbit: small-lift up to 2 t, medium 2–20 t, heavy 20–50 t, super-heavy above 50 t.'],
+['Model rocket','A rocket with at most 125 g of propellant and 1 500 g total mass (US rule), made of light non-metal parts, with a certified motor up to class G (160 N·s).'],
+['Motor class','The letter on a rocket motor, A to O: the total impulse range, doubling with each letter.'],
+['Single-stage-to-orbit (SSTO)','A rocket that reaches orbit without dropping any stage. No operational example exists: it would need about 94 % of its mass to be propellant.'],
+['Sounding rocket','A suborbital rocket that goes straight up, usually 50 km to over 1 000 km, and falls back: a few minutes of weightlessness or observation.'],
+['Thrust-to-weight ratio (T/W)','Lift-off thrust divided by weight. 5 or more for a hobby rocket, 1.2–1.5 for an orbital launcher.'],
+['Total impulse','The integral of thrust over time, I = ∫F dt, in newton-seconds: the quantity the motor letter measures.'],
 ['Activation energy','The energy hill a reaction must climb before it can run downhill. Raising the temperature helps molecules climb it: the Arrhenius law (chapter 10).'],
 ['Arrhenius law','The reaction rate grows exponentially with temperature, k = A·exp(−Eₐ/RT): why a small temperature rise can speed a reaction a lot.'],
 ['BATES grain','A stack of propellant segments, each burning on the bore and both end faces, giving a nearly constant thrust (chapter 13).'],

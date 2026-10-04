@@ -57,3 +57,26 @@ export const PROPS = {
   cold:     { n: 'Cold nitrogen gas', Tc: 293, Mw: 28.0, g: 1.40 },
   steam:    { n: 'Hot steam (heated water)', Tc: 700, Mw: 18.0, g: 1.30 },
 };
+
+/**
+ * Vertical flight with constant thrust and exponential atmosphere (no wind, no tilt).
+ * m0 liftoff mass [kg], mp propellant [kg], F thrust [N] for tb [s], D body diameter [m], Cd drag coefficient on frontal area.
+ * Returns time histories (thinned) and the headline numbers.  Stops at apogee.
+ */
+export function flyVertical({ m0, mp, F, tb, D, Cd = 0.55, rod = 1.2, g = G0 }) {
+  const A = Math.PI / 4 * D * D, out = { t: [0], h: [0], v: [0] };
+  let t = 0, h = 0, v = 0, vmax = 0, tRod = null, vRod = 0, gravLoss = 0, dragLoss = 0;
+  const lift = F > m0 * g;
+  if (!lift) return { ...out, apogee: 0, vmax: 0, tApogee: 0, vRod: 0, tRod: null, lift: false, gravLoss: 0, dragLoss: 0, tw: F / (m0 * g) };
+  while (t < 2000) {
+    const dt = t < tb + 1 ? 0.004 : 0.02, burning = t < tb, m = m0 - mp * Math.min(1, t / tb);
+    const rho = 1.225 * Math.exp(-h / 8500), drag = 0.5 * rho * v * Math.abs(v) * Cd * A;
+    const a = ((burning ? F : 0) - drag) / m - g;
+    gravLoss += burning ? g * dt : 0; dragLoss += Math.abs(drag) / m * dt;
+    v += a * dt; h += v * dt; t += dt; vmax = Math.max(vmax, v);
+    if (tRod == null && h >= rod) { tRod = t; vRod = v; }
+    if ((out.t.length < 2 || t - out.t[out.t.length - 1] >= Math.max(0.05, t / 400))) { out.t.push(t); out.h.push(h); out.v.push(v); }
+    if (v <= 0 && t > tb) break;
+  }
+  return { ...out, apogee: h, vmax, tApogee: t, vRod, tRod, lift: true, gravLoss, dragLoss, tw: F / (m0 * g) };
+}

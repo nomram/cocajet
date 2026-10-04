@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>16 · The rocket zoo: classes of rockets — Jet Engines for Dummies</title>
+<meta name="description" content="How rockets are sorted into classes: motor impulse letters A to O, model and high-power hobby rockets and their certification levels, sounding rockets, small to super-heavy launch vehicles, propulsion type, staging and reuse, and why thrust-to-weight ratio separates the classes.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter">
+
+<span class="eyebrow">Chapter 16 · Classes of rockets</span>
+<h1>The rocket zoo: what the classes are</h1>
+<div class="meta"><span>~45 min</span><span>3 widgets</span><span>from a water bottle to Starship</span></div>
+<p class="lede">A water rocket and a moon rocket obey the same equations, but their lift-off masses differ by a factor of ten million, and so does almost everything else about them: who may fly them, what motors they use, what they can carry and what they cost. People therefore sort rockets in several ways at once. This chapter lays out the sorting systems one by one (by motor size, by the rules, by job, by payload, by engine and architecture) and shows the one physical quantity, the thrust-to-weight ratio, that quietly decides which class a rocket must belong to.</p>
+
+<h2 id="motor" data-short="By motor size: A to O">Sort by motor size: the letters A to O</h2>
+<p>Chapter 13 introduced the label on a hobby motor. The letter is the <strong>total impulse</strong>, $I=\int F\,dt$, in newton-seconds, and <em>each letter allows twice the impulse of the one before</em>. That makes the ladder logarithmic, like the Richter scale: from an A motor to an O motor is fourteen doublings, a factor of more than 16 000.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Class</th><th class="num">Total impulse (N·s)</th><th>What it flies</th></tr>
+<tr><td><strong>½A – A – B</strong></td><td class="num">0.6 – 5</td><td>micro rockets and small gliders; a few tens of metres to a hundred</td></tr>
+<tr><td><strong>C – D</strong></td><td class="num">5 – 20</td><td>the classic model-shop motors; apogee a few hundred metres</td></tr>
+<tr><td><strong>E – F – G</strong></td><td class="num">20 – 160</td><td>large model rockets; up to about a kilometre</td></tr>
+<tr><td><strong>H – I</strong></td><td class="num">160 – 640</td><td>start of high-power rocketry (Level 1); several hundred metres to two kilometres</td></tr>
+<tr><td><strong>J – K – L</strong></td><td class="num">640 – 5 120</td><td>serious hobby rockets (Level 2); two to five kilometres</td></tr>
+<tr><td><strong>M – N – O</strong></td><td class="num">5 120 – 40 960</td><td>the top of the hobby (Level 3); five to ten kilometres or more</td></tr>
+</table></div>
+<p>For reference: the CJ-1 at full power for one minute delivers 3 500 N·s, an L-class impulse, but it delivers it as 58 N for 60 s instead of 1 000 N for 3 s. The class tells you the <em>energy-like total</em>, not how hard the push is; the second number in the label (the average thrust) and the burn time tell the rest. The widget climbs the ladder: it sizes a typical rocket for each motor and flies it straight up.</p>
+<div data-widget="impulse-ladder"></div>
+
+<h2 id="rules" data-short="By the rules">Sort by who flies it and which rules apply</h2>
+<p>The motor letters become legal and club categories. The example below is the United States; every country has its own rules (aviation authority, explosives law, club structure), so check yours before you buy or fly anything.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Category</th><th>Definition (US example)</th><th>Motor classes</th><th>What you need</th></tr>
+<tr><td><strong>Water and toy rockets</strong></td><td>pressure from air, no combustion</td><td>none</td><td>common sense, a safe field, the rules of chapter 12</td></tr>
+<tr><td><strong>Model rockets</strong> (FAA “Class 1”)</td><td>at most 125 g of propellant, at most 1 500 g in total, slow-burning propellant, paper, wood or breakable plastic, no substantial metal</td><td>up to G (160 N·s)</td><td>certified motors, the club or national safety code; usable by beginners</td></tr>
+<tr><td><strong>High-power rockets</strong> (“Class 2”)</td><td>more than a model rocket, but at most 40 960 N·s of total impulse</td><td>H up to O</td><td>club certification Level 1 (H, I), Level 2 (J, K, L) or Level 3 (M, N, O); a cleared range; the aviation authority is told about the launch site</td></tr>
+<tr><td><strong>Advanced high-power</strong> (“Class 3”)</td><td>anything more than that</td><td>beyond O</td><td>a specific waiver or licence; in practice, an organised amateur or university group</td></tr>
+<tr><td><strong>Sounding and orbital rockets</strong></td><td>professional, commercial or government</td><td>not lettered</td><td>launch licence, range safety, insurance</td></tr>
+</table></div>
+<p>Notice what the ladder buys you: the Level system is a <em>training path</em>. To fly H and I motors you first prove you can build, fly and recover a rocket on smaller ones; to move up to J, K and L you do it again; and so on. It is the same logic as an aircraft licence, and the reason the hobby has an excellent safety record under clubs and a poor one outside them.</p>
+<div class="callout danger"><span class="ct">Staying on the right side of the line</span>The categories exist because the hazard rises steeply with impulse: the energy in an O motor is thousands of times that in a C motor, and the distance at which a failure can hurt someone grows with it. Use certified motors from a seller who checks your certification, follow the club’s distance tables, and never modify a motor or build propellant at home (chapter 13). This chapter says nothing about weapons; military missiles share the physics but are outside this guide.</div>
+
+<h2 id="job" data-short="By job">Sort by job: what is the rocket for?</h2>
+<div class="table-wrap"><table class="data">
+<tr><th>Job</th><th>What it does</th><th>Typical engine</th><th>Example</th></tr>
+<tr><td><strong>Education and sport</strong></td><td>teaches and entertains; recoverable</td><td>water, model and high-power solid motors</td><td>chapters 12 and 13</td></tr>
+<tr><td><strong>Sounding rocket</strong></td><td>goes straight up to 50 km – over 1 000 km and falls back; a few minutes above the atmosphere for experiments</td><td>one or two solid stages</td><td>research flights from many countries</td></tr>
+<tr><td><strong>Orbital launcher</strong></td><td>puts satellites and crews into orbit; needs about 9.4 km/s</td><td>liquid, solid and hybrid stages, often several</td><td>Electron, Falcon 9, Saturn V</td></tr>
+<tr><td><strong>Upper stage and kick motor</strong></td><td>moves a payload from low orbit to a higher or farther orbit</td><td>hydrogen/oxygen or storable liquids, solids</td><td>transfer to geostationary orbit, to the Moon</td></tr>
+<tr><td><strong>Spacecraft propulsion</strong></td><td>manoeuvring and attitude control in space; the thrust can be tiny</td><td>monopropellant, cold gas, ion and Hall thrusters</td><td>chapters 14 and 15</td></tr>
+<tr><td><strong>Test and demonstration vehicle</strong></td><td>hops and landing tests, to prove a technology</td><td>whatever the real vehicle will use</td><td>reusable-booster test flights</td></tr>
+</table></div>
+
+<h2 id="payload" data-short="Launch vehicle classes">Sort launchers by payload: small to super-heavy</h2>
+<p>For orbital launchers the common yardstick is the mass that can be put into <strong>low Earth orbit</strong> (LEO, about 200–400 km up):</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Class</th><th class="num">Payload to LEO</th><th>Examples (rounded)</th></tr>
+<tr><td><strong>Small-lift</strong> (micro-launchers at the bottom)</td><td class="num">up to 2 t</td><td>Electron ≈ 300 kg</td></tr>
+<tr><td><strong>Medium-lift</strong></td><td class="num">2 – 20 t</td><td>Falcon 9 with a recovered booster ≈ 17 t</td></tr>
+<tr><td><strong>Heavy-lift</strong></td><td class="num">20 – 50 t</td><td>Delta IV Heavy ≈ 28 t; Falcon 9 with an expended booster ≈ 23 t</td></tr>
+<tr><td><strong>Super-heavy-lift</strong></td><td class="num">over 50 t</td><td>Falcon Heavy ≈ 64 t; SLS ≈ 95 t; Saturn V ≈ 140 t; Starship (design goal) 100 t or more</td></tr>
+</table></div>
+<p>The classes are rough: the same rocket changes class depending on how much it saves for recovery, and the numbers shift between versions. The point is the pattern. Look at the chart and notice that the class boundaries line up with <em>lift-off mass</em> (a medium launcher weighs hundreds of tonnes, a super-heavy one thousands), and that the whole zoo falls along a band of constant thrust-to-weight ratio between 1.2 and 1.5, far below the hobby rockets.</p>
+<div data-widget="rocket-zoo"></div>
+
+<h2 id="delta" data-short="Δv budgets">Sort by where it goes: the Δv budget</h2>
+<p>Chapter 12’s rocket equation says that a rocket is defined, above all, by how much velocity change $\Delta v$ it can deliver. Here is what each class of destination asks of the rocket, with the usual round numbers (they include gravity and drag losses where relevant):</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Destination</th><th class="num">Δv (km/s)</th><th>Class of rocket that does it</th></tr>
+<tr><td>Straight up to 100 km (the edge of space)</td><td class="num">≈ 1.5 – 2</td><td>sounding rocket; one stage</td></tr>
+<tr><td>Low Earth orbit</td><td class="num">≈ 9.4</td><td>two or three stages of liquid or solid, or one reusable stage plus a booster</td></tr>
+<tr><td>Low orbit → geostationary transfer</td><td class="num">≈ 2.4</td><td>upper stage</td></tr>
+<tr><td>Low orbit → trans-lunar injection</td><td class="num">≈ 3.1</td><td>hydrogen/oxygen upper stage</td></tr>
+<tr><td>Low orbit → leaving Earth</td><td class="num">≈ 3.2</td><td>upper stage, or an ion thruster slowly (chapter 15)</td></tr>
+<tr><td>Low orbit → Mars transfer</td><td class="num">≈ 3.6</td><td>upper stage plus a kick stage</td></tr>
+</table></div>
+<p>Orbit is the expensive one: 9.4 km/s, three times the rest of the budget to the Moon put together. That is why launch vehicles are the big, multi-stage, high-class machines and why spacecraft, once in orbit, can use tiny engines.</p>
+
+<h2 id="tw" data-short="Thrust-to-weight">The hidden boundary: thrust-to-weight ratio</h2>
+<p>There is one number that separates the hobby rocket from the orbital launcher, and it is not size: it is the <strong>lift-off thrust-to-weight ratio</strong> $T/W=F/(mg)$. A rocket accelerates at $(T/W-1)\,g$; at $T/W=1$ it does not even leave the pad. Why would a launcher not simply use a higher $T/W$? Look at the burn time for a fixed mass ratio $R$ and specific impulse $I_{sp}$:</p>
+<div class="eq">$$t_b=\frac{(1-1/R)\,I_{sp}}{T/W},\qquad \Delta v_{\text{gravity}}\approx g\,t_b$$</div>
+<p>The longer the burn, the longer gravity pulls the rocket back. With $I_{sp}=300$ s and $R=4$: at $T/W=1.3$ the burn takes 173 s and gravity eats <strong>1.7 km/s</strong>; at $T/W=5$ it is 45 s and 440 m/s; at 15, 150 m/s. So a bigger $T/W$ is better for the speed, and the price is paid elsewhere: more engines, stronger structure, and more drag low in the dense air (the rocket is fastest when the air is thickest). The launchers’ compromise is $T/W\approx1.2$–$1.5$, and they then tilt over (a “gravity turn”) so that later in the climb gravity works against the horizontal velocity less.</p>
+<p>A hobby rocket sits at the other end for a different reason. It has no guidance, only fins, and fins steer only if the air flows past them quickly. Clubs therefore ask for a thrust-to-weight of about 5 or more at lift-off and a speed of at least about 15 m/s leaving the launch rod. The ladder widget above checks both; the widget below shows the trade for any rocket.</p>
+<div data-widget="liftoff-tw"></div>
+
+<h2 id="arch" data-short="By engine and design">Sort by engine and architecture</h2>
+<div class="table-wrap"><table class="data">
+<tr><th>Axis</th><th>Choices</th><th>What decides it</th></tr>
+<tr><td><strong>Propulsion</strong></td><td>solid · hybrid · liquid · electric · air-breathing (chapters 13–15, 14)</td><td>thrust level, Isp, simplicity, cost, safety, shut-off</td></tr>
+<tr><td><strong>Propellant</strong></td><td>kerosene/oxygen · methane/oxygen · hydrogen/oxygen · storable hypergolic pairs · composite solids</td><td>Isp against tank volume (the propellant chart, chapter 14)</td></tr>
+<tr><td><strong>Staging</strong></td><td>single stage · serial stages (one on top of another) · parallel stages (side boosters that burn together) · “stage-and-a-half” (engines dropped, tanks kept)</td><td>the mass ratio needed for the Δv: chapter 12’s staging formula</td></tr>
+<tr><td><strong>Single-stage-to-orbit</strong></td><td>no operational example yet</td><td>needs about 94 % of the rocket to be propellant (chapter 12): possible on paper, brutal in practice</td></tr>
+<tr><td><strong>Reuse</strong></td><td>expendable · first stage recovered · fully reusable (a design goal)</td><td>a recovered stage must carry extra propellant and landing hardware, which costs payload</td></tr>
+<tr><td><strong>Guidance</strong></td><td>fins only (hobby) · spin stabilised · thrust-vector control, gimballed engines, small steering thrusters</td><td>speed and altitude: past the thick air, fins no longer work</td></tr>
+</table></div>
+
+<h2 id="scale" data-short="Why size matters">Why a big rocket is easier than a small one</h2>
+<p>Compare a model rocket and a moon rocket and you find one of the oldest rules in engineering, the square-cube law. If you scale a rocket up by a factor $L$ in every dimension, its propellant volume (and mass) grows as $L^3$ but its tank <em>surface</em>, and so the mass of a thin tank wall, grows only as $L^2$. The <strong>structure fraction $\varepsilon$ falls</strong> as the rocket grows, which, through the rocket equation’s logarithm, gives a better mass ratio for the same technology. Drag works the same way: the ballistic coefficient $m/(C_dA)$ grows as $L$, so a large rocket loses far less of its speed to the air than a small one. A hobby rocket can lose a quarter of its speed to drag; a launcher usually loses only a few hundred metres per second out of 9 400. The catch is that big rockets also have bigger problems (many engines in a small space, bigger tanks to cool and to keep from buckling) so each class needs its own engineering, not just a magnification.</p>
+
+<h2 id="takeaways" data-short="What you learned">What you now know</h2>
+<ul>
+<li>Motor classes A–O are letters for total impulse; each letter doubles the one before, and the second number in the label is the average thrust.</li>
+<li>Rules follow the letters: model rockets (up to G, 160 N·s, up to 125 g of propellant, up to 1 500 g in total in the US); high-power H–O with club certification Levels 1–3 (H–I, J–L, M–O); anything above 40 960 N·s is a waiver-level “Class 3”.</li>
+<li>By job: sounding rockets (suborbital), orbital launchers, upper stages, spacecraft thrusters.</li>
+<li>Launch vehicles are classed by payload to LEO: small up to 2 t, medium 2–20 t, heavy 20–50 t, super-heavy above 50 t.</li>
+<li>Δv sets the class: 1.5–2 km/s to the edge of space, 9.4 km/s to low orbit, then about 3 km/s more for the Moon, geostationary orbit or escape.</li>
+<li>Thrust-to-weight separates the hobbyist (5 or more, for steering speed) from the launcher (1.2–1.5, because gravity loss is $g\,t_b$ and the engines and structure are expensive).</li>
+<li>Bigger is easier, up to a point: the square-cube law improves the structure fraction and drag with size.</li>
+</ul>
+
+<div data-widget="quiz">
+<script type="application/json">[
+ {"q":"A motor is a J-class motor. About how much total impulse can it have?","o":["10 – 20 N·s","160 – 320 N·s","640 – 1 280 N·s","40 960 N·s"],"a":2,"why":"A starts at 1.25 N·s and each letter doubles: G tops out at 160, H at 320, I at 640, J at 1 280. J spans 640 to 1 280 N·s."},
+ {"q":"Which certification level would a rocket with an M-class motor normally need?","o":["None: it is a model rocket","Level 1","Level 2","Level 3"],"a":3,"why":"In the usual club system Level 1 covers H and I, Level 2 covers J to L, and Level 3 covers M to O."},
+ {"q":"A launcher has a payload to low Earth orbit of 28 tonnes. Which class is it?","o":["Small-lift","Medium-lift","Heavy-lift","Super-heavy-lift"],"a":2,"why":"Small-lift is up to 2 t, medium 2–20 t, heavy 20–50 t, and super-heavy above 50 t."},
+ {"q":"Why can an orbital launcher live with a lift-off thrust-to-weight of only about 1.3, while a model rocket needs 5 or more?","o":["Launchers have better fins","A launcher has minutes of burn and guidance, so it only pays a modest gravity loss; a model rocket must be fast off the rod so its fins can steer","Launchers are lighter","Model rockets burn a different propellant"],"a":1,"why":"Gravity loss ≈ g·t_burn. Launchers accept a long burn because the extra engines and structure of a high T/W cost more than the gravity loss saves. A model rocket has no guidance and needs speed for its fins to work."},
+ {"q":"What does the square-cube law say about scaling a rocket up?","o":["Everything gets proportionally heavier","Propellant (volume) grows faster than tank walls (area), so the structure fraction falls and the mass ratio improves","Drag grows faster than mass","Thrust falls"],"a":1,"why":"Volume ∝ L³, wall area ∝ L²: bigger tanks hold proportionally more propellant per kilogram of wall. Drag also matters less because mass/(Cd·A) grows with L."}
+]</script>
+</div>
+
+</article>
+</main>
+</div>
+</body>
+</html>

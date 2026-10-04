@@ -25,10 +25,11 @@ An interactive, from-scratch guide to jet engines, written in plain HTML, CSS an
 | `13-solid.html` | Solid rockets at concept level: burn-rate law, chamber-pressure balance and stability, grain geometry bench, motor classes, failure modes |
 | `14-hybrid.html` | Hybrid, liquid and air-breathing engines: O/F shift, propellant choice, hard starts, Isp vs Mach |
 | `15-electric.html` | Electric propulsion: ducted fan vs turbojet, ion thrusters, ion wind, one map of every engine |
+| `16-classes.html` | The rocket zoo: motor classes A–O, hobby certification levels, sounding rockets, small to super-heavy launchers, Δv budgets, thrust-to-weight |
 | `models.html` | STL gallery: per-part downloads, whole assembly, one-click ZIP, printing and casting notes |
 | `reference.html` | Formula sheet, searchable glossary, bill of materials, FAQ, sources |
 
-About 75 interactive widgets (plots, calculators, simulators) are shared by the chapters. Every chapter opens with a **thread strip** (`js/thread.js`): the question the chapter answers, what it adds to the running ledger, the ledger itself (live numbers from the engine model, from air to 58 N) and a bridge to the next chapter. A single small physics model (`js/engine-model.js`) drives all the cycle calculators, the compressor map, the thrust numbers and the simulator, so the numbers agree everywhere.
+About 85 interactive widgets (plots, calculators, simulators) are shared by the chapters. Every chapter opens with a **thread strip** (`js/thread.js`): the question the chapter answers, what it adds to the running ledger, the ledger itself (live numbers from the engine model, from air to 58 N) and a bridge to the next chapter. A single small physics model (`js/engine-model.js`) drives all the cycle calculators, the compressor map, the thrust numbers and the simulator, so the numbers agree everywhere.
 
 ## Run it locally
 
