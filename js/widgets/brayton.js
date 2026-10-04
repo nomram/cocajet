@@ -120,8 +120,9 @@ export default function init(el) {
     if (!vis || !play.get() || !state) return;
     tracer = (tracer + dt * 0.12) % 1;
     draw();
-    const n = state.loops.pv.length - 1, i = Math.min(n, Math.floor(tracer * n)), stage = Math.min(3, Math.floor(tracer * 4));
-    const a = state.loops.pv[i], b = state.loops.ts[i];
+    const pick = (arr) => arr[Math.min(arr.length - 1, Math.floor(tracer * (arr.length - 1)))], stage = Math.min(3, Math.floor(tracer * 4));
+    const a = pick(state.loops.pv), b = pick(state.loops.ts);
+    if (!a || !b) return;
     pPV.dot(a[0], a[1], { color: '#fff', r: 7 }); pTS.dot(b[0], b[1], { color: '#fff', r: 7 });
     pPV.ptext(pPV.m.l + 10, pPV.m.t + 8, labels[stage], { color: pPV.col.fuel, size: 12, weight: 800 });
   }
