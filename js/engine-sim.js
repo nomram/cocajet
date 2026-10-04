@@ -4,6 +4,7 @@
    No DOM — works in Node and in the browser.
    ========================================================================== */
 import { CJ1, FUELS, isa, gasPath, buildFuelTable, stepSpool, R_AIR } from './engine-model.js';
+import { FuelSupply } from './fuel-supply.js';
 
 export const PHASES = {
   off: 'Off', starter: 'Spin-up (starter)', ignition: 'Ignition', ramp: 'Accelerating', run: 'Running',
@@ -12,7 +13,7 @@ export const PHASES = {
 
 /** Liner materials -> max safe wall temperature (K) used for the damage model. */
 export const LINERS = {
-  can:   { name: 'Coke can (aluminium 3004)', Tmax: 870 },
+  can:   { name: 'Coke can (aluminium 3004)', Tmax: 800 },
   ss304: { name: 'Stainless 304',             Tmax: 1150 },
   ss310: { name: 'Stainless 310S',            Tmax: 1300 },
   inco:  { name: 'Inconel 625',               Tmax: 1450 },
@@ -60,27 +61,35 @@ export class EngineSim {
     this.alt = opts.altitude || 0;
     this.dT = opts.dT || 0;
     this.V0 = opts.V0 || 0;
+    this.rh = opts.rh || 0;
     this.liner = opts.liner || 'can';
     this.partMeta = {};           // id -> {z0,z1}
     this.mode = 'auto';           // 'auto' (ECU) | 'manual'
     this.throttle = 0;            // 0..1 (auto)
     this.manual = { fuel: 0, starter: false, ignition: false };
     this.events = [];
+    this.fuelSys = new FuelSupply({ T: 288.15 });
     this._rebuildAmbient();
     this.reset();
   }
 
   _rebuildAmbient() {
-    this.amb = isa(this.alt, this.dT);
+    this.amb = isa(this.alt, this.dT, this.rh);
     this.table = buildFuelTable(this.p, this.amb, { V0: this.V0 });
+    this.fuelSys.setAmbient(this.amb.T);
   }
-  setAmbient({ altitude, dT, V0 } = {}) {
+  setAmbient({ altitude, dT, V0, rh } = {}) {
     if (altitude != null) this.alt = altitude;
     if (dT != null) this.dT = dT;
     if (V0 != null) this.V0 = V0;
+    if (rh != null) this.rh = rh;
     this._rebuildAmbient();
   }
+  /** change the propane supply (bottle size/fill, regulator, valve size...) */
+  setFuelSystem(o) { Object.assign(this.fuelSys, o); if (o.liquid != null) this.fuelSys.liquid0 = o.liquid; if (o.regulator != null) this.fuelSys.Preg = o.regulator; this.fuelSys.reset(this.amb.T); }
   setParam(obj) { Object.assign(this.p, obj); this._rebuildAmbient(); }
+  /** change the real engine (a blocked nozzle, a worn turbine...) WITHOUT telling the controller: its fuel table stays as built */
+  setFault(obj) { Object.assign(this.p, obj); }
   setParts(parts) {
     for (const pt of parts) this.partMeta[pt.id] = { z0: pt.bbox.min[2], z1: pt.bbox.max[2], material: pt.material };
     this._initThermal();
@@ -89,8 +98,14 @@ export class EngineSim {
   reset() {
     this.t = 0;
     this.phase = 'off';
-    this.N = 0; this.mf = 0; this.lit = false;
+    this.N = 0; this.mf = 0; this.mfCmd = 0; this.lit = false;
     this.starter = false; this.ignition = false;
+    this.fuelSys.reset(this.amb.T);
+    this.batt = { soc: this.batt ? this.batt.soc : 1, V: 12.4, I: 0 };      // a 3S LiPo carries over between runs
+    this.surgeT = 0; this.surgePhase = 0; this.surgeCycles = 0; this.surgeMod = 1; this._surgeFlag = false;
+    this.starved = false; this.thrustMeas = 0; this.starterLevel = 0; this.dNdt = 0;
+    this.trim = 0;
+    if (this.egtLimit == null) this.egtLimit = 1110;       // K (837 °C): the ECU backs the fuel off above this exhaust temperature
     this.phaseT = 0; this.lightTimer = 0;
     this.gp = gasPath(this.p, 1500, 0, this.amb, { V0: this.V0, lit: false });
     this.fuelIntegral = 0;
@@ -124,10 +139,10 @@ export class EngineSim {
   }
   stop() {
     if (this.phase === 'off') return;
-    this.phase = 'cooldown'; this.phaseT = 0; this.lit = false; this.mf = 0;
+    this.phase = 'cooldown'; this.phaseT = 0; this.lit = false; this.mf = 0; this.mfCmd = 0;
     this.note('Fuel off. Cool-down run: the starter keeps the air flowing until the hot section is below 100 °C.');
   }
-  killFuel() { this.mf = 0; this.lit = false; if (this.phase !== 'off') { this.phase = this.N > 2000 ? 'cooldown' : 'off'; this.note('Fuel valve closed.'); } }
+  killFuel() { this.mf = 0; this.mfCmd = 0; this.lit = false; if (this.phase !== 'off') { this.phase = this.N > 2000 ? 'cooldown' : 'off'; this.note('Fuel valve closed.'); } }
   setMode(m) { this.mode = m; if (m === 'manual' && this.phase === 'off') this.phase = 'cooldown'; }
 
   /* ---------------- helpers ---------------- */
@@ -146,103 +161,142 @@ export class EngineSim {
   _step(dt) {
     this.t += dt; this.phaseT += dt;
     const p = this.p;
-    let starter = false, mf = this.mf;
+    let starter = false, cmd = this.mfCmd;
     const sm = Math.min(1, Math.max(0, (this.N - 30000) / 18000));
     const assist = 0.66 + 0.34 * sm * sm * (3 - 2 * sm);          // the starter does part of the work at low speed, so less fuel is needed
     const ff = this.ffFuel(Math.max(this.N, 20000)) * assist;
+    const Pb = this.gp ? this.gp.P03 : this.amb.P;
 
     if (this.mode === 'manual') {
       starter = this.manual.starter;
-      mf = this.manual.fuel * 1e-3;
+      cmd = this.manual.fuel * 1e-3;
       this.ignition = this.manual.ignition;
-      this._lightLogic(dt, mf, ff);
     } else {
       switch (this.phase) {
         case 'off':
-          mf = 0; this.lit = false; break;
+          cmd = 0; this.lit = false; break;
         case 'starter':
-          starter = true; mf = 0;
+          starter = true; cmd = 0;
           if (this.N > 17000) { this.phase = 'ignition'; this.phaseT = 0; this.ignition = true; this.note('Igniter on, gas valve cracked open.'); }
           break;
         case 'ignition':
           starter = true; this.ignition = true;
-          mf = 0.00032 + 0.00004 * this.phaseT;
-          this._lightLogic(dt, mf, ff);
+          cmd = 0.00032 + 0.00004 * this.phaseT;
           if (this.lit) { this.phase = 'ramp'; this.phaseT = 0; this.note('Light-off! Flame established; ramping fuel.'); }
-          else if (this.phaseT > 6) { this.phase = 'fault'; mf = 0; this.ignition = false; this.note('No ignition. Check igniter / gas supply.', 'bad'); }
+          else if (this.phaseT > 6) { this.phase = 'fault'; cmd = 0; this.ignition = false; this.note('No ignition. Check igniter / gas supply.', 'bad'); }
           break;
         case 'ramp': case 'run': {
           starter = this.N < 44000;
           const Nt = this.phase === 'ramp' ? Math.min(this.idleRpm, this.targetRpm()) : this.targetRpm();
-          // feed-forward from the steady-state table + a bounded proportional boost, with rate limits and an EGT limiter
+          // feed-forward from the steady-state table + a bounded PD correction, with rate limits and an EGT limiter
           const err = Math.min(1, Math.max(-1, (Nt - this.N) / Math.max(Nt, 1)));
-          let want = ff * (1 + Math.min(0.55, Math.max(-0.5, 32 * err)));
           const T04 = this.gp ? this.gp.T04 : 0;
-          if (T04 > 1060) want *= Math.max(0.6, 1 - (T04 - 1060) / 300);
+          const limiting = T04 > this.egtLimit;
+          // slow integral trim: lets the controller find the fuel a worn or damaged engine really needs
+          if (this.lit && this.phase === 'run' && !limiting) this.trim = Math.min(0.9, Math.max(-0.2, this.trim + Math.min(0.2, Math.max(-0.2, err)) * 0.25 * dt));
+          let want = ff * (1 + this.trim + Math.min(0.30, Math.max(-0.45, 14 * err - 4.0e-6 * (this.dNdt || 0))));
+          if (limiting) want *= Math.max(0.6, 1 - (T04 - this.egtLimit) / 250);
           want = Math.max(want, 0.52 * ff);                       // never lean-blow-out the flame on a throttle chop
-          const up = this.phase === 'ramp' ? 0.00035 : 0.00060;   // kg/s per s
-          if (this.lit) { if (want > mf) mf = Math.min(want, mf + up * dt); else mf = Math.max(want, mf - 0.0009 * dt); }
-          else mf = Math.min(want, mf + up * dt);
+          // surge protection: back off the fuel while the compressor is on its stall line
+          if (this.surgeT > 0.05) want *= Math.max(0.55, 1 - 0.5 * this.surgeT);
+          const up = this.phase === 'ramp' ? 0.00014 : 0.00060;   // kg/s per s
+          if (this.lit) { if (want > cmd) cmd = Math.min(want, cmd + up * dt); else cmd = Math.max(want, cmd - 0.0009 * dt); }
+          else cmd = Math.min(want, cmd + up * dt);
           this.ignition = this.phase === 'ramp' && this.N < 40000;
-          this._lightLogic(dt, mf, ff);
           if (this.phase === 'ramp' && this.N >= this.idleRpm * 0.97) { this.phase = 'run'; this.phaseT = 0; this.ignition = false; this.note('Idle reached. Use the throttle.'); }
           break;
         }
         case 'cooldown':
-          mf = 0; this.lit = false; this.ignition = false;
+          cmd = 0; this.lit = false; this.ignition = false;
           starter = this.N < 22000 && this.hotTemp() > 400 && this.phaseT < 400;
           if (this.hotTemp() <= 400 && this.N < 6000) { this.phase = 'off'; this.note('Hot section below 125 °C. Safe to approach (the casing is still warm).'); }
           if (!starter && this.N < 1500) { this.phase = 'off'; }
           break;
         case 'flameout':
         case 'fault':
-          mf = 0; this.lit = false; this.ignition = false;
+          cmd = 0; this.lit = false; this.ignition = false;
           starter = this.N < 22000 && this.hotTemp() > 400;
           if (this.phaseT > 4) { this.phase = 'cooldown'; this.phaseT = 0; }
           break;
       }
     }
+    this.mfCmd = cmd;
+    // the propane bottle, regulator and valve decide what really flows
+    const mf = this.fuelSys.step(dt, cmd, Pb);
+    const starved = this.fuelSys.starved(cmd, Pb) && this.lit;
+    if (starved && !this.starved) this.note('FUEL STARVATION: valve wide open but the bottle is too cold (' + (this.fuelSys.Tb - 273.15).toFixed(0) + ' °C, ' + (this.fuelSys.bottlePressure / 1e5).toFixed(1) + ' bar). Warm the bottle or use a bigger one.', 'bad');
+    this.starved = starved;
+    this._lightLogic(dt, mf);
     this.mf = mf; this.starter = starter;
     this.fuelUsed += mf * dt;
 
-    const r = stepSpool(p, { N: this.N, lit: this.lit }, { mf, starter }, this.amb, dt, { V0: this.V0 });
+    // the starter's speed controller ramps its power up over ~6 s and drops it quickly
+    this.starterLevel = (this.starterLevel || 0) + Math.min(dt * (starter ? 0.17 : 1.5), Math.max(-dt * 1.5, (starter ? 1 : 0) - (this.starterLevel || 0)));
+    const r = stepSpool(p, { N: this.N, lit: this.lit }, { mf, starter: this.starterLevel > 0.001, starterScale: this._starterScale() * this.starterLevel }, this.amb, dt, { V0: this.V0 });
     this.N = r.N; this.gp = r.gp; this.dNdt = r.dNdt;
+    this._battery(dt, r.starterTorque);
 
-    // failure modes
-    if (this.lit && r.gp.surge && this.N > 60000) {
-      this.lit = false; this.phase = 'flameout';
-      this.note('COMPRESSOR SURGE → flame-out. Too much fuel too fast pushes the compressor over its surge line.', 'bad');
-    }
+    this._surge(dt);
     if (this.N > p.Nmax * 1.03 && this.lit) this.noteOnce('over', 'OVERSPEED! A real wheel could burst at this speed.');
     if (this.gp.T04 > 1120 && this.lit && this.phase !== 'ignition') this.noteOnce('temp', 'OVER-TEMPERATURE: EGT is above the safe limit.');
     this.peak.T04 = Math.max(this.peak.T04, this.lit ? this.gp.T04 : 0);
     this.peak.N = Math.max(this.peak.N, this.N);
     this.peak.thrust = Math.max(this.peak.thrust, this.gp.thrust);
+    this.thrustMeas += (this.gp.thrust * this.surgeMod - this.thrustMeas) * (1 - Math.exp(-dt / 0.12));   // a load cell has a lag
 
     this._thermal(dt);
-    if (this.phase === 'run' || this.phase === 'ramp' || this.mode === 'manual') {
-      if (this.phase === 'cooldown' && this.N < 500 && this.mode === 'manual') { /* idle */ }
-    }
   }
 
-  _lightLogic(dt, mf, ff) {
-    const Nlo = 8000, Nhi = 62000;
+  /** equivalence ratio in the primary zone (about 26 % of the air enters there) */
+  pzPhi(mf, m = this.gp ? this.gp.m : 0.01) { return mf / (0.26 * Math.max(m, 0.004)) * FUELS[this.p.fuel || 'propane'].AFR; }
+
+  _lightLogic(dt, mf) {
+    const phi = this.pzPhi(mf);
     if (!this.lit) {
-      if (this.ignition && mf > 0.00028 && this.N > Nlo && this.N < Nhi && mf < ff * 3) {
+      // the spark only lights a mixture that is neither too weak nor too rich at the plug
+      if (this.ignition && mf > 0.00028 && this.N > 8000 && this.N < 62000 && phi > 0.65 && phi < 2.6) {
         this.lightTimer += dt;
         if (this.lightTimer > 1.4) { this.lit = true; this.lightTimer = 0; }
       } else this.lightTimer = Math.max(0, this.lightTimer - dt);
     } else {
-      // blow-out: too lean or far too rich for the current airflow
-      const lean = mf < 0.28 * ff && this.N > 30000;
-      const rich = mf > 3.4 * ff && this.N > 30000;
+      // blow-out: primary zone outside the lean / rich stability limits (propane flammability: phi 0.5 - 2.5)
+      const lean = phi < 0.42 && this.N > 25000;
+      const rich = phi > 3.0 && this.N > 25000;
       if (mf <= 1e-5 || lean || rich) {
         this.lit = false;
         if (this.mode === 'manual' || this.phase !== 'cooldown') {
           this.phase = this.mode === 'manual' ? this.phase : 'flameout';
-          this.note(mf <= 1e-5 ? 'Fuel cut: flame out.' : (lean ? 'Flame-out: mixture too lean.' : 'Flame-out: mixture too rich.'), 'bad');
+          this.note(mf <= 1e-5 ? 'Fuel cut: flame out.' : (lean ? 'Flame-out: mixture too lean (primary zone φ = ' + phi.toFixed(2) + ').' : 'Flame-out: mixture too rich (primary zone φ = ' + phi.toFixed(2) + ').'), 'bad');
         }
       }
+    }
+  }
+
+  /* ---- starter battery: 3S LiPo, 2200 mAh ---- */
+  _starterScale() { return Math.min(1.1, Math.max(0.25, this.batt.V / 11.3)); }
+  _battery(dt, torque) {
+    const b = this.batt, Kt = 0.0046;                       // N m per A of the starter motor
+    b.I = torque > 0 ? torque / Kt + 1.5 : 0;
+    const voc = 3 * (3.45 + 0.75 * Math.pow(Math.max(0, b.soc), 0.6));
+    b.V = voc - b.I * 0.035;
+    b.soc = Math.max(0, b.soc - b.I * dt / (2.2 * 3600));
+  }
+
+  /* ---- compressor surge: pulsing, ECU back-off, flame-out if it persists ---- */
+  _surge(dt) {
+    const g = this.gp, lim = g.limits;
+    this.surgeMargin = (g.m - lim.mSurge) / lim.mSurge;
+    const inSurge = this.lit && g.surge && this.N > 60000;
+    if (inSurge) {
+      this.surgeT += dt; this.surgePhase += dt * 8.0;           // chuffing at about 8 Hz
+      if (!this._surgeFlag) { this._surgeFlag = true; this.surgeCycles++; this.note('COMPRESSOR SURGE: the flow keeps reversing. Back off the fuel or open the nozzle.', 'bad'); }
+      const ph = this.surgePhase % 1;
+      this.surgeMod = 1 - 0.75 * Math.pow(ph, 0.6) * (1 - ph * 0.3);       // slow build, abrupt collapse
+      if (this.surgeT > 2.4 && this.mode !== 'manual') { this.lit = false; this.phase = 'flameout'; this.phaseT = 0; this.note('Flame-out after prolonged surge. The ECU cut the fuel.', 'bad'); this.surgeT = 0; }
+      else if (this.surgeT > 3.5) { this.lit = false; this.note('Flame-out after prolonged surge.', 'bad'); this.surgeT = 0; }
+    } else {
+      this.surgeT = Math.max(0, this.surgeT - dt * 0.6); this.surgeMod += (1 - this.surgeMod) * Math.min(1, dt * 10);
+      if (this.surgeT === 0) this._surgeFlag = false;
     }
   }
 
@@ -339,8 +393,19 @@ export class EngineSim {
         ngv: Math.max(5, vNGV), turb: Math.max(5, vTurb), noz: Math.max(5, g.Ve),
       },
       nozChoked: g.nozChoked, pr04: g.P04 / this.amb.P, starter: this.starter, ignition: this.ignition,
-      surge: g.surge, linerDamage: this.linerDamage, T04C: T(g.T04), T03C: T(g.T03),
+      surge: this.surgeT > 0.05, surgeMod: this.surgeMod, surgePhase: this.surgePhase % 1, linerDamage: this.linerDamage, T04C: T(g.T04), T03C: T(g.T03),
+      // the thrust calculation, term by term (what the HUD prints)
+      thrustCalc: {
+        F: this.thrust, mg: g.mg, Ve: g.Ve, mom: g.thrustParts.mom, press: g.thrustParts.press, ram: g.thrustParts.ram,
+        V0: this.V0, A5: p.A5, Pe: g.Pe, P0: this.amb.P, choked: g.nozChoked, Mexit: g.Mexit, meas: this.thrustMeas,
+      },
+      phi: g.phi, etaB: g.etaB,
     };
   }
+
+  /** net thrust [N], including the pulsing of a surging compressor */
+  get thrust() { return this.gp ? this.gp.thrust * this.surgeMod : 0; }
+  /** compressor pressure ratio, including surge pulsing */
+  get PR() { return this.gp ? 1 + (this.gp.PRc - 1) * this.surgeMod : 1; }
 }
 const avg = (a) => { let s = 0; for (const v of a) s += v; return s / a.length; };

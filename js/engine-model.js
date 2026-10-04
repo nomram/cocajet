@@ -13,9 +13,13 @@
        solved so that mass flow matches everywhere
      * Shaft power balance and spool-up dynamics  (I * w * dw/dt = P_turb - P_comp)
 
+   Gas properties are real-gas (cp, gamma, enthalpy and entropy of the actual
+   N2/O2/CO2/H2O mixture, see thermo.js) rather than constants.
+
    It is a *teaching* model: good to a few tens of percent for a real small
    engine, and it reproduces the right trends, which is what the widgets need.
    ========================================================================== */
+import { gasFor, humidityRatio } from './thermo.js';
 
 export const R_AIR = 287.05;
 export const T_REF = 288.15;
@@ -45,7 +49,7 @@ export const CJ1 = {
   etaDiff: 0.70,      // fraction of exit dynamic head recovered (vaned diffuser + bend)
   // combustor
   dpB: 0.05,          // total-pressure loss  (fraction of P02)
-  etaB: 0.94,         // combustion efficiency
+  etaB: 0.91,         // combustion efficiency at the design point (incomplete burn-out + heat lost through the casing)
   // turbine & nozzle
   At: 7.7e-4,         // effective turbine-stage throat area [m^2]   (NGV + rotor)
   Dturb: 0.051,       // mean turbine diameter [m]
@@ -64,8 +68,8 @@ export const CJ1 = {
 };
 
 /* --- atmosphere ------------------------------------------------------------ */
-export function isa(h = 0, dT = 0) {
-  // troposphere + lower stratosphere, good to 20 km
+export function isa(h = 0, dT = 0, rh = 0) {
+  // troposphere + lower stratosphere, good to 20 km;  rh = relative humidity 0..1 (optional)
   let T, P;
   if (h <= 11000) {
     T = 288.15 - 0.0065 * h;
@@ -75,8 +79,10 @@ export function isa(h = 0, dT = 0) {
     P = 22632.06 * Math.exp(-9.80665 * (h - 11000) / (R_AIR * 216.65));
   }
   T += dT;
-  const rho = P / (R_AIR * T);
-  return { T, P, rho, a: Math.sqrt(1.4 * R_AIR * T), h };
+  const hum = rh > 0 ? humidityRatio(rh, T, P) : 0;
+  const g = gasFor(0, 'propane', hum);
+  const rho = P / (g.R * T);
+  return { T, P, rho, a: g.a(T), h, rh, hum };
 }
 
 /* --- orifice / nozzle mass flow ---------------------------------------------
@@ -88,9 +94,9 @@ export function flowFn(r, g) {
   if (r <= rc) r = rc;
   return Math.sqrt(2 * g / (g - 1) * (Math.pow(r, 2 / g) - Math.pow(r, (g + 1) / g)));
 }
-export function orificeFlow(A, Cd, Pup, T, Pdown, g = 1.333) {
+export function orificeFlow(A, Cd, Pup, T, Pdown, g = 1.333, R = R_AIR) {
   if (Pdown >= Pup) return 0;
-  return Cd * A * Pup / Math.sqrt(R_AIR * T) * flowFn(Pdown / Pup, g);
+  return Cd * A * Pup / Math.sqrt(R * T) * flowFn(Pdown / Pup, g);
 }
 
 /* --- compressor mean-line ---------------------------------------------------- */
@@ -101,10 +107,11 @@ export function wiesnerSlip(beta2deg, Z) {
 
 /**
  * Compressor performance at one speed and mass flow.
+ * @param hum  water-vapour mass fraction of the inlet air (optional)
  * @returns {object} PR, eta, T02, P02, work, losses ...
  */
-export function compressor(p, N, m, T01, P01) {
-  const g = 1.4, cp = 1005;
+export function compressor(p, N, m, T01, P01, hum = 0) {
+  const gas = gasFor(0, p.fuel || 'propane', hum), R = gas.R, cp = gas.cp(T01), g = gas.gamma(T01);
   const U2 = Math.PI * p.D2 * N / 60;
   const U1 = Math.PI * p.D1t * N / 60;
   const Zeff = p.Zfull + 0.7 * p.Zsplit;
@@ -113,44 +120,48 @@ export function compressor(p, N, m, T01, P01) {
 
   // inducer: static density from a couple of fixed-point passes
   const A1 = Math.PI / 4 * (p.D1t * p.D1t - p.D1h * p.D1h) * 0.90;
-  const rho01 = P01 / (R_AIR * T01);
+  const rho01 = P01 / (R * T01);
   let Cm1 = m / (rho01 * A1);
   for (let i = 0; i < 4; i++) {
     const T1 = Math.max(150, T01 - Cm1 * Cm1 / (2 * cp));
-    const rho1 = rho01 * Math.pow(T1 / T01, 2.5);
+    const rho1 = rho01 * Math.pow(T1 / T01, 1 / (g - 1));
     Cm1 = m / (rho1 * A1);
   }
   const T1 = Math.max(150, T01 - Cm1 * Cm1 / (2 * cp));
   const W1 = Math.hypot(Cm1, U1);
   const beta1 = Math.atan2(U1, Cm1) * 180 / Math.PI;           // flow angle from axial
   const incidence = beta1 - p.beta1b;                            // + at low flow
-  const MW1 = W1 / Math.sqrt(g * R_AIR * T1);
+  const MW1 = W1 / gas.a(T1);
 
   // exit blockage grows with the number of blades (0.6 mm thick); 0.92 for the reference 7+7 wheel
   const blk = 0.92 * Math.max(0.5, 1 - (p.Zfull + p.Zsplit) * 0.6e-3 / (Math.PI * p.D2 * Math.cos(p.beta2 * Math.PI / 180))) / 0.945;
   // exit: iterate density / flow coefficient / outlet pressure
+  const h01 = gas.h(T01);
+  const outlet = (dHin, dHs) => {
+    const T02 = gas.Th(h01 + dHin, T01 + dHin / cp);
+    const T2s = gas.Th(h01 + dHs, T01 + dHs / cp);
+    return { T02, PR: gas.pressureRatio(T01, T2s) };
+  };
   let PR = 1.5, Cm2 = 0, Ctheta2 = 0, dHE = 0, T02 = T01, rho2 = rho01;
   for (let it = 0; it < 6; it++) {
-    rho2 = 0.88 * (P01 * PR) / (R_AIR * T02);
+    rho2 = 0.88 * (P01 * PR) / (R * T02);
     Cm2 = m / (rho2 * Math.PI * p.D2 * p.b2 * blk);
     Ctheta2 = sigma * U2 - Cm2 * tanB2;
     dHE = U2 * Ctheta2;                                          // Euler work
     const losses = lossBreakdown(p, { U2, W1, Cm2, Ctheta2, incidence, MW1, dHE, Zeff });
     const dHin = Math.max(1, dHE + losses.disk);
     const dHs = Math.max(0, dHE - losses.sum);
-    T02 = T01 + dHin / cp;
-    PR = Math.pow(1 + dHs / (cp * T01), g / (g - 1));
+    ({ T02, PR } = outlet(dHin, dHs));
   }
   const losses = lossBreakdown(p, { U2, W1, Cm2, Ctheta2, incidence, MW1, dHE, Zeff });
   const dHin = Math.max(1, dHE + losses.disk);
   const dHs = Math.max(0, dHE - losses.sum);
-  PR = Math.pow(1 + dHs / (cp * T01), g / (g - 1));
-  T02 = T01 + dHin / cp;
+  ({ T02, PR } = outlet(dHin, dHs));
   const eta = Math.min(0.95, dHs / dHin);
   return {
     N, m, U2, U1, sigma, PR, eta, T02, P02: P01 * PR, dH: dHin, dHs, dHE,
     Cm1, Cm2, Ctheta2, W1, beta1, incidence, MW1, phi2: Cm2 / U2,
-    losses, power: m * cp * (T02 - T01),
+    losses, power: m * dHin,
     Phi: m / (rho01 * U2 * p.D2 * p.D2),
   };
 }
@@ -192,13 +203,30 @@ export function compressorLimits(p, N, T01, P01) {
 }
 
 /* --- turbine efficiency vs blade-speed ratio -------------------------------- */
-function turbineEff(p, N, T03, PRt) {
-  const x = 0.333 / 1.333;
-  const dhIs = 1148 * T03 * (1 - Math.pow(PRt, -x));
+function turbineEff(p, N, dhIs) {
   const U = Math.PI * p.Dturb * N / 60;
   const nu = U / Math.sqrt(2 * Math.max(dhIs, 1));
   const f = 1 - 0.9 * Math.pow((nu - 0.62) / 0.62, 2);
   return Math.max(0.25, p.etaTpk * Math.min(1, Math.max(0.3, f)));
+}
+export function turbineBladeSpeedRatio(p, N, dhIs) { return Math.PI * p.Dturb * N / 60 / Math.sqrt(2 * Math.max(dhIs, 1)); }
+
+/* --- combustion efficiency: a Lefebvre-style loading parameter -----------------
+   Efficiency rises with pressure and inlet temperature (faster chemistry) and falls with
+   air flow (less residence time).  The curve is normalised so the design point gives p.etaB.  */
+const REF = { P02: 196.6e3, T02: 366, m: 0.151 };
+export function combustionLoading(P02, T02, m) {
+  return Math.pow(P02 / REF.P02, 1.75) * Math.exp((T02 - REF.T02) / 150) / (m / REF.m);
+}
+export function combustionEfficiency(p, P02, T02, m) {
+  const F = (x) => 1 - 0.40 * Math.exp(-2.2 * x);
+  return Math.min(0.995, p.etaB * F(combustionLoading(P02, T02, m)) / F(1));
+}
+
+/* --- mechanical losses: bearings (viscous drag, ~N^1.5) + windage on the turbine disc (~rho N^3) ----- */
+export function mechLoss(p, N, P04) {
+  const x = N / p.Ndesign;
+  return (1 - p.etaM) * 12.5e3 * (0.45 * Math.pow(x, 1.5) + 0.55 * Math.pow(x, 3) * Math.min(1.5, P04 / 1.40e5));
 }
 
 /* --- the full gas path at one (N, fuel flow) --------------------------------- */
@@ -207,13 +235,14 @@ function turbineEff(p, N, T03, PRt) {
  * @param p    parameter set (see CJ1)
  * @param N    spool speed [rpm]
  * @param mf   fuel mass flow [kg/s]
- * @param amb  {T,P}   ambient (use isa())
+ * @param amb  {T,P,hum}   ambient (use isa())
  * @param opts {V0: flight speed m/s, lit: boolean}
  */
 export function gasPath(p, N, mf, amb, opts = {}) {
   const V0 = opts.V0 || 0;
-  const fuel = FUELS[p.fuel] || FUELS.propane;
-  const gg = 1.333, xg = (gg - 1) / gg, cpg = 1148, cpa = 1005;
+  const fuel = FUELS[p.fuel] || FUELS.propane, fk = FUELS[p.fuel] ? p.fuel : 'propane';
+  const hum = amb.hum || 0;
+  const gA = gasFor(0, fk, hum);
   const M0 = V0 / amb.a;
   const ramT = 1 + 0.2 * M0 * M0;
   const T01 = amb.T * ramT;
@@ -223,32 +252,37 @@ export function gasPath(p, N, mf, amb, opts = {}) {
   const lim = compressorLimits(p, Math.max(N, 500), T01, P01);
 
   const evalAt = (m) => {
-    const c = compressor(p, N, m, T01, P01);
+    const c = compressor(p, N, m, T01, P01, hum);
     const mg = m + mf;
-    const dTc = lit ? p.etaB * mf * fuel.LHV / (mg * 1150) : 0;
-    const T03 = c.T02 + dTc;
+    const gP = lit ? gasFor(mf / m, fk, hum) : gA;
+    const etaB = lit ? combustionEfficiency(p, c.P02, c.T02, m) : 0;
+    let T03 = c.T02;
+    if (lit) T03 = gP.Th((m * gA.h(c.T02) + etaB * Math.min(mf, 0.98 * m / fuel.AFR) * fuel.LHV) / mg, c.T02 + 600);   // cannot burn more fuel than the oxygen allows
     // combustor loss ~ (corrected flow)^2 : tiny when the engine is only being cranked
     const dpEff = Math.min(0.30, p.dpB * Math.pow(mg / 0.15, 2) * (T03 / 1060) * Math.pow(190e3 / c.P02, 2));
     const P03 = c.P02 * (1 - dpEff);
     // turbine orifice: find PRt so that flow(PRt) = mg
-    const capFlow = p.Cd * p.At * P03 / Math.sqrt(R_AIR * T03) * flowFn(critRatio(gg), gg);
+    const RP = gP.R, gt = gP.gamma(T03 - 40);
+    const kT = p.Cd * p.At * P03 / Math.sqrt(RP * T03);
+    const capFlow = kT * flowFn(critRatio(gt), gt);
     let PRt;
     if (mg >= capFlow) {
-      PRt = 1 / critRatio(gg);
+      PRt = 1 / critRatio(gt);
     } else {
-      let lo = 1.00001, hi = 1 / critRatio(gg);
+      let lo = 1.00001, hi = 1 / critRatio(gt);
       for (let i = 0; i < 40; i++) {
         const mid = 0.5 * (lo + hi);
-        const f = p.Cd * p.At * P03 / Math.sqrt(R_AIR * T03) * flowFn(1 / mid, gg);
-        if (f < mg) lo = mid; else hi = mid;
+        if (kT * flowFn(1 / mid, gt) < mg) lo = mid; else hi = mid;
       }
       PRt = 0.5 * (lo + hi);
     }
-    const etaT = turbineEff(p, N, T03, PRt);
-    const T04 = T03 * (1 - etaT * (1 - Math.pow(PRt, -xg)));
+    const h03 = gP.h(T03), T04s = gP.Ts(gP.s(T03) - RP * Math.log(PRt), T03 * Math.pow(PRt, -0.25));
+    const dhIs = h03 - gP.h(T04s);
+    const etaT = turbineEff(p, N, dhIs);
+    const T04 = gP.Th(h03 - etaT * dhIs, T03 - 50);
     const P04 = P03 / PRt;
-    const mNoz = orificeFlow(p.A5, p.Cd, P04, T04, amb.P, gg);
-    return { c, P03, T03, T04, P04, PRt, etaT, mg, mNoz, res: mNoz - mg, overflow: mg >= capFlow };
+    const mNoz = orificeFlow(p.A5, p.Cd, P04, T04, amb.P, gP.gamma(T04 - 30), RP);
+    return { c, gP, P03, T03, T04, P04, PRt, etaT, dhIs, mg, mNoz, etaB, dpEff, res: mNoz - mg, overflow: mg >= capFlow };
   };
 
   let lo = lim.mSurge * 0.30, hi = lim.mChoke;
@@ -265,38 +299,43 @@ export function gasPath(p, N, mf, amb, opts = {}) {
     m = 0.5 * (lo + hi);
     sol = evalAt(m);
   }
-  const { c } = sol;
+  const { c, gP } = sol;
   // beyond the surge line (positive incidence > 9 deg) and spinning fast enough to matter
   if (!surge && m < lim.mSurge && N > 0.45 * p.Nmax) surge = true;
 
   // nozzle exit
-  const mg = sol.mg;
-  const rcrit = critRatio(gg);
+  const mg = sol.mg, RP = gP.R;
+  const gn = gP.gamma(sol.T04 - 30), rcrit = critRatio(gn);
   const nozChoked = amb.P / sol.P04 <= rcrit;
   let Ve, Pe = amb.P, Tex;
+  const h04 = gP.h(sol.T04), s04 = gP.s(sol.T04);
   if (nozChoked) {
-    Tex = sol.T04 * 2 / (gg + 1);
-    Ve = Math.sqrt(gg * R_AIR * Tex) * 0.99;
     Pe = sol.P04 * rcrit;
+    const T5s = gP.Ts(s04 - RP * Math.log(sol.P04 / Pe), sol.T04 * 0.85);
+    Ve = 0.99 * Math.sqrt(Math.max(0, 2 * (h04 - gP.h(T5s))));
+    Tex = gP.Th(h04 - 0.5 * Ve * Ve, T5s);
   } else {
-    const pr = Math.min(1, amb.P / sol.P04);
-    Tex = sol.T04 * Math.pow(pr, xg);
-    Ve = 0.985 * Math.sqrt(Math.max(0, 2 * cpg * sol.T04 * (1 - Math.pow(pr, xg))));
+    const T5s = gP.Ts(s04 - RP * Math.log(sol.P04 / Math.min(sol.P04, amb.P)), sol.T04 * 0.9);
+    Ve = 0.985 * Math.sqrt(Math.max(0, 2 * (h04 - gP.h(T5s))));
+    Tex = gP.Th(h04 - 0.5 * Ve * Ve, T5s);
   }
-  const thrust = mg * Ve + (Pe - amb.P) * p.A5 - m * V0;
+  const mom = mg * Ve, press = (Pe - amb.P) * p.A5, ram = m * V0;
+  const thrust = mom + press - ram;
   const Pc = c.power;
-  const Pt = mg * cpg * (sol.T03 - sol.T04);
+  const Pt = mg * (gP.h(sol.T03) - h04);
+  const Pmech = mechLoss(p, N, sol.P04);
   return {
     N, mf, m, mg, lit,
     T01, P01, T02: c.T02, P02: c.P02, T03: sol.T03, P03: sol.P03, T04: sol.T04, P04: sol.P04,
-    T5: Tex, Ve, Pe, nozChoked,
-    PRc: c.PR, etaC: c.eta, PRt: sol.PRt, etaT: sol.etaT,
-    thrust: Math.max(0, thrust), thrustRaw: thrust,
-    Pc, Pt, Pnet: p.etaM * Pt - Pc,
+    T5: Tex, Ve, Pe, nozChoked, Mexit: Ve / Math.sqrt(gn * RP * Tex),
+    PRc: c.PR, etaC: c.eta, PRt: sol.PRt, etaT: sol.etaT, etaB: sol.etaB, dhIsT: sol.dhIs,
+    thrust: Math.max(0, thrust), thrustRaw: thrust, thrustParts: { mom, press, ram },
+    Pc, Pt, Pmech, Pnet: Pt - Pc - Pmech,
     tsfc: thrust > 1 ? mf / thrust : 0,                  // kg/(N s)
     comp: c, limits: lim, surge, choked, overflow: sol.overflow,
     far: mf / Math.max(m, 1e-9),
     phi: (mf / Math.max(m, 1e-9)) * fuel.AFR,            // overall equivalence ratio
+    cpHot: gP.cp(sol.T03), gammaHot: gP.gamma(sol.T03), Rhot: RP,
   };
 }
 
@@ -343,15 +382,14 @@ export function stepSpool(p, state, controls, amb, dt, opts = {}) {
   const N = Math.max(state.N, 1500);                       // avoid the 1/omega singularity at standstill
   const gp = gasPath(p, N, controls.mf, amb, { ...opts, lit: state.lit });
   const w = N * Math.PI / 30;
-  // small brushless starter: ~0.09 N m at stall, falling to zero at 55 000 rpm
-  const starterTorque = controls.starter ? 0.09 * Math.max(0, 1 - state.N / 55000) : 0;
-  // bearing + windage drag
-  const Pdrag = 9e-14 * N ** 3 + 0.0004 * N;
-  const torque = (p.etaM * gp.Pt - gp.Pc - Pdrag) / w + starterTorque;
+  // small brushless starter: ~0.09 N m at stall, falling to zero at 55 000 rpm (scaled by battery state)
+  const sp = p.starter || { T0: 0.09, N0: 55000 };
+  const starterTorque = controls.starter ? sp.T0 * (controls.starterScale ?? 1) * Math.max(0, 1 - state.N / sp.N0) : 0;
+  const torque = gp.Pnet / w + starterTorque;
   const dw = torque / p.I;
   let Nnew = state.N + dw * 30 / Math.PI * dt;
   Nnew = Math.min(Math.max(Nnew, 0), p.Nmax * 1.08);
-  return { N: Nnew, gp, torque, Pnet: torque * w, dNdt: dw * 30 / Math.PI };
+  return { N: Nnew, gp, torque, Pnet: torque * w, dNdt: dw * 30 / Math.PI, starterTorque };
 }
 
 /* --- compressor map generator ---------------------------------------------------- */
