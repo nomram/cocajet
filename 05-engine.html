@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5 · The whole engine on one page — Jet Engines for Dummies</title>
+<meta name="description" content="A true cross-section of the CJ-1 Coke-can turbojet, its station numbers, its spec sheet, a full engine-cycle calculator, performance curves and the power balance that decides running speed.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter" style="max-width:1020px">
+
+<span class="eyebrow">Chapter 5 · The engine</span>
+<h1>The whole engine on one page</h1>
+<div class="meta"><span>~35 min</span><span>true cross-section</span><span>4 calculators</span></div>
+<p class="lede">You have the science. Here is the machine, complete, before we build it piece by piece in chapter 6. Think of it as the map you look at before you start walking.</p>
+
+<h2 id="section" data-short="The cross-section">A true cross-section</h2>
+<p>This drawing was <em>not</em> hand-drawn: it is the mid-plane slice through the 14 STL files you can download (so it is exactly the engine, to scale). Air flows from left to right.</p>
+<figure class="svg" style="padding:6px"><img src="img/cj1-section.svg" alt="Cross-section of the CJ-1 turbojet" style="width:100%;height:auto;display:block;border-radius:10px"><figcaption>Cross-section of CJ-1 (STL slice). Numbers refer to the list below. Dashed centre-line = the shaft axis.</figcaption></figure>
+<div class="table-wrap"><table class="data">
+<tr><th>#</th><th>Part</th><th>Job</th><th>Chapter-6 step</th></tr>
+<tr><td>1</td><td>Inlet bellmouth + compressor housing</td><td>Gather air smoothly, guide it to the impeller, hold a 0.4 mm gap over the blade tips</td><td><a href="06-build.html#step4">4</a></td></tr>
+<tr><td>2</td><td>Centrifugal impeller</td><td><strong>Suck &amp; squeeze:</strong> throws air outward at 337 m/s</td><td><a href="06-build.html#step2">2</a></td></tr>
+<tr><td>3</td><td>Diffuser plate + vanes</td><td>Slow the air from 330 to ~140 m/s, converting speed to pressure</td><td><a href="06-build.html#step3">3</a></td></tr>
+<tr><td>4</td><td>Bearing tunnel (the “spine”)</td><td>Holds the two bearings and ties the hot end to the cold end</td><td><a href="06-build.html#step1">1</a></td></tr>
+<tr><td>5</td><td>Combustor casing</td><td>Pressure vessel around the flame tube; carries fuel and igniter ports</td><td><a href="06-build.html#step5">5</a></td></tr>
+<tr><td>6</td><td><strong>Flame tube (Coke can)</strong></td><td><strong>Bang:</strong> burns fuel in a stable pocket, then dilutes the gas to turbine-safe temperature</td><td><a href="06-build.html#step6">6</a></td></tr>
+<tr><td>7</td><td>Fuel ring + igniter</td><td>Meter propane into the primary zone; spark to light it</td><td><a href="06-build.html#step7">7</a></td></tr>
+<tr><td>8</td><td>Nozzle guide vanes</td><td>Accelerate and swirl the hot gas onto the turbine</td><td><a href="06-build.html#step8">8</a></td></tr>
+<tr><td>9</td><td>Turbine wheel</td><td>Extracts ~12 kW to drive the compressor</td><td><a href="06-build.html#step8">8</a></td></tr>
+<tr><td>10</td><td>Turbine casing</td><td>Shroud with 0.2–0.4 mm tip gap</td><td><a href="06-build.html#step9">9</a></td></tr>
+<tr><td>11</td><td>Exhaust nozzle + tail cone</td><td><strong>Blow:</strong> converts the leftover pressure to a 376 m/s jet</td><td><a href="06-build.html#step9">9</a></td></tr>
+<tr><td>12</td><td>Main shaft</td><td>Locks impeller and turbine together on Ø8 steel</td><td><a href="06-build.html#step1">1</a></td></tr>
+</table></div>
+
+<h2 id="stations" data-short="Station numbers">Station numbers</h2>
+<p>Engineers label the points along the gas path with numbers so everyone talks about the same place. We use a simplified set:</p>
+<ul>
+<li><strong>0</strong>: free air far ahead.&nbsp; <strong>2</strong>: compressor exit.&nbsp; <strong>3</strong>: turbine inlet (TIT).&nbsp; <strong>4</strong>: turbine exit (EGT, exhaust gas temperature).&nbsp; <strong>5</strong>: nozzle exit.</li>
+</ul>
+<p>The key numbers at each station at full power, from the model (try the calculator below to change anything):</p>
+<div data-widget="engine-cycle"></div>
+
+<h2 id="spec" data-short="Spec sheet">Spec sheet</h2>
+<div data-widget="spec-sheet"></div>
+
+<h2 id="curves" data-short="Performance curves">Performance curves</h2>
+<p>Real engines come with a data sheet like this. Four things to notice: <strong>(1)</strong> thrust grows much faster than rpm; <strong>(2)</strong> fuel flow climbs steeply near the top; <strong>(3)</strong> at idle the exhaust gas is about as hot as at full power, because the engine runs <em>lean</em> and is limited by what can sustain combustion, not by power; <strong>(4)</strong> the compressor’s pressure ratio goes as (speed)².</p>
+<div data-widget="engine-curves"></div>
+
+<h2 id="balance" data-short="Power balance">The power balance that fixes the speed</h2>
+<p>There is no “speed knob” on a jet engine. You give it a fuel flow and it finds its own speed: the one where the turbine exactly pays the compressor’s bill. If the turbine makes more than the compressor needs the surplus accelerates the rotor (rotor inertia $I\approx 52\ \text{g·cm}^2$): </p>
+<div class="eq">$$I\,\omega\,\frac{d\omega}{dt}=\eta_m P_t - P_c - P_{\text{drag}}\quad\Longrightarrow\quad \text{steady when } \eta_mP_t=P_c+P_{\text{drag}}$$</div>
+<div data-widget="power-balance"></div>
+<div class="callout fire"><span class="ct">What this says about starting</span>At low rpm the compressor squeezes so little that the turbine can only break even with a very hot flame: holding 30 000 rpm on its own needs ~820 °C at the turbine inlet, and 20 000 rpm needs more than 1 200 °C, which is more than the metal can take. That is why every small turbine needs a <strong>starter motor</strong> to spin it above ~30 000 rpm before the fuel is lit, and why “hung starts” (stuck at low rpm) happen.</div>
+
+<h2 id="next" data-short="What next">Now let’s build it</h2>
+<p>The next chapter takes this finished machine apart and puts it back together in ten layers. Each step introduces <em>one</em> component: what it is for, the physics and numbers behind it, a widget to play with, how to make it cheaply, and the 3D model to rotate and download.</p>
+<p><a class="btn fire" href="06-build.html">Start the 3D build →</a></p>
+
+</article>
+</main>
+</div>
+</body>
+</html>

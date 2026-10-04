@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>6 · Build it, layer by layer (3D) — Jet Engines for Dummies</title>
+<meta name="description" content="Build the Coke-can turbojet one component at a time in 3D: shaft and bearings, impeller, diffuser, housing, casing, Coke-can flame tube, fuel and ignition, turbine, nozzle and stand, with the physics, numbers and cheap build options for each, and STL files for every part.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body class="wide-page">
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<div style="max-width:1380px;margin:0 auto">
+<span class="eyebrow">Chapter 6 · The engine</span>
+<h1>Build it, layer by layer</h1>
+<p class="lede" style="max-width:80ch">Scroll. The engine assembles itself on the left, one component per step, while on the right you get what it does, the physics and numbers behind it, a widget to play with, and the cheap way to make it. Use the buttons on the 3D view to <strong>explode</strong> it, <strong>slice</strong> it, make the casings see-through, and (at the end) turn on <strong>airflow and heat</strong>.</p>
+<div class="safety-strip" style="max-width:80ch"><b>Safety:</b> everything here is for understanding. A real gas turbine can burst, burn and deafen. Never build or run one without the precautions in <a href="safety.html">Safety first</a>.</div>
+</div>
+
+<div class="build-layout">
+  <div class="build-viewer">
+    <div class="viewer" id="bviewer"></div>
+    <div class="stepper" id="stepper"></div>
+    <div class="vcaption" id="bcap">Drag to rotate · scroll the page to add the next part · click a part to see what it is.</div>
+  </div>
+
+  <div class="build-steps">
+
+  <!-- ===================== STEP 1 ===================== -->
+  <section class="step" id="step1" data-step="1" data-parts="shaft,bearing-tunnel">
+    <div class="hd"><div class="big">1</div><div><span class="eyebrow">Layer 1</span><h2>The spine: shaft &amp; bearing tunnel</h2></div></div>
+    <p class="lede" style="font-size:1.1rem">Everything starts with the part that never moves relative to the rest and the part that spins faster than anything you own: a rigid tunnel carrying two bearings, and an 8 mm shaft running through it.</p>
+    <div class="parts-here"></div>
+    <h3>What it does</h3>
+    <p>The <strong>bearing tunnel</strong> is a thick-walled steel tube bolted to the diffuser plate at the front and holding the shaft on two small ball bearings, one near each end. Everything else attaches to it. The <strong>shaft</strong> is a straight, hardened steel rod that locks the compressor wheel at one end to the turbine wheel at the other (an M8 nut at the hot end), so the turbine’s torque goes straight into the compressor.</p>
+    <h3>The physics: rpm that nobody told the bearings about</h3>
+    <p>Bearing makers rate speed with the <strong>DN number</strong>: bore diameter (mm) × rpm. Ours is $8\times115\,000=0.92\times10^6$, far beyond ordinary grease-packed bearings (~0.3 M). Hybrid ceramic-ball bearings with a little oil mist, or a turbocharger’s oil-fed journal bearings, can take it.</p>
+    <p>The second big constraint is the shaft’s <strong>critical speed</strong>: a spinning shaft has natural bending frequencies, and any imbalance excites them. Short, fat shafts have high criticals; long, thin ones low. Our engine’s first critical is ~40 000 rpm; we spend the first 10 seconds of every start passing through it, quickly, then run at 2.9× above it. That is only safe if the wheels are <em>balanced</em> (chapter 8).</p>
+    <div data-widget="critical-speed"></div>
+    <div class="callout tip"><span class="ct">Cheap ways to make it</span>
+      <ul><li><strong>Shaft:</strong> an 8 mm hardened, ground rod (a “linear shaft” or drill-rod, h6 tolerance) cut to ~168 mm and threaded M6/M8 at the hot end. Buy it, don’t turn it. About USD 8.</li>
+      <li><strong>Bearings:</strong> two <em>8×16×5 mm</em> (688-type) angular-contact or hybrid ceramic bearings. The cheapest sensible fix. About USD 15 each.</li>
+      <li><strong>Tunnel:</strong> a length of Ø28 steel bar bored out to Ø16 (a lathe job) or a welded Ø28 tube with two bored end blocks. Bolt flange at the front, plate at the rear.</li>
+      <li><strong>Lubrication:</strong> a drip of turbine oil or ATF every few runs is the minimum; add 3–5 % two-stroke oil to a liquid fuel; or fit a tiny pump (chapter 8).</li></ul></div>
+  </section>
+
+  <!-- ===================== STEP 2 ===================== -->
+  <section class="step" id="step2" data-step="2" data-parts="impeller">
+    <div class="hd"><div class="big">2</div><div><span class="eyebrow">Layer 2</span><h2>Suck &amp; squeeze: the impeller</h2></div></div>
+    <p class="lede" style="font-size:1.1rem">A 56 mm aluminium wheel with seven full and seven short backswept blades. At 115 000 rpm its tips travel at 337 m/s and fling the air outward, doubling its pressure.</p>
+    <div class="parts-here"></div>
+    <h3>What it does</h3>
+    <p>Air enters the front (the <em>inducer</em>) moving axially, is caught by the twisted blades, turned through 90° and thrown outward at the rim (the <em>exducer</em>) with 340 m/s of swirl. All the energy comes from the blades pushing on the air: $\Delta h_0=U_2C_{\theta2}\approx79$ kJ/kg (chapter 4).</p>
+    <h3>The numbers</h3>
+    <table class="data">
+    <tr><td>Exducer diameter $D_2$</td><td class="num">56 mm</td><td>sets the tip speed $U_2=\pi D N/60=337$ m/s</td></tr>
+    <tr><td>Inducer tip / hub</td><td class="num">42 / 12 mm</td><td>inlet area 1 270 mm² → air at ~110 m/s</td></tr>
+    <tr><td>Blades</td><td class="num">7 + 7 splitters</td><td>effective count ≈ 12 for the slip factor (σ = 0.84)</td></tr>
+    <tr><td>Exit blade height</td><td class="num">6 mm</td><td>flow coefficient $C_{m2}/U_2 = 0.28$</td></tr>
+    <tr><td>Backsweep</td><td class="num">30°</td><td>wider stable range</td></tr>
+    <tr><td>Result</td><td class="num">PR 1.94, η 77 %</td><td>air leaves at 366 K (+78 K)</td></tr>
+    </table>
+    <p>The <strong>compressor map</strong> shows what the wheel can do. Keep the engine to the right of the dashed red <em>surge line</em>:</p>
+    <div data-widget="compressor-map"></div>
+    <div class="callout tip"><span class="ct">Cheap ways to make it</span>
+      <ul><li><strong>Best bargain:</strong> a <em>scrap turbocharger compressor wheel</em> (~56 mm exducer: the Garrett T25/GT28-class, from any scrap yard, USD 30–70). Bore it to Ø8 H7 (a lathe, a collet, a steady hand) and balance it (chapter 8). These wheels are designed for 120 000 rpm.</li>
+      <li><strong>Print &amp; cast:</strong> print the STL in castable resin / PLA, make a plaster or investment mould, cast A356 aluminium (+1 % shrink compensation).</li>
+      <li><strong>Mill it:</strong> from 6061-T6 billet on a 4/5-axis CNC; the blades are ruled surfaces so even a 3-axis can do a flank-milled version.</li>
+      <li>Aluminium is fine at this tip speed: stress ≈ 130 MPa vs 276 MPa yield, but not above ~150 °C: compressor wheels stay cool (366 K).</li></ul></div>
+  </section>
+
+  <!-- ===================== STEP 3 ===================== -->
+  <section class="step" id="step3" data-step="3" data-parts="diffuser-plate">
+    <div class="hd"><div class="big">3</div><div><span class="eyebrow">Layer 3</span><h2>Slow it down: the diffuser</h2></div></div>
+    <p class="lede" style="font-size:1.1rem">The air leaves the wheel at 340 m/s with far too much kinetic energy and too little pressure. A ring of 15 curved vanes slows it to ~150 m/s and turns the difference into pressure.</p>
+    <div class="parts-here"></div>
+    <h3>What it does</h3>
+    <p>This plate is the back wall of the compressor and carries 15 spiral vanes. The channels between the vanes widen slightly, so the air slows (Bernoulli: slower air has higher pressure). The angled vanes also guide the swirling air outward instead of letting it spin around the gap. After the vanes the air turns 90° and flows aft into the combustor.</p>
+    <h3>The design rule</h3>
+    <p>The pressure you can recover is $C_p=1-1/AR^2$ (AR = area ratio), but only if the flow stays attached. Diverge the walls faster than ~7° (total angle) and the boundary layer separates. Our vanes open by 6°: widen the passage as far as it can stand, no further.</p>
+    <div data-widget="diffuser"></div>
+    <div class="callout tip"><span class="ct">Cheap ways to make it</span>
+      <ul><li><strong>Skip the vanes</strong> (vaneless diffuser): a flat plate and a wide gap. 5–10 points less efficiency but no precision parts. Many first builds do exactly this.</li>
+      <li><strong>Sheet vanes:</strong> 15 strips of 1 mm stainless, bent on a log-spiral jig and TIG/braze-tacked to a 6 mm aluminium plate.</li>
+      <li><strong>Print the STL</strong> in resin to check fit, then machine or cast it in aluminium.</li></ul></div>
+  </section>
+
+  <!-- ===================== STEP 4 ===================== -->
+  <section class="step" id="step4" data-step="4" data-parts="compressor-housing">
+    <div class="hd"><div class="big">4</div><div><span class="eyebrow">Layer 4</span><h2>Gather it: bellmouth &amp; compressor housing</h2></div></div>
+    <p class="lede" style="font-size:1.1rem">A trumpet-shaped inlet that lets air in without a fight, wrapped around a casing that hugs the impeller tips within 0.4 mm.</p>
+    <div class="parts-here"></div>
+    <h3>What it does</h3>
+    <p>The <strong>bellmouth</strong> turns the sideways-converging streamlines from all around into a clean axial stream so the inducer sees a uniform flow. Its curved lip (radius ≈ 1/3 of the inlet diameter) avoids a sharp edge where the air would separate and waste pressure. Further in, the housing wall follows the exact curve of the impeller shroud contour, 0.4 mm away from the blade tips; then it forms the front wall of the diffuser and the bend that turns the flow aft.</p>
+    <p>Two tolerances rule the compressor: the <strong>lip radius</strong> and the <strong>tip clearance</strong>. The gap lets high-pressure air leak back over each blade tip, and the loss is roughly proportional to gap ÷ blade height ($0.4/6\approx7\%$ of the work!).</p>
+    <div data-widget="inlet-clearance"></div>
+    <div class="callout tip"><span class="ct">Cheap ways to make it</span>
+      <ul><li><strong>Spin or hand-form</strong> a 2 mm aluminium funnel for the bellmouth (a kitchen funnel is the right shape!); bore the shroud on a lathe.</li>
+      <li><strong>3D-print the lip and bend</strong> in a high-temperature resin; compressor air only reaches ~100 °C.</li>
+      <li><strong>Set the clearance with shims:</strong> assemble with the housing slightly loose, spin the wheel by hand, tighten until you feel <em>no</em> rub. An abradable (cast PTFE or silicone) shroud liner lets the blades cut their own tiny groove.</li></ul></div>
+  </section>
+
+  <!-- ===================== STEP 5 ===================== -->
+  <section class="step" id="step5" data-step="5" data-parts="combustor-casing">
+    <div class="hd"><div class="big">5</div><div><span class="eyebrow">Layer 5</span><h2>Contain it: the combustor casing</h2></div></div>
+    <p class="lede" style="font-size:1.1rem">A stainless pipe, 100 mm across, that holds the pressurised air around the flame tube. Two ports: fuel in, igniter in.</p>
+    <div class="parts-here"></div>
+    <h3>What it does</h3>
+    <p>The casing is a low-pressure vessel (about 1 bar above atmospheric) that forces the compressor’s air to flow around the flame tube and enter it through its holes, not leak past. At the front it bolts to the compressor housing flange; at the rear a closing plate with a Ø68 hole passes the nozzle-guide ring. Two threaded bosses carry the <strong>fuel feed pipe</strong> (3 o’clock) and the <strong>igniter</strong> (12 o’clock).</p>
+    <p>Because the pressure is small, the wall can be thin: it’s the <strong>heat and thermal growth</strong> that matter. The outside of the casing stays at 200–300 °C and the 8 flange bolts see a total end-load of only ~340 N.</p>
+    <div data-widget="pressure-vessel"></div>
+    <div class="callout tip"><span class="ct">Cheap ways to make it</span>
+      <ul><li><strong>Exhaust-pipe stock:</strong> a Ø100 (4") 304 stainless exhaust tube, 2 mm wall, from a car-parts shop; cut to 105 mm.</li>
+      <li><strong>Flanges:</strong> laser- or waterjet-cut 4 mm stainless plate (an online cutting service will do it from a DXF for ~USD 10 each); TIG-weld to the pipe, then <em>skim flat</em> or lap on a surface plate.</li>
+      <li><strong>Ports:</strong> weld in M10 and Ø8 pipe bosses; the igniter boss must be perpendicular to the axis.</li>
+      <li>Use a copper-graphite or ceramic-fibre gasket between flanges.</li></ul></div>
+  </section>
+
+  <!-- ===================== STEP 6 ===================== -->
+  <section class="step" id="step6" data-step="6" data-parts="flame-tube">
+    <div class="hd"><div class="big">6</div><div><span class="eyebrow">Layer 6 · the star</span><h2>Bang: the Coke-can flame tube</h2></div></div>
+    <p class="lede" style="font-size:1.1rem">A ring-shaped can with three rows of holes: the place where fuel meets air, burns, and is then diluted to a temperature the turbine can live with.</p>
+    <div class="parts-here"></div>
+    <h3>What it does</h3>
+    <p>The flame tube is an <strong>annular liner</strong>: two concentric tubes, a Coke can (Ø66) on the outside and a Ø34.5 tube on the inside, closed at the front by a domed plate. It sits in the casing with a gap on both sides, so compressor air flows <em>around</em> it and enters through the holes. The air is split into three jobs:</p>
+    <ol>
+      <li><strong>Primary zone (~22 % of the air).</strong> Air + all the fuel. Locally rich-to-stoichiometric (φ ≈ 1.3), the flame burns at ~2 000 °C. Swirling jets from the first hole row make a recirculating pocket that anchors the flame so the 60 m/s flow can’t blow it out.</li>
+      <li><strong>Secondary zone (~30 %).</strong> Finishes burning the rich products (CO, soot) and starts cooling.</li>
+      <li><strong>Dilution zone (~47 %).</strong> Big holes dump in the rest of the cool air to bring the gas down to the turbine-inlet temperature (~800 °C) and even out hot spots.</li>
+    </ol>
+    <h3>The numbers: hole sizing</h3>
+    <p>The total hole area is fixed by continuity and the pressure you are willing to sacrifice: $\dot m=C_d A\sqrt{2\rho\,\Delta P}$. At ΔP = 3.7 % of the compressor outlet pressure (a good compromise between mixing quality and thrust), the 0.15 kg/s needs <strong>1 400 mm²</strong>, split by zone. Change the sliders and compare with the STL’s holes; then print the <strong>1:1 template</strong> and use it to drill your own can.</p>
+    <div data-widget="flame-tube-design"></div>
+    <h3>Why a can survives at all</h3>
+    <p>Aluminium melts near 650 °C and loses most of its strength by 300 °C, yet the flame is 2 000 °C. The can survives (briefly!) because the <strong>cooling film</strong> from the holes keeps the wall at 500–650 °C, and because the 0.1 mm wall conducts so little heat along itself. Play with the cooling effectiveness and see how thin the margin is:</p>
+    <div data-widget="wall-temp"></div>
+    <div class="callout warn"><span class="ct">Honest warning</span>The Coke can is a <em>teaching liner</em>. Expect a few minutes of full power at best, hours at idle. The warped, oxidised can is your cue to upgrade to 0.5 mm 310 stainless (same pattern, ~USD 40 laser-cut) before turbine inlet temperatures climb, and you can print this exact STL to check the stainless version’s fit.</div>
+    <div class="callout tip"><span class="ct">Cheap ways to make it</span>
+      <ul><li><strong>Outer liner:</strong> a plain 12 oz can (Ø66 × 122). Cut both ends off with a rotary tool, trim the wall to 87 mm, deburr, then tape on the 1:1 template and drill: 2 mm pilot first, then a step drill. Use a <em>second can inside the first</em> if you want a stiffer wall.</li>
+      <li><strong>Inner liner:</strong> Ø34.5 steel exhaust tube (0.5 mm), or a ~60 mm tomato-purée can cut and rolled.</li>
+      <li><strong>Dome:</strong> a 2 mm annular washer dished over a hardwood mould with a ball-peen hammer; fold the edges and crimp or rivet to the two tubes. Drill 8 × Ø6 lance holes plus the small cooling holes.</li>
+      <li><strong>Joints:</strong> aluminium cannot be soldered or welded easily with hobby kit: use stainless rivets, a few self-tapping screws, or crimp.</li></ul></div>
+  </section>
+
+  <!-- ===================== STEP 7 ===================== -->
+  <section class="step" id="step7" data-step="7" data-parts="fuel-ring,igniter">
+    <div class="hd"><div class="big">7</div><div><span class="eyebrow">Layer 7</span><h2>Feed &amp; light it: fuel ring and igniter</h2></div></div>
+    <p class="lede" style="font-size:1.1rem">A ring of stainless tube with eight short lances pushes propane gas straight into the primary zone; a glow or spark plug lights it.</p>
+    <div class="parts-here"></div>
+    <h3>What it does</h3>
+    <p>Propane arrives from the regulator through the side pipe into a Ø5 ring, then through 8 lances that pass through holes in the flame-tube dome. Each lance has a tiny exit hole, and the pressure drop across those holes meters the fuel. The <strong>igniter</strong> pokes through the casing and the can wall into the primary zone, where it lights the mixture. Once burning, the flame holds itself.</p>
+    <h3>The numbers: how small are the holes?</h3>
+    <p>At full power the engine burns 2.9 g/s of propane (10.4 kg/h; a 9 kg cylinder lasts under an hour). A gas flow through a hole at the regulator pressure is <em>choked</em> above a pressure ratio of ~1.8, so the flow depends only on the area and the upstream pressure. That makes metering easy: the hole sizes below.</p>
+    <div data-widget="fuel-system"></div>
+    <div class="callout danger"><span class="ct">Gas safety</span>
+      <ul><li>Use a <strong>fail-closed solenoid</strong> after the regulator. No power → no gas.</li>
+      <li>Leak-test every joint with soapy water, outdoors, <em>before</em> every session. Never use a naked flame to “check”.</li>
+      <li>Cylinder upright (vapour draw), a flame-trap/flashback arrestor in the line, and the cylinder 3+ m behind the engine.</li>
+      <li>Never run an engine in a garage, shed, or under a roof: exhaust is CO + 800 °C air.</li></ul></div>
+    <div class="callout tip"><span class="ct">Cheap ways to make it</span>
+      <ul><li><strong>Ring:</strong> Ø5 × 0.8 stainless brake line (cheap!), bent round a Ø45 former and brazed or silver-soldered to 8 lances of Ø4 tube.</li>
+      <li><strong>Lance holes:</strong> drill with a jeweller’s bit (Ø0.7–0.8 mm) in a pin vise: practise on scrap.</li>
+      <li><strong>Igniter:</strong> an M10 glow plug (heater-plug from a model-engine shop, about USD 5) driven from a 2 S LiPo; for a spark use a motorbike spark plug on a piezo or a small coil.</li>
+      <li><strong>Regulator &amp; valve:</strong> a BBQ-type propane regulator + a 12 V brass solenoid valve + a needle valve for trimming: about USD 40 total.</li></ul></div>
+  </section>
+
+  <!-- ===================== STEP 8 ===================== -->
+  <section class="step" id="step8" data-step="8" data-parts="ngv,turbine-wheel">
+    <div class="hd"><div class="big">8</div><div><span class="eyebrow">Layer 8</span><h2>Blow &amp; drive: guide vanes and turbine</h2></div></div>
+    <p class="lede" style="font-size:1.1rem">16 fixed vanes aim the hot gas at the rotor; 19 twisted blades on a thin disc catch it and drive the shaft. The hottest, most highly stressed part of the whole engine.</p>
+    <div class="parts-here"></div>
+    <h3>What they do</h3>
+    <p>The <strong>nozzle guide vanes</strong> (NGV) are a stationary ring of cambered vanes between two thin cones. They squeeze the flow (area drops from 2 800 to 1 450 mm²), accelerating it to ~310 m/s and turning it 58° into the direction of rotation. The <strong>turbine wheel</strong> is a disc with 19 blades: they turn the flow back toward the axis, and the swirl momentum they remove is the energy that drives the compressor ($\Delta h_0=U(C_{\theta2}-C_{\theta3})\approx 75$–80 kJ/kg, 12 kW at 0.15 kg/s).</p>
+    <div data-widget="turbine-stage"></div>
+    <p>Notice the match with the STL: the rotor blade enters at ~15° and leaves at 60° from the axis, exactly the angles in the solver. A turbine blade root sees a centrifugal stress of $\sigma\approx\tfrac12\rho\omega^2(r_t^2-r_h^2)\approx$ 160 MPa while at ~800 °C: that is why only alloys such as 310 stainless or Inconel qualify (chapter 9).</p>
+    <div class="callout tip"><span class="ct">Cheap ways to make it</span>
+      <ul><li><strong>Wheel from plate:</strong> waterjet a 4 mm 310S disc, cut 19 blades from 1.5 mm sheet, twist each ~10° in a vice, and TIG- or laser-weld them into slots in the rim. <em>Balance the finished wheel</em> before it ever sees rpm.</li>
+      <li><strong>Turbo turbine:</strong> a scrap-turbo turbine wheel (Inconel, radial inflow) is a robust alternative: design a radial-inflow variant and let the junkyard supply an off-the-shelf rotor.</li>
+      <li><strong>NGV ring:</strong> 1.5 mm 310 sheet formed into the two cones, 16 vanes cut from the same sheet, curved on a mandrel, spot-welded in slotted holes.</li>
+      <li><strong>Safety margin:</strong> the real danger is a bursting disc. Never run a home-made wheel without a containment ring and distance (see <a href="safety.html">Safety</a>).</li></ul></div>
+  </section>
+
+  <!-- ===================== STEP 9 ===================== -->
+  <section class="step" id="step9" data-step="9" data-parts="turbine-casing,exhaust-nozzle">
+    <div class="hd"><div class="big">9</div><div><span class="eyebrow">Layer 9</span><h2>Push: turbine casing, nozzle &amp; tail cone</h2></div></div>
+    <p class="lede" style="font-size:1.1rem">A tight shroud around the turbine blades and a gently narrowing nozzle that converts the last of the pressure into a 376 m/s jet.</p>
+    <div class="parts-here"></div>
+    <h3>What they do</h3>
+    <p>The <strong>turbine casing</strong> holds the NGV ring and then wraps the rotor with a 0.2–0.4 mm tip gap (hot gas leaks over blade tips just as compressor air does). Behind it, the <strong>nozzle</strong> narrows from Ø60 to a 1 119 mm² ring-shaped exit around a <strong>tail cone</strong>, supported on three thin struts. The cone hides the shaft nut and gives the flow a smooth, drag-free end.</p>
+    <p>The nozzle area is the <em>tuning knob</em>: smaller = hotter turbine inlet, higher pressure, higher exit speed, less air. Larger = cool and gentle. You can alter it after the engine is built by fitting a ring or trimming the tip. The widget shows what happens to thrust and temperature at constant rpm: notice how fast the temperature climbs as you close the nozzle.</p>
+    <div data-widget="nozzle"></div>
+    <div class="callout tip"><span class="ct">Cheap ways to make it</span>
+      <ul><li><strong>Nozzle cone:</strong> a car-exhaust <em>reducer</em> (cone) from a parts shop, or roll 1.5 mm 304 into a cone and TIG it. Make it <strong>oversize first</strong>, then reduce.</li>
+      <li><strong>Tail cone:</strong> spun, or two cheap steel funnels welded base-to-base; three 1.5 mm strips as struts.</li>
+      <li><strong>Turbine shroud:</strong> a rolled and welded ring bored (or <em>ground in place</em> with the wheel, protected, spinning slowly) to leave 0.3 mm: the machinist’s favourite trick.</li>
+      <li><strong>Thermal growth:</strong> hot parts grow ~1 % per 700 °C of temperature rise (steel 17 µm/m/K): allow a floating joint, never a rigid one, between hot and cold parts.</li></ul></div>
+  </section>
+
+  <!-- ===================== STEP 10 ===================== -->
+  <section class="step" id="step10" data-step="10" data-parts="test-stand" style="min-height:92vh">
+    <div class="hd"><div class="big">10</div><div><span class="eyebrow">Layer 10</span><h2>Hold it down: stand, starter &amp; plumbing</h2></div></div>
+    <p class="lede" style="font-size:1.1rem">A rigid test stand, a starter motor, a fuel line and four gauges turn a pile of parts into something you can (carefully) run.</p>
+    <div class="parts-here"></div>
+    <h3>Everything together</h3>
+    <p>The completed engine is now on the left. <strong>Switch on “Airflow” and “Heat”</strong> in the viewer: the engine is running at partial power right now. Cold air (blue) is sucked in, squeezed, heated around the can (white), burned in the primary zone (orange flame), diluted, accelerated by the vanes, spent in the turbine, and blown out the back. The metal glows according to its real temperature from the model; “thermal cam” shows it in false colour. Then open <a href="07-run.html">the simulator</a> to start it yourself.</p>
+    <h3>The extras you need</h3>
+    <div class="table-wrap"><table class="data">
+    <tr><th>Item</th><th>Why</th><th>Cheap option</th><th class="num">≈ USD</th></tr>
+    <tr><td>Starter</td><td>Spin the rotor to ≥ 30 000 rpm before lighting</td><td>Brushless RC inrunner (e.g. 3660-size) + ESC + 3S LiPo, rubber drive cone on the impeller nose (chapter 7)</td><td class="num">70</td></tr>
+    <tr><td>EGT sensor</td><td>Watch the temperature behind the turbine</td><td>K-type thermocouple + digital display</td><td class="num">15</td></tr>
+    <tr><td>RPM sensor</td><td>Know the speed</td><td>Reflective IR sensor + a black-and-white stripe on the nut, or a Hall sensor and tiny magnet</td><td class="num">12</td></tr>
+    <tr><td>Pressure gauge</td><td>Compressor-exit pressure (should read ≈ 95 kPa at full speed)</td><td>0–1 bar gauge on a 2 mm tap</td><td class="num">10</td></tr>
+    <tr><td>Controller</td><td>Sequence the start, protect the engine</td><td>An Arduino/ESP32 with a relay board (the ECU in the simulator is the same logic)</td><td class="num">20</td></tr>
+    <tr><td>Protection</td><td>Hearing (jet noise ≈ 120 dB at 1 m), eyes, fire</td><td>Ear defenders + plugs, face shield, CO2/dry-powder extinguisher, welding gloves</td><td class="num">60</td></tr>
+    </table></div>
+    <p>With the engine itself, a realistic total <strong>including a basic machine-shop and gas fittings is about USD 600–900</strong>; most of the cost is the turbine (wheel + vanes + casing ≈ USD 200) and the stainless casing/flanges (≈ USD 120).</p>
+    <div class="btn-row" style="margin:14px 0"><a class="btn fire" href="07-run.html">▶ Run it in the simulator</a><a class="btn" href="models.html">⬇ Download all STL files</a><a class="btn" href="safety.html">Safety checklist</a></div>
+  </section>
+
+  </div>
+</div>
+</main>
+</div>
+
+<script type="module">
+import { EngineViewer, loadManifest } from './js/viewer3d.js';
+import { EngineSim } from './js/engine-sim.js';
+import { h } from './js/ui.js';
+
+const stepNames = ['', 'Spine: shaft + bearing tunnel', 'Impeller', 'Diffuser plate', 'Inlet bellmouth + compressor housing', 'Combustor casing', 'Flame tube (Coke can)', 'Fuel ring + igniter', 'Nozzle guide vanes + turbine wheel', 'Turbine casing + exhaust nozzle', 'Test stand: the complete engine'];
+const mount = document.getElementById('bviewer');
+const stepper = document.getElementById('stepper'), cap = document.getElementById('bcap');
+let viewer = null, manifest = null, current = 1, simOn = false;
+
+for (let i = 1; i <= 10; i++) stepper.append(h('button', { type: 'button', title: stepNames[i], onclick: () => { const t = document.getElementById('step' + i); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); setTimeout(() => t.scrollIntoView({ block: 'start' }), 900); } }, String(i)));
+const stepBtns = [...stepper.children];
+
+function showStep(n) {
+  current = n;
+  stepBtns.forEach((b, i) => { b.className = i + 1 === n ? 'active' : i + 1 < n ? 'done' : ''; });
+  cap.innerHTML = `<b>Step ${n}:</b> ${stepNames[n]}`;
+  if (!viewer || !viewer.manifest) return;
+  viewer.setStep(n);
+  viewer.setCaption(`Step ${n} of 10 · ${stepNames[n]}`);
+  // run the engine only once everything that gets hot is in place
+  if (n >= 9 && !simOn) {
+    const sim = new EngineSim(); viewer.attachSim(sim);
+    sim.start(); for (let i = 0; i < 700; i++) sim.step(0.05); sim.setThrottle(0.65); for (let i = 0; i < 900; i++) sim.step(0.05);
+    simOn = true; viewer.setFlow(n >= 10); if (n >= 10) viewer.setFlow(true);
+  } else if (n < 9 && simOn) { viewer.detachSim(); simOn = false; viewer.setFlow(false); }
+  if (n === 10 && viewer.btns.flow && !viewer.state.flow) { viewer.setFlow(true); }
+}
+
+// parts pills with STL links
+loadManifest().then(m => {
+  manifest = m;
+  document.querySelectorAll('.step').forEach(sec => {
+    const ids = sec.dataset.parts.split(','), box = sec.querySelector('.parts-here');
+    ids.forEach(id => {
+      const p = m.parts.find(q => q.id === id); if (!p) return;
+      const pill = h('span', { class: 'part-pill', title: p.note, onclick: (e) => { if (e.target.tagName !== 'A' && viewer) viewer.frame([id], { pad: 1.5 }); } },
+        h('span', { class: 'sw', style: { background: p.color } }), p.name, h('span', { style: { color: 'var(--muted)', fontSize: '.74rem' } }, `${p.mass_g.toFixed(0)} g`),
+        h('a', { href: 'models/' + p.file, download: p.file, title: 'Download STL (' + (p.tris / 1000).toFixed(1) + 'k triangles)' }, '⬇ STL'));
+      box.append(pill);
+    });
+  });
+});
+
+// lazy-start the viewer when the page is first scrolled near it
+(async function start() {
+  viewer = new EngineViewer(mount, { tools: ['spin', 'explode', 'cut', 'xray', 'flow', 'heat', 'view', 'reset'], flow: false, caption: 'Step 1 · loading…', onSelect: (m) => { if (m) cap.innerHTML = `<b>${m.name}</b> · ${m.materialName} · ${m.mass_g.toFixed(0)} g. ${m.note}`; } });
+  await viewer.load();
+  showStep(current);
+})().catch(err => { console.error(err); mount.innerHTML = '<div class="vloading">3D needs WebGL, which your browser blocked.</div>'; });
+
+// scroll-driven step selection
+const io = new IntersectionObserver((entries) => {
+  for (const e of entries) if (e.isIntersecting) { const n = +e.target.dataset.step; if (n !== current) showStep(n); }
+}, { rootMargin: '-28% 0px -58% 0px' });
+document.querySelectorAll('.step').forEach(s => io.observe(s));
+</script>
+</body>
+</html>

@@ -312,3 +312,13 @@ figure.svg svg { width: 100%; height: auto; display: block; }
 @media (max-width: 560px) { body { font-size: 16px; } main { padding-top: 22px; } .brand small { display: none; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
 @media print { .topbar, .sidenav, .pn, .viewer, .widget .ctls { display: none !important; } .layout { display: block; } body { background: #fff; color: #000; } }
+
+/* wide pages (build, simulator): chapter list becomes a slide-over menu to give the content the full width */
+body.wide-page .layout { grid-template-columns: 1fr; max-width: 1700px; }
+body.wide-page .sidenav { position: fixed; z-index: 60; left: 0; top: var(--top-h); bottom: 0; width: min(86vw, 320px); height: auto; background: var(--bg); transform: translateX(-102%); transition: transform .22s ease; border-right: 1px solid var(--line-2); box-shadow: var(--shadow); }
+body.wide-page.nav-open .sidenav { transform: none; }
+body.wide-page #menu-btn { display: inline-flex; }
+body.wide-page main { padding-inline: clamp(14px, 2.5vw, 40px); }
+
+/* skeleton box reserved for a lazy widget until it initialises (avoids layout jumps when scrolling to anchors) */
+[data-widget]:not(.widget):not(.stat-row) { min-height: 420px; border: 1px dashed var(--line-2); border-radius: var(--radius); background: color-mix(in srgb, var(--panel) 70%, transparent); margin: 1.8em 0 2.2em; }

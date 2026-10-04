@@ -261,8 +261,8 @@ export class EngineViewer {
     }
     if (frame && step != null) {
       const ids = [...this.parts.values()].filter(p => p.meta.step === step).map(p => p.id);
-      this.frame(ids, { pad: step === total ? 1.15 : 1.9 });
-    } else if (frame && step == null) this.frame(null, { pad: 1.12 });
+      this.frame(step === total ? null : ids, { pad: step === total ? 1.18 : 1.35 });
+    } else if (frame && step == null) this.frame(null, { pad: 1.18 });
     this._updateFlowAvailability();
   }
 
@@ -307,6 +307,8 @@ export class EngineViewer {
     if (this.manifest && sim.setParts) sim.setParts(this.manifest.parts);
   }
 
+  detachSim() { this.sim = null; this.vis = null; }
+
   /* ---------- camera ---------- */
   setView(name, animate = true) {
     const views = {
@@ -337,8 +339,9 @@ export class EngineViewer {
       box.union(b);
     }
     const c = box.getCenter(new THREE.Vector3()), s = box.getSize(new THREE.Vector3());
-    const radius = Math.max(40, 0.5 * Math.hypot(s.x, s.y * 1.25, s.z));
-    const dist = (radius * pad) / Math.tan(THREE.MathUtils.degToRad(FOV) / 2) * 0.5;
+    // the engine axis runs along screen-x in the default views: fit width (÷ aspect) and height separately
+    const needW = s.x * 0.95 + s.z * 0.35, needH = s.y * 1.15 + s.x * 0.2;
+    const dist = pad * Math.max(needW / this.camera.aspect, needH) / (2 * Math.tan(THREE.MathUtils.degToRad(FOV) / 2));
     const dir = this.camera.position.clone().sub(this.controls.target).normalize();
     this._camTween = { t: 0, dur: 1.0, fromP: this.camera.position.clone(), toP: c.clone().add(dir.multiplyScalar(Math.min(1400, Math.max(180, dist)))), fromT: this.controls.target.clone(), toT: c };
   }

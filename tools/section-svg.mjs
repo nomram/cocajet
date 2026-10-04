@@ -54,6 +54,21 @@ for (const p of manifest.parts) {
   for (const [a, b] of segs) d += `M${X(a[0]).toFixed(1)} ${Y(a[1]).toFixed(1)}L${X(b[0]).toFixed(1)} ${Y(b[1]).toFixed(1)}`;
   svg += `<path d="${d}" stroke="${p.color}" stroke-width="1.6" fill="none" stroke-linecap="round"><title>${p.name}</title></path>\n`;
 }
+// numbered callouts (anchor on the part, label above/below)
+const MARK = [
+  ['1', 'compressor-housing', 3, 37.5, 12, 62], ['2', 'impeller', 34, 15, 34, 62], ['3', 'diffuser-plate', 46, 36, 46, 62],
+  ['4', 'bearing-tunnel', 105, 11, 105, 62], ['5', 'combustor-casing', 135, 50, 135, 66], ['6', 'flame-tube', 125, 33, 125, 62],
+  ['7', 'fuel-ring', 67.5, -25, 67.5, -62], ['8', 'ngv', 172, 27, 172, 62], ['9', 'turbine-wheel', 185, 21, 185, -50],
+  ['10', 'turbine-casing', 182, -34, 182, -62], ['11', 'exhaust-nozzle', 232, 24, 232, 62], ['12', 'shaft', 150, 0, 150, -50],
+];
+for (const [n, id, z, x, lz, lx] of MARK) {
+  const col = (manifest.parts.find(p => p.id === id) || {}).color || '#fff';
+  svg += `<line x1="${X(z)}" y1="${Y(x)}" x2="${X(lz)}" y2="${Y(lx)}" stroke="${col}" stroke-width="1" stroke-dasharray="3 3" opacity=".8"/>`;
+  svg += `<circle cx="${X(z)}" cy="${Y(x)}" r="3" fill="${col}"/>`;
+  svg += `<circle cx="${X(lz)}" cy="${Y(lx)}" r="11" fill="#0e1318" stroke="${col}" stroke-width="1.6"/><text x="${X(lz)}" y="${Y(lx) + 4}" fill="#e7edf3" font-size="11" font-weight="700" text-anchor="middle">${n}</text>`;
+}
+// flow arrow + station labels
+svg += `<g fill="#9aa4ad" font-size="11" text-anchor="middle"><text x="${X(-12)}" y="${Y(-70)}">air in →</text><text x="${X(262)}" y="${Y(-70)}">→ jet</text></g>`;
 svg += `</svg>\n`;
 fs.mkdirSync(path.dirname(out), { recursive: true });
 fs.writeFileSync(out, svg);
