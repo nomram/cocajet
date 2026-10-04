@@ -98,6 +98,9 @@
 <tr><td>Stoichiometric air–fuel ratio</td><td>$\text{AFR}_{st}=\dfrac{(x+y/4)\,M_{O_2}}{0.231\,M_{fuel}}$</td><td>propane: 15.7 kg/kg</td></tr>
 <tr><td>Adiabatic flame temperature</td><td>$\sum n_{prod}\,h_{prod}(T_{ad})=\sum n_{react}\,h_{react}$ (with dissociation equilibria)</td><td>propane–air, φ = 1: ≈ 2 300 K</td></tr>
 <tr><td>Hess’s law</td><td>$\Delta H=\sum\Delta H_f(\text{prod})-\sum\Delta H_f(\text{react})$</td><td>3(−393.5) + 4(−241.8) − (−103.8) kJ/mol</td></tr>
+<tr><td>Flammability limit in φ</td><td>$\phi=\dfrac{x/(1-x)}{x_{st}/(1-x_{st})}$, $x_{st}=\dfrac1{1+n_{O_2}/0.2095}$</td><td>propane 2.1 % → φ = 0.51; 9.5 % → 2.5</td></tr>
+<tr><td>Droplet evaporation time</td><td>$t\approx d_0^2/K$, $K\sim1\ \text{mm}^2/\text{s}$ in hot air</td><td>30 µm: ≈ 1 ms; halve the diameter, quarter the time</td></tr>
+<tr><td>Exhaust speed from chemistry</td><td>$V_e\propto\sqrt{T_c/\mathcal M}$</td><td>H₂/O₂: √(3 250/10) = 18; kerosene/O₂: √(3 670/23) = 13</td></tr>
 <tr><td>Fuel heat power</td><td>$\dot Q=\dot m_f\,\text{LHV}$</td><td>2.86 g/s × 46.35 MJ/kg = 132 kW</td></tr>
 <tr><td>Arrhenius rate</td><td>$k=A\,e^{-E_a/RT}$</td><td>$E_a=80$ kJ/mol: the rate doubles about every 6.5 K near 300 K</td></tr>
 <tr><td>Semenov runaway</td><td>runaway if the heat-made curve stays above $h(T-T_a)$; critical rise $\Delta T\approx RT^2/E_a$</td><td>≈ 26 K at 500 K for $E_a=80$ kJ/mol</td></tr>
@@ -379,6 +382,11 @@ const G = [
 ['Similarity scaling','Scaling an engine in size at constant tip speed so Mach numbers stay equal: flows and thrust go as the square of the size, speed as its inverse.'],
 ['Tip-speed ratio (λ)','Blade-tip speed divided by wind speed. Fast, few-bladed wind turbines run at λ ≈ 7–9; many-bladed farm windmills at about 1.'],
 ['Weakest link','The part that gives out first (liner, turbine or bearings): the life of the engine is the life of that part.'],
+['Flash point','The lowest temperature at which a liquid gives off enough vapour to ignite in air near its surface. Petrol: −43 °C; kerosene: 38 °C or more (chapter 10).'],
+['Flammability limits (LFL, UFL)','The leanest and richest fuel–air mixtures that will carry a flame, quoted as % fuel by volume. Propane: 2.1 % to 9.5 % (chapter 10).'],
+['Atomiser','A nozzle that breaks liquid fuel into a spray of fine droplets (20–50 µm) so it evaporates fast enough to burn in the flame zone.'],
+['Vaporiser tube','A tube held in the flame in which liquid fuel is heated until it leaves as vapour; simple, but it needs a start on gas fuel.'],
+['Total-loss lubrication','Feeding a small amount of oil (about 5 % by volume mixed into the fuel) that burns in the engine after lubricating the bearings.'],
 ];
 G.sort((a, b) => a[0].localeCompare(b[0], 'en'));
 const dl = document.getElementById('gl'), q = document.getElementById('gq'), cnt = document.getElementById('gcount');

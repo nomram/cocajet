@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>10 · The chemistry of heat — Jet Engines for Dummies</title>
-<meta name="description" content="Exothermic and endothermic reactions from the very basics: bond energies, enthalpy and Hess's law, activation energy, thermal runaway and how engines and rockets keep a violent reaction under control. Calorimeter, Arrhenius, Semenov and stirred-reactor widgets.">
+<meta name="description" content="Exothermic and endothermic reactions from the very basics: bond energies, enthalpy and Hess's law, activation energy, thermal runaway and how engines and rockets keep a violent reaction under control. Fuel and oxidiser menus, flammability limits, how a jet mixes fuel and air, and why propellant mixing is left to professionals. Calorimeter, Arrhenius, Semenov and stirred-reactor widgets.">
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="vendor/katex/katex.min.css">
 <script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
@@ -19,7 +19,7 @@
 
 <span class="eyebrow">Chapter 10 · Fire and ignition</span>
 <h1>The chemistry of heat</h1>
-<div class="meta"><span>~90 min</span><span>12 widgets</span><span>from atoms to a rocket</span></div>
+<div class="meta"><span>~115 min</span><span>15 widgets</span><span>from atoms to a rocket</span></div>
 <p class="lede">Every newton of thrust in this guide ultimately comes from one thing: atoms swapping partners and the energy difference leaving as heat. This chapter starts from the very beginning (what is a chemical formula? what does “balancing” mean? how many kilograms of air does one kilogram of fuel need?), then asks why anything gets hot and why a cold pack gets cold, and builds up to the problem every engine designer lives with: <em>a reaction that releases heat speeds itself up, so how do you stop it running away?</em></p>
 
 
@@ -197,6 +197,18 @@
 <h3>Why the combustor has so many holes</h3>
 <p>Look at the CJ-1 numbers in the widget (press <em>The CJ-1 primary zone</em>): the front of the flame tube burns at about φ = 1.1, near 2 340 K. The turbine wheel would not survive that for a second (chapter 9). So the burner keeps only <strong>about a quarter of the air</strong> in the flame, and the rest (secondary and dilution holes) is mixed in after the flame has done its burning: with the target set at the 1 066 K the engine really has at the turbine inlet, the widget says about 24 % may pass through the flame. The combustor design of chapter 6 follows from one line of chemistry. (The real engine uses 26 %, and a combustion efficiency of 91 % brings the overall φ to 0.30, as the ledger shows.)</p>
 
+<h2 id="fuels" data-short="The fuel menu">The fuel menu: what could a jet burn?</h2>
+<p>So far the fuel was propane, because it is the easiest: a gas that needs only a regulator. But choosing a fuel is a trade among four questions. <strong>How much energy per kilogram?</strong> (the weight you carry). <strong>How much per litre?</strong> (the size of the tank). <strong>How does it get into the flame?</strong> (a gas through a valve; a liquid through a pump and an atomiser or a vaporiser). <strong>How can it hurt you?</strong> (flash point, poison, an invisible flame, a vapour that pools). The widget below gives the numbers, computed from the same equations as the earlier sections; click a bar to read the practical notes for that fuel.</p>
+<div data-widget="fuel-menu"></div>
+<p>Four things to notice:</p>
+<ul>
+<li><strong>The hydrocarbons are nearly the same.</strong> Methane, propane, butane, petrol and kerosene all hold 43–50 MJ/kg, need about 15–17 kg of air per kilogram and burn at 2 300–2 350 K. Swapping among them does not change the turbine-temperature problem; the dilution holes handle all of them. What differs is delivery and safety.</li>
+<li><strong>Alcohols carry some oxygen already.</strong> Ethanol is C₂H₆O: a third of its mass is oxygen that is already attached, so it holds only 27 MJ/kg and needs 9 kg of air instead of 15. For a jet, which has air for free, that oxygen is dead weight: you need 1.6 times the flow (methanol: twice). For a <em>rocket</em>, which must carry its oxidiser, it is a bonus: the German V-2 of 1944 burnt alcohol with liquid oxygen.</li>
+<li><strong>Hydrogen wins on mass and loses on volume.</strong> 120 MJ/kg, but even compressed to 350 bar a litre holds only 2.9 MJ, an eighth of liquid propane. That is why hydrogen rockets have enormous tanks (chapter 14).</li>
+<li><strong>The flash point decides who may store it in a tank.</strong> The flash point is the lowest temperature at which the liquid gives off enough vapour to ignite. Petrol’s is −43 °C: above its liquid there is always an explosive mixture. Kerosene’s is 38 °C or more: the vapour space is usually too lean to burn. That single number is why aircraft burn kerosene and why a garage jerry-can of petrol is a bad fuel for a turbine.</li>
+</ul>
+<div class="callout tip"><span class="ct">Which fuel for the CJ-1?</span>Propane (the default of the whole guide: no pump, no filter, no soot), or kerosene / Jet-A / paraffin lamp oil / diesel when you want more range per litre and are ready to build the pump and vaporiser of chapter 8. Not petrol (flash point), and not alcohols until you have a working engine to compare against (twice the flow, a bigger fuel line, a different jet size).</div>
+
 <h2 id="rate" data-short="Why not instantly?">Why doesn’t everything burn at once? Activation energy</h2>
 <p>A tank of petrol and the air around it sit together all day. The reaction is hugely exothermic and still nothing happens. Why? Before bonds can re-form, the old ones have to be stretched and partly broken: the molecules must climb an <strong>energy hill</strong>, the <strong>activation energy</strong> $E_a$. Only the few molecules that collide hard enough at the right moment make it over. At temperature $T$ the fraction with enough energy is the <strong>Boltzmann factor</strong>:</p>
 <div class="eq">$$k = A\,e^{-E_a/RT}$$</div>
@@ -233,6 +245,19 @@
 <div data-widget="particle-size"></div>
 <p>Two engineering consequences. In a jet engine, liquid fuel is sprayed into droplets of ~30 µm so that each burns in about a millisecond: the combustor is only a few centimetres long because of this (propane, being a gas, needs no droplets, which is why our engine is so simple). In solid-propellant rockets the burn rate is tuned by the particle size of the ingredients and by a pinch of catalyst, among other things (chapter 13).</p>
 
+<h2 id="mixing" data-short="Mixing fuel with things">Mixing: fuel with air, fuel with oil, and the one mixture this guide does not make</h2>
+<h3>1 · Fuel with air: the flammability window</h3>
+<p>A flame travels through a mixture only if the mixture is neither too lean nor too rich. Between the <strong>lower flammability limit</strong> (LFL) and the <strong>upper limit</strong> (UFL) a spark starts something that spreads; outside, it fizzles. The limits are usually quoted as a percentage of fuel by volume in air, and converting to the equivalence ratio φ of the earlier sections puts every fuel on the same axis. Propane burns between 2.1 % and 9.5 % (φ from 0.51 to 2.5); hydrogen from 4 % to 75 % (φ from 0.10 to 7); kerosene vapour from 0.7 % to 5 %.</p>
+<div data-widget="flammability-window"></div>
+<p>The CJ-1 shows why a combustor is built the way it is. The <strong>whole</strong> air flow is at φ ≈ 0.30, below the lean limit of every fuel in the chart: <em>that mixture could never sustain a flame</em>. The engine burns only because the front of the flame tube holds a pocket at φ ≈ 1.1, deep inside the window, and the remaining three quarters of the air is added <em>afterwards</em>, when the burning is finished and the gas only needs cooling. The same window explains the safety rules: a fuel leak that fills a room must pass through the whole window on the way to “too rich”, and the room calculator shows that an unlit CJ-1 supply leaking into a garage reaches the lean limit in minutes, not hours. <strong>Run engines outdoors, with the gas bottle outside, away from drains and low spots (propane is heavier than air and pools).</strong></p>
+<h3>2 · How the engine mixes fuel into the air</h3>
+<p>Mixing is a race against the residence time of chapter 10’s flame section. A <strong>gas</strong> fuel is injected in thin jets across the swirling air, so the two stir together in a few centimetres. A <strong>liquid</strong> has to become vapour before it can burn, and there are two routes. An <em>atomiser</em> breaks it into droplets of 20–50 µm; each droplet then evaporates in a time that grows with the square of its diameter ($t\approx d^2/K$, with $K$ of the order of 1 mm²/s in hot air), which is the same $d^2$ law as the particle-size widget above: halve the droplet and you quarter the time. A <em>vaporiser tube</em> sits in the flame and heats the fuel until it leaves as vapour; it is simple but lights slowly, which is why liquid-fuel engines start on propane. Poor mixing leaves rich pockets (soot, carbon monoxide) and lean pockets (cold, unburnt) and, worst for the engine, hot streaks that fall on the turbine blades (the <em>pattern factor</em> of chapter 9).</p>
+<h3>3 · Fuel with oil</h3>
+<p>Small turbines that have no oil pump of their own lubricate the bearings “total-loss”: a few percent of turbine oil, typically about 5 % by volume, is mixed into the kerosene and burns in the engine. The rules are mundane and all matter: use oil made for the purpose, measure it (a graduated cylinder, not an eye), mix in a clean, labelled, closed container outdoors, and never top up one fuel with another. In particular, adding petrol to a tank of kerosene drops the flash point of the <em>whole tank</em> to something close to petrol’s. (The CJ-1 uses the oil-mist bearings of chapter 6 and propane, so none of this applies to it.)</p>
+<h3>4 · Fuel with an oxidiser: the line this guide does not cross</h3>
+<p>The third kind of mixture is a different thing altogether. Fuel and <em>air</em> are safe to prepare, because the oxygen is diluted four to one by nitrogen and the mixture is flowing, carrying its heat away, in a vessel you can shut with a valve. Fuel mixed with a <strong>concentrated oxidiser</strong> (a solid oxidiser salt, liquid oxygen, peroxide) is a propellant or an explosive: there is no nitrogen to dilute it, no flow to remove the heat, and the whole batch is one runaway waiting for a spark, a bit of friction or a static discharge (the Semenov diagram, scaled up). Professional propellant mixing is done remotely, in small batches, in licensed buildings with earthing, humidity control and blast walls, by people who are trained for it. The most dangerous moments are the ordinary ones, grinding, sieving and stirring fine dry powders, and they are where self-taught experimenters are hurt, long before any rocket leaves the ground.</p>
+<div class="callout danger"><span class="ct">What this guide will not give you, and what to do instead</span>It contains <strong>no propellant formulations, no mixing ratios and no mixing, casting or curing procedures</strong> for solid propellants, and it will not add them: the chapters on solid and hybrid rockets (13 and 14) teach how the physics works so that you can read, evaluate and fly real motors, not how to make the stuff. For a rocket, the roads that actually work are: <strong>(1)</strong> water and compressed-air rockets (chapter 12), which teach the rocket equation, the nozzle and recovery with no combustion at all; <strong>(2)</strong> <strong>certified commercial motors</strong>, flown through a club (NAR in the United States, Tripoli, UKRA in the United Kingdom, or your national body), with the Level 1 to 3 path of chapter 16 to larger motors; <strong>(3)</strong> hybrid and liquid engines built by university or club teams under range-safety supervision, which is how almost every amateur altitude record was set. For a home-built <em>propulsion project</em>, the CJ-1 is the chosen answer: fuel and air meet only inside a flowing combustor, and a valve ends the reaction.</div>
+
 <h2 id="burn" data-short="Burning vs detonation">Two ways to release the same energy</h2>
 <p>A reacting front moves through a material in one of two completely different ways:</p>
 <div class="table-wrap"><table class="data">
@@ -243,6 +268,32 @@
 <tr><td>Used for</td><td>engines, burners, <strong>rocket motors</strong></td><td>mining and demolition (not propulsion, with rare research exceptions)</td></tr>
 </table></div>
 <p>Every propulsion system in this guide is a <em>deflagration held at a steady pressure inside a vessel with a hole in it</em>. A rocket motor is built to burn, never to detonate; the whole art is making the burn rate respond <em>gently</em> to pressure and giving the gas a way out. That is the topic of chapter 13.</p>
+
+<h2 id="oxidisers" data-short="The oxidiser menu">The oxidiser menu (roles, not recipes)</h2>
+<p>A jet rents its oxidiser from the sky; a rocket has to carry it. What makes a good one? <strong>A lot of oxygen per kilogram</strong> (so little dead weight travels with it), oxygen that is <strong>easy to release</strong> when the fuel arrives, a <strong>high density</strong> (small tanks), and <strong>storability and safety</strong>. The table lists the families by what they do, with the fraction of their mass that is <em>usable</em> oxygen, a figure you can work out with the formula-mass widget at the start of the chapter. (Peroxide holds 94 % oxygen by formula, but half of it leaves as the oxygen in water, which burns nothing, so only 47 % counts.)</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Oxidiser</th><th>Formula</th><th class="num">Usable oxygen (% of mass)</th><th>Where it is used</th><th>Main hazard</th></tr>
+<tr><td><strong>Air</strong></td><td>N₂ + O₂</td><td class="num">23 % (free)</td><td>every jet, every car</td><td>none; but 77 % is nitrogen ballast that must be compressed and heated</td></tr>
+<tr><td><strong>Liquid oxygen</strong></td><td>O₂</td><td class="num">100 %</td><td>most liquid rocket engines</td><td>boils at −183 °C; makes anything it touches burn fiercely, especially oil and grease</td></tr>
+<tr><td><strong>Nitrous oxide</strong></td><td>N₂O</td><td class="num">36 %</td><td>hybrid rockets, racing engines</td><td>can decompose with heat or a shock, releasing heat on its own</td></tr>
+<tr><td><strong>Hydrogen peroxide</strong> (concentrated)</td><td>H₂O₂</td><td class="num">47 %</td><td>monopropellant thrusters</td><td>decomposes violently on contact with many metals and organic matter</td></tr>
+<tr><td><strong>Nitrogen tetroxide</strong></td><td>N₂O₄</td><td class="num">70 %</td><td>storable engines on spacecraft and upper stages</td><td>very toxic, corrosive; ignites on contact with its fuel (hypergolic)</td></tr>
+<tr><td><strong>Crystalline oxidiser salts</strong> (nitrates, perchlorates)</td><td>solids that hold O inside a salt</td><td class="num">≈ 45 – 60 %</td><td>the bulk of the mass of composite solid motors and fireworks (chapter 13)</td><td>fine, dry, mixed with fuel: friction- and static-sensitive; regulated almost everywhere</td></tr>
+</table></div>
+<p>Oxygen in the formula is not oxygen delivered: the molecule must release it when the fuel arrives, which is a matter of bond energies (the earlier section on bonds) and of the activation energy of the reaction. That is why oxygen in a stable molecule such as water does nothing, and oxygen in a strained one such as peroxide or perchlorate releases heat of its own as it comes out.</p>
+<h3>From chemistry to specific impulse</h3>
+<p>Chapter 12 showed that the thrust of a rocket is $\dot m V_e$ and that the exhaust speed is largest when the chamber is hot and the exhaust molecules are light. The chemistry in this chapter supplies both numbers, and puts them together as</p>
+<div class="eq">$$V_e\ \propto\ \sqrt{\frac{T_c}{\mathcal M}},\qquad I_{sp}=\frac{V_e}{g_0}$$</div>
+<p>with $T_c$ the chamber (flame) temperature and $\mathcal M$ the average molar mass of the exhaust. The published values below are why the hydrogen engine, with the <em>coolest</em> flame, still has the highest specific impulse: its exhaust is mostly water vapour mixed with spare hydrogen, so $\mathcal M$ is about 10 g/mol instead of 22.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Propellant pair (published, rounded)</th><th class="num">T<sub>c</sub> (K)</th><th class="num">Exhaust M (g/mol)</th><th class="num">√(T<sub>c</sub>/M)</th><th class="num">Isp, vacuum (s)</th></tr>
+<tr><td>Liquid hydrogen + liquid oxygen</td><td class="num">≈ 3 250</td><td class="num">≈ 10</td><td class="num">18</td><td class="num">≈ 450</td></tr>
+<tr><td>Methane + liquid oxygen</td><td class="num">≈ 3 550</td><td class="num">≈ 20</td><td class="num">13</td><td class="num">≈ 360</td></tr>
+<tr><td>Kerosene + liquid oxygen</td><td class="num">≈ 3 670</td><td class="num">≈ 23</td><td class="num">13</td><td class="num">≈ 350</td></tr>
+<tr><td>Composite solid</td><td class="num">≈ 3 400</td><td class="num">≈ 28</td><td class="num">11</td><td class="num">≈ 265</td></tr>
+</table></div>
+<p>The ordering follows the ratio, not the flame temperature, and the last column is the number the chart below plots against density: the quantity that finally decides how big the tanks must be.</p>
+<div data-widget="propellant-chart"></div>
 
 <h2 id="care" data-short="Handling chemicals">Handling the chemistry sensibly</h2>
 <ul>
@@ -266,6 +317,10 @@
 <li>A flame is a stabilised runaway: residence time versus burning speed gives ignition, blow-out and hysteresis. The CJ-1’s primary zone is held a few times above its blow-out limit.</li>
 <li>The flame temperature follows from an energy balance on the balanced equation (about 2 300 K for propane–air), held down by dissociation. The turbine limit forces the combustor to dilute: only about a quarter of the air goes through the flame.</li>
 <li>Surface area sets the burn rate: finer pieces burn faster (t ∝ d²). Burning (deflagration) and detonation are different physics; rockets are built for the first.</li>
+<li>Hydrocarbon fuels are all alike (43–50 MJ/kg, 2 300 K); alcohols carry oxygen and hold less energy per kilogram; hydrogen holds the most per kilogram and the least per litre. The flash point decides which liquids may sit in a tank: petrol no, kerosene yes.</li>
+<li>A flame needs a mixture between the lower and upper flammability limits. The CJ-1’s whole air flow (φ ≈ 0.30) is outside the window; only the primary zone (φ ≈ 1.1) is inside it, and the rest of the air comes later.</li>
+<li>Fuel and air are mixed by jets (gas) or atomised droplets and vaporiser tubes (liquid); the droplet evaporation time goes as $d^2$. Fuel and a concentrated oxidiser are a different class of mixture, handled only by professionals; this guide gives no formulations, ratios or procedures for them.</li>
+<li>Exhaust speed goes as $\sqrt{T_c/\mathcal M}$: that is why hydrogen, with the coolest flame, has the highest specific impulse.</li>
 </ul>
 
 <div data-widget="quiz">
@@ -281,7 +336,11 @@
  {"q":"Petrol holds 10× more energy per kg than TNT. Why is TNT still “stronger”?","o":["It is not stronger","TNT carries its own oxygen and releases the energy in microseconds","TNT is denser","TNT burns hotter"],"a":1,"why":"The petrol figure doesn’t count the air’s oxygen. Per kg of fuel + oxygen they are comparable. TNT is dangerous because of how fast it releases the energy (detonation), not how much it holds."},
  {"q":"A reaction’s rate doubles for every 10 K. What does a 50 K rise do?","o":["×2","×5","×32","×100 000"],"a":2,"why":"Five doublings: 2⁵ = 32."},
  {"q":"On a Semenov diagram, which change makes runaway MORE likely?","o":["More cooling surface","Lower ambient temperature","A larger heap of the same reactant (less surface per kg)","A catalyst that is removed"],"a":2,"why":"Heat made scales with the mass, heat lost with the surface. A bigger pile loses relatively less heat, so the loss line gets flatter."},
- {"q":"What does the stirred-reactor model say happens when the gas flows through too fast?","o":["The flame burns hotter","The flame blows out","Nothing changes","The reaction becomes endothermic"],"a":1,"why":"Too short a residence time: the reaction cannot finish, the temperature drops, the rate drops further: blow-out."}
+ {"q":"What does the stirred-reactor model say happens when the gas flows through too fast?","o":["The flame burns hotter","The flame blows out","Nothing changes","The reaction becomes endothermic"],"a":1,"why":"Too short a residence time: the reaction cannot finish, the temperature drops, the rate drops further: blow-out."},
+ {"q":"Why can the CJ-1 burn when its overall mixture is φ ≈ 0.30, below propane’s lean limit?","o":["The limit does not apply to turbines","Only the front pocket of the flame tube burns, at φ ≈ 1.1 inside the window; the remaining air is added after the burning is finished","Propane burns at any mixture in a hot engine","The compressor makes the air richer"],"a":1,"why":"The primary zone is held inside the flammability window; dilution air joins downstream, where it only cools the gas."},
+ {"q":"Why is petrol a bad fuel for a turbine tank while kerosene is acceptable?","o":["Petrol has less energy","Petrol’s flash point (−43 °C) means its vapour space is always explosive; kerosene’s (38 °C or more) is normally too lean to burn","Petrol is heavier","Kerosene is a gas"],"a":1,"why":"The flash point is the temperature at which the liquid makes an ignitable vapour; petrol is above it at any normal temperature."},
+ {"q":"Why does hydrogen/oxygen have a higher specific impulse than kerosene/oxygen even though its flame is cooler?","o":["It is denser","Its exhaust molecules are much lighter (small M), and exhaust speed goes as √(T/M)","It burns slower","It contains more carbon"],"a":1,"why":"Lighter exhaust moves faster for the same heat: M ≈ 10 g/mol against ≈ 23."},
+ {"q":"What kind of mixing does this guide leave to licensed professionals?","o":["Fuel with air in a combustor","Turbine oil into kerosene","Fuel with a concentrated oxidiser to make a propellant","Propane with butane"],"a":2,"why":"With no nitrogen to dilute it and no flow to carry heat away, the whole batch is a runaway waiting for friction, static or heat."}
 ]</script>
 </div>
 

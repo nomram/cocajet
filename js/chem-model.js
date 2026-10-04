@@ -80,6 +80,7 @@ export const FUELS = {
   propane:  { name: 'Propane (our fuel)', f: 'C3H8', C: 3, H: 8, O: 0, hf: -103.85 },
   butane:   { name: 'Butane (lighter gas)', f: 'C4H10', C: 4, H: 10, O: 0, hf: -125.6 },
   ethanol:  { name: 'Ethanol (alcohol)', f: 'C2H6O', C: 2, H: 6, O: 1, hf: -234.8 },
+  methanol: { name: 'Methanol (wood alcohol)', f: 'CH4O', C: 1, H: 4, O: 1, hf: -201.0 },
   octane:   { name: 'Octane (petrol)', f: 'C8H18', C: 8, H: 18, O: 0, hf: -208.4 },
   kerosene: { name: 'Kerosene / Jet-A (average)', f: 'C12H23', C: 12, H: 23, O: 0, hf: -291.7 },
 };
