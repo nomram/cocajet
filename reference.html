@@ -88,9 +88,43 @@
 <tr><td>Bypass fan (ideal)</td><td>$\tfrac12\dot m_{tot}(V_e^2-V_0^2)=\eta\,P_{core}$</td><td>B = 4: 116 N on the stand</td></tr>
 </table></div>
 
+
+<h3>Chemistry, runaway and ignition (chapters 10–11)</h3>
+<div class="table-wrap"><table class="data">
+<tr><th>Quantity</th><th>Formula</th><th>Example</th></tr>
+<tr><td>Reaction enthalpy from bonds</td><td>$\Delta H=\sum E_{\text{broken}}-\sum E_{\text{made}}$ (negative: exothermic)</td><td>propane + O₂: −2 044 kJ/mol = 46.35 MJ/kg</td></tr>
+<tr><td>Hess’s law</td><td>$\Delta H=\sum\Delta H_f(\text{prod})-\sum\Delta H_f(\text{react})$</td><td>3(−393.5) + 4(−241.8) − (−103.8) kJ/mol</td></tr>
+<tr><td>Fuel heat power</td><td>$\dot Q=\dot m_f\,\text{LHV}$</td><td>2.86 g/s × 46.35 MJ/kg = 132 kW</td></tr>
+<tr><td>Arrhenius rate</td><td>$k=A\,e^{-E_a/RT}$</td><td>$E_a=80$ kJ/mol: the rate doubles about every 6.5 K near 300 K</td></tr>
+<tr><td>Semenov runaway</td><td>runaway if the heat-made curve stays above $h(T-T_a)$; critical rise $\Delta T\approx RT^2/E_a$</td><td>≈ 26 K at 500 K for $E_a=80$ kJ/mol</td></tr>
+<tr><td>Minimum ignition energy</td><td>grows steeply toward the lean and rich limits, with gas speed, and for a gap below the quenching distance</td><td>propane in still air: 0.25 mJ at φ ≈ 1.1; ~100× more at the limits</td></tr>
+<tr><td>Paschen breakdown</td><td>$V_b=\dfrac{B\,p\,d}{\ln(Apd)-\ln\ln(1+1/\gamma)}$</td><td>air, 1 mm gap, 1 bar: ≈ 5 kV</td></tr>
+<tr><td>Spark energy stored</td><td>capacitor $E=\tfrac12CV^2$, coil $E=\tfrac12LI^2$</td><td>1 µF at 1 kV: 0.5 J (only a fraction reaches the gas)</td></tr>
+</table></div>
+
+<h3>Rockets and electric propulsion (chapters 12–15)</h3>
+<div class="table-wrap"><table class="data">
+<tr><th>Quantity</th><th>Formula</th><th>Example</th></tr>
+<tr><td>Rocket thrust</td><td>$F=\dot m_pV_e+(P_e-P_a)A_e$</td><td>no incoming-air term: works in a vacuum</td></tr>
+<tr><td>Specific impulse</td><td>$I_{sp}=F/(\dot m_p g_0)=V_{e,eff}/g_0$</td><td>CJ-1: 58 N / (2.86 g/s × 9.81) = 2 070 s; kerosene/O₂ ≈ 330 s</td></tr>
+<tr><td>Rocket equation</td><td>$\Delta v=I_{sp}g_0\ln(m_0/m_f)$</td><td>9.4 km/s at 330 s needs a mass ratio of 18</td></tr>
+<tr><td>Staging (identical stages)</td><td>$\lambda=\pi^{1/n}$, $R=\dfrac1{\lambda+\varepsilon(1-\lambda)}$, $\Delta v=nI_{sp}g_0\ln R$</td><td>2 stages, ε = 0.10, payload 2 %: 10.2 km/s</td></tr>
+<tr><td>Nozzle exit speed</td><td>$V_e=\sqrt{\dfrac{2\gamma}{\gamma-1}\dfrac{R_uT_c}{\mathcal M}\Big[1-(P_e/P_c)^{\frac{\gamma-1}{\gamma}}\Big]}$</td><td>Mach 2.6 at ε = 4, γ = 1.19</td></tr>
+<tr><td>Characteristic velocity, thrust coefficient</td><td>$c^*=\dfrac{\sqrt{RT_c}}{\sqrt\gamma\,(2/(\gamma+1))^{(\gamma+1)/(2(\gamma-1))}}$, $F=C_FP_cA_t$</td><td>$c^*\approx1\,430$ m/s, $C_F\approx1.5$</td></tr>
+<tr><td>Solid burn rate</td><td>$r=aP_c^{\,n}$</td><td>4 mm/s at 1 MPa, n = 0.35: 6 mm/s at 3.4 MPa</td></tr>
+<tr><td>Solid chamber pressure</td><td>$P_c=(\rho c^*aK_n)^{1/(1-n)}$, $K_n=A_b/A_t$</td><td>$K_n=219$: 3.35 MPa; stable only for $n<1$</td></tr>
+<tr><td>Hybrid regression</td><td>$\dot r=aG_{ox}^{\,n}$, $G_{ox}=\dot m_{ox}/A_p$, $\dot m_f\propto d^{1-2n}$</td><td>$n>0.5$: O/F rises as the port widens</td></tr>
+<tr><td>Hard-start pressure jump</td><td>$\Delta P=(\gamma-1)\,m\,q/V$</td><td>10 g in 1 L, q = 3.5 MJ/kg: ≈ 9 MPa</td></tr>
+<tr><td>Ducted fan thrust (static)</td><td>$F=(4\rho A_e)^{1/3}P_{flow}^{2/3}$</td><td>90 mm fan, 2.5 kW of flow power: 55 N</td></tr>
+<tr><td>Jet power</td><td>$P=\tfrac12FV_e=\tfrac12F\,I_{sp}g_0$</td><td>1 tonne hovering at 3 000 s: 147 MW</td></tr>
+<tr><td>Ion exhaust speed and thrust</td><td>$v=\sqrt{2qV/m}$, $F=I\sqrt{2mV/q}$, $F/P=2\eta/v$</td><td>xenon, 1.1 kV: 40 km/s</td></tr>
+<tr><td>Space-charge limit</td><td>$J=\tfrac49\varepsilon_0\sqrt{2q/m}\,V^{3/2}/d^2$</td><td>174 A/m² at 1.1 kV, 1 mm</td></tr>
+<tr><td>Ion wind thrust</td><td>$F=\eta\,I\,d/\mu$, $\mu\approx2\times10^{-4}$ m²/(V·s)</td><td>1.3 mA across 30 mm: ≈ 70 mN</td></tr>
+</table></div>
+
 <h2 id="glossary" data-short="Glossary">Glossary</h2>
 <div class="widget" style="padding:14px 16px">
-  <input id="gq" type="search" placeholder="Search 70 terms (e.g. surge, creep, slip)…" aria-label="Search the glossary" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--line-2);background:var(--panel);color:var(--text);font:inherit">
+  <input id="gq" type="search" placeholder="Search the glossary (e.g. surge, creep, Isp, runaway)…" aria-label="Search the glossary" style="width:100%;padding:10px 14px;border-radius:10px;border:1px solid var(--line-2);background:var(--panel);color:var(--text);font:inherit">
   <div id="gcount" style="font-size:.8rem;color:var(--muted);margin:8px 2px"></div>
   <dl id="gl" style="margin:0"></dl>
 </div>
@@ -129,6 +163,9 @@
 <details class="deep"><summary>Why does the engine need a starter?</summary><div><p>At low speed the compressor squeezes so little air that the turbine can only break even with a very hot flame, so the engine cannot sustain itself. The starter spins the rotor up to about 17 000 rpm, we light the fuel, and the starter keeps helping until the engine is self-sustaining at roughly 45 000 rpm (idle is 48 000). In the simulator you can watch this happen and see what a hot start or a wet start does.</p></div></details>
 <details class="deep"><summary>Can I print the STL files and run the engine?</summary><div><p>No. A printed compressor wheel would shatter; a printed turbine wheel would melt. Printing is for fit-checks, patterns for casting, jigs and gauges. The <a href="models.html#print">gallery page</a> says what each part must really be made from.</p></div></details>
 <details class="deep"><summary>How accurate is the simulator?</summary><div><p>It is a physics model with simplifications: a one-dimensional mean-line compressor, a lumped-heat metal model, a single-zone combustor. It captures trends and orders of magnitude (thrust, temperatures, the start-up sequence, how things go wrong), not the last 10 %. Real engines differ with machining quality, leaks, ambient conditions and many things not modelled. Treat it as a training aid, not as a certificate.</p></div></details>
+<details class="deep"><summary>Can I make my own rocket propellant or motor?</summary><div><p>This guide deliberately does not teach that. Chapters 12–15 explain how rockets work, in the way a university textbook does: physics, chemistry, stability and failure modes. They give no formulations and no manufacturing steps. Propellant and motor manufacture is regulated in almost every country, depends on tests that a home workshop cannot do (rate tests, proof pressure, X-ray inspection) and is a leading cause of injuries in rocketry. The safe routes are a water rocket (chapter 12) and certified motors flown through a club (NAR, Tripoli, UKRA or your national equivalent).</p></div></details>
+<details class="deep"><summary>Why not simply put an electric fan on it instead of a turbine?</summary><div><p>Chapter 15 does that comparison: a ducted fan turns electricity into thrust 27 times more efficiently than the CJ-1 turns fuel heat into thrust, but a lithium battery holds about 70 times less energy per kilogram than propane. For a five-minute run the propane jet is still lighter overall; for hobby jets that fly short sorties, the electric fan wins on simplicity and noise.</p></div></details>
+<details class="deep"><summary>Are the ion-wind and spark-plug projects safe to try at home?</summary><div><p>Not without supervision. Ion wind needs 20–40 kV (a shock hazard even at milliamps) and chapter 15 is a calculator, not a build guide. The home-made spark plug of chapter 11 is a low-power igniter for a gas burner in a test cell; read that chapter’s safety notes first and use the 3D-printed parts only as patterns and fit-checks.</p></div></details>
 <details class="deep"><summary>Does the site work offline?</summary><div><p>Yes: the 3D library, math renderer and all STL files are included in the repository (no external CDNs). Because the pages load JavaScript modules and STL files, open them through a local web server (<code>python3 -m http.server</code> in the project folder) rather than by double-clicking, since browsers block these requests from <code>file://</code> pages.</p></div></details>
 <details class="deep"><summary>How loud is it, really?</summary><div><p>115–125 dB at 1 m at full power: comparable to a jet-ski or a chainsaw, but with a shriek that carries. Hearing damage starts in seconds without protection. The <a href="safety.html">safety page</a> has a calculator.</p></div></details>
 <details class="deep"><summary>Can I use these materials and numbers in my own design?</summary><div><p>Use them to learn and to estimate, not as design allowables. Material curves are rounded, representative values; real alloys vary by supplier, heat treatment and batch. A real design needs the data sheet of the actual material and a safety factor you can justify.</p></div></details>
@@ -149,6 +186,17 @@
 <div class="card"><span class="num">PAPER</span><h3>Betz, A. (1920)</h3><p>“Das Maximum der theoretisch möglichen Ausnützung des Windes durch Windmotoren”, <em>Zeitschrift für das gesamte Turbinenwesen</em> 26. The 16/27 limit.</p></div>
 <div class="card"><span class="num">STANDARDS</span><h3>ISO 2533 · ISO 21940-11 · EN 1993-1-2 / 1-4</h3><p>Standard atmosphere (chapter 1); rotor balancing grades, formerly ISO 1940-1 (chapter 8); strength of steel and stainless steel at high temperature (chapter 9).</p></div>
 <div class="card"><span class="num">FREE ONLINE</span><h3>NASA Glenn, <em>Beginner’s Guide to Propulsion</em></h3><p>grc.nasa.gov, in the K-12 section: engine animations, the thrust equation and an engine simulator.</p></div>
+<div class="card"><span class="num">TEXTBOOK</span><h3>Sutton &amp; Biblarz, <em>Rocket Propulsion Elements</em></h3><p>Wiley, 9th ed. 2017. The standard text behind chapters 12–14: nozzles, solid motor ballistics, liquid and hybrid engines.</p></div>
+<div class="card"><span class="num">COMBUSTION</span><h3>Turns, <em>An Introduction to Combustion</em></h3><p>McGraw-Hill, 3rd ed. 2011. Thermochemistry, flame propagation, ignition and the stirred reactor (chapters 10–11).</p></div>
+<div class="card"><span class="num">COMBUSTION</span><h3>Frank-Kamenetskii, <em>Diffusion and Heat Transfer in Chemical Kinetics</em></h3><p>Plenum, 1969. The theory of thermal explosion: the origin of the runaway criterion in chapter 10.</p></div>
+<div class="card"><span class="num">IGNITION</span><h3>Heywood, <em>Internal Combustion Engine Fundamentals</em></h3><p>McGraw-Hill, 2nd ed. 2018. Spark ignition, flame kernels and plug behaviour (chapter 11).</p></div>
+<div class="card"><span class="num">PLASMA</span><h3>Lieberman &amp; Lichtenberg, <em>Principles of Plasma Discharges and Materials Processing</em></h3><p>Wiley, 2nd ed. 2005. Paschen’s law, breakdown and corona; also the physics of ion sources.</p></div>
+<div class="card"><span class="num">PAPER</span><h3>Paschen, F. (1889)</h3><p>“Über die zum Funkenübergang in Luft, Wasserstoff und Kohlensäure bei verschiedenen Drucken erforderliche Potentialdifferenz”, <em>Annalen der Physik</em> 273, 69–96.</p></div>
+<div class="card"><span class="num">ELECTRIC PROPULSION</span><h3>Goebel &amp; Katz, <em>Fundamentals of Electric Propulsion: Ion and Hall Thrusters</em></h3><p>JPL / Wiley, 2008. Free from NASA JPL. The Child–Langmuir limit and ion thruster design (chapter 15).</p></div>
+<div class="card"><span class="num">PAPER</span><h3>Karabeyoglu et al. (2001)</h3><p>“Development and testing of paraffin-based hybrid rocket fuels”, AIAA 2001-4503. Liquefying fuels and why they regress faster (chapter 14).</p></div>
+<div class="card"><span class="num">PAPER</span><h3>Xu et al. (2018)</h3><p>“Flight of an aeroplane with solid-state propulsion”, <em>Nature</em> 563, 532–535. The first ion-wind aeroplane (chapter 15).</p></div>
+<div class="card"><span class="num">HOBBY ROCKETRY</span><h3>NAR · Tripoli · UKRA · ThrustCurve.org · OpenRocket</h3><p>Clubs, safety codes and certification for model and high-power rocketry; certified motor data; a free flight simulator (chapter 13).</p></div>
+<div class="card"><span class="num">FREE ONLINE</span><h3>NASA, <em>Dawn mission</em> and <em>Rocket Propulsion</em> pages</h3><p>nasa.gov, in the open: ion propulsion in practice and basic rocket relations (chapters 12 and 15).</p></div>
 <div class="card"><span class="num">DATA SHEETS</span><h3>Special Metals: Inconel 625 and 718</h3><p>Manufacturer data sheets for strength and creep data of the nickel alloys; stainless producers publish the same for 304, 310S and 321.</p></div>
 </div>
 
@@ -168,6 +216,48 @@
 
 <script type="module">
 const G = [
+['Activation energy','The energy hill a reaction must climb before it can run downhill. Raising the temperature helps molecules climb it: the Arrhenius law (chapter 10).'],
+['Arrhenius law','The reaction rate grows exponentially with temperature, k = A·exp(−Eₐ/RT): why a small temperature rise can speed a reaction a lot.'],
+['BATES grain','A stack of propellant segments, each burning on the bore and both end faces, giving a nearly constant thrust (chapter 13).'],
+['Bond energy','The energy needed to pull two bonded atoms apart. Burning releases energy because the new bonds (CO₂, H₂O) are stronger than the old ones.'],
+['CATO','“Catastrophic at take-off”: a motor failure at ignition, typically from a cracked grain or blocked nozzle raising the pressure beyond the case.'],
+['Child–Langmuir limit','The maximum current density an ion thruster’s grids can pass before the ions’ own charge shields the field (chapter 15).'],
+['Chugging','A low-frequency pressure oscillation in hybrid or liquid engines, caused by feedback through the propellant feed system (chapter 14).'],
+['Characteristic velocity (c*)','A measure of how well the propellant and chamber make pressure, c* = P_c A_t/ṁ; independent of the nozzle. About 1 430 m/s for a typical solid.'],
+['Corona discharge','A faint glowing ionisation of the air near a sharp electrode at high voltage, below the level that sparks. The basis of ion wind.'],
+['De Laval nozzle','A converging–diverging nozzle: sonic at the throat, supersonic in the bell (chapter 12). The shape of every rocket engine.'],
+['Deflagration / detonation','Burning that advances by heat conduction at subsonic speed, versus a shock-driven reaction at supersonic speed. Motors are built to contain the first.'],
+['Delta-v (Δv)','The change in speed a rocket can give itself: Δv = I_sp g₀ ln(m₀/m_f).'],
+['Endothermic / exothermic','A reaction that absorbs heat (cooling its surroundings) or releases it (heating them). Burning fuel is exothermic.'],
+['Erosive burning','A propellant burning faster than its normal rate because gas races across its surface in a narrow channel.'],
+['Equilibrium pressure','The chamber pressure at which the gas made by the burning propellant equals the gas leaving through the throat.'],
+['Grain','The shaped block of solid propellant (or fuel) inside a motor. Its shape fixes the burning area, and so the thrust curve.'],
+['Hall thruster','An electric thruster in which a magnetic field traps electrons that ionise the propellant; the electric field accelerates the ions.'],
+['Hard start','A violent ignition caused by propellant reaching the chamber before the flame; in a jet engine, a hot start.'],
+['Heat range (spark plug)','How quickly a plug conducts heat from its tip: hot plugs burn off deposits, cold plugs resist pre-ignition (chapter 11).'],
+['Hybrid rocket','A rocket with a solid fuel grain and a flowing oxidiser, so it can be throttled and shut off with a valve.'],
+['Hypergolic','Propellants that ignite on contact, with no igniter.'],
+['Ion thruster','An electric engine that ionises a gas and accelerates the ions through a voltage: tens of km/s exhaust, millinewtons of thrust.'],
+['Isp (specific impulse)','Thrust per weight-flow of propellant, in seconds: I_sp = F/(ṁ g₀). The fuel efficiency of any engine.'],
+['Jet power','The kinetic power of the exhaust, ½ṁV_e² = ½FV_e: what limits electric thrusters.'],
+['Kn (burning-area ratio)','The ratio of burning surface to throat area in a solid motor; sets the chamber pressure.'],
+['Mass ratio','Starting mass divided by final mass of a rocket: m₀/m_f.'],
+['Minimum ignition energy (MIE)','The smallest spark energy that lights a given mixture; 0.25 mJ for propane at the best mixture, far more near the limits.'],
+['Monopropellant','A single liquid that releases energy when it decomposes over a catalyst.'],
+['Neutraliser','The electron source in an ion thruster that keeps the spacecraft from charging up.'],
+['O/F ratio','Oxidiser-to-fuel mass ratio in a rocket; its optimum maximises performance. In a hybrid it shifts during the burn.'],
+['Paschen curve','The breakdown voltage of a gas against pressure × gap: why a spark plug sparks, and why a sealed gap does not spark in a vacuum.'],
+['Pressure exponent (n)','How steeply a solid propellant’s burn rate rises with pressure, r = aPⁿ. It must be below 1 for a stable motor.'],
+['Ramjet / scramjet','Engines without a compressor: the vehicle’s speed squeezes the air. In a scramjet the air stays supersonic through the burner.'],
+['Regenerative cooling','Cooling a rocket chamber with its own fuel, which then burns, so the wall’s heat is recovered.'],
+['Regression rate','How fast the surface of a hybrid’s fuel grain recedes, ṙ = aG_oxⁿ.'],
+['Rocket equation','Tsiolkovsky’s Δv = I_sp g₀ ln(m₀/m_f): the speed gained grows only with the logarithm of the mass ratio.'],
+['Semenov diagram','Heat made by a reaction against heat lost to the surroundings, as a function of temperature; shows when a steady state exists and when it runs away.'],
+['Specific impulse (vacuum)','Isp at zero ambient pressure; higher than the sea-level value because there is no back-pressure on the nozzle.'],
+['Staging','Dropping empty tanks and engines during ascent so they do not have to be accelerated further.'],
+['Thermal runaway','A self-accelerating reaction: more heat raises the rate, which makes more heat, until something fails.'],
+['Throat','The narrowest part of a nozzle, where a choked flow reaches Mach 1 and the mass flow is fixed.'],
+['Volumetric impulse','Impulse per litre of propellant, ρ·I_sp: why hydrogen needs huge tanks despite its high Isp.'],
 ['Afterburner','A fuel-spraying ring and flame-holder in the jet pipe that burns the unused oxygen after the turbine for extra thrust, at a high fuel cost (chapter 8).'],
 ['Air–fuel ratio (AFR)','Mass of air divided by mass of fuel. Propane burns completely at 15.6:1 (stoichiometric); our engine runs at about 52:1 overall because most air only cools.'],
 ['Angle of attack','The angle between a wing or blade’s chord line and the oncoming air. Lift rises with it until the wing stalls at 12–15°.'],

@@ -19,10 +19,16 @@ An interactive, from-scratch guide to jet engines, written in plain HTML, CSS an
 | `07-run.html` | The engine simulator: start, throttle, air, flame and heat, failures |
 | `08-improve.html` | Cheap upgrades ranked by thrust per dollar, balancing, bearings, turbofan, controller |
 | `09-materials.html` | Strength vs temperature, creep, centrifugal and thermal stress, alloy choice |
+| `10-chemistry.html` | The chemistry of heat: endo/exothermic reactions, bond energies, Hess's law, Arrhenius, Semenov runaway and its control, the stirred reactor, particle size |
+| `11-ignition.html` | Ignition and spark plugs: minimum ignition energy, Paschen's law, coil / CDI / piezo, plug anatomy and heat range, igniter placement, a home-made plug with printable parts |
+| `12-rockets.html` | Rockets: the rocket equation and staging, the de Laval (venturi) nozzle, choking, thrust vs speed, a water rocket |
+| `13-solid.html` | Solid rockets at concept level: burn-rate law, chamber-pressure balance and stability, grain geometry bench, motor classes, failure modes |
+| `14-hybrid.html` | Hybrid, liquid and air-breathing engines: O/F shift, propellant choice, hard starts, Isp vs Mach |
+| `15-electric.html` | Electric propulsion: ducted fan vs turbojet, ion thrusters, ion wind, one map of every engine |
 | `models.html` | STL gallery: per-part downloads, whole assembly, one-click ZIP, printing and casting notes |
 | `reference.html` | Formula sheet, searchable glossary, bill of materials, FAQ, sources |
 
-About 50 interactive widgets (plots, calculators, simulators) are shared by the chapters. A single small physics model (`js/engine-model.js`) drives all the cycle calculators, the compressor map, the thrust numbers and the simulator, so the numbers agree everywhere.
+About 75 interactive widgets (plots, calculators, simulators) are shared by the chapters. Every chapter opens with a **thread strip** (`js/thread.js`): the question the chapter answers, what it adds to the running ledger, the ledger itself (live numbers from the engine model, from air to 58 N) and a bridge to the next chapter. A single small physics model (`js/engine-model.js`) drives all the cycle calculators, the compressor map, the thrust numbers and the simulator, so the numbers agree everywhere.
 
 ## Run it locally
 
@@ -67,12 +73,19 @@ js/site.js                    navigation, theme, KaTeX loader, lazy widget loade
 js/ui.js, js/plot.js          small DOM helpers and a canvas plotting library
 js/engine-model.js            the physics: ISA, compressor, combustor, turbine, nozzle, spool matching
 js/engine-sim.js              the running-engine simulator: start sequence, ECU, failures, thermal model
+js/thermo.js                  real-gas properties (vibrational cp, enthalpy, entropy), humidity, propane vapour pressure
+js/fuel-supply.js             propane bottle, regulator and valve (freeze-off)
+js/ignition-model.js          minimum ignition energy, Paschen's law, plug and igniter models
+js/rocket-model.js            nozzle relations, rocket equation, motor classes
+js/solid-model.js             solid-motor interior ballistics (burn rate, chamber filling, grains)
+js/electric-model.js          ducted fan, ion thruster and ion-wind relations
+js/thread.js                  the red thread: chapter questions, live ledger, bridges
 js/viewer3d.js, js/flow3d.js  three.js viewer and the air / flame / exhaust particle system
 js/widgets/*.js               one file per interactive widget (<div data-widget="name">)
 models/                       STL files + manifest
 img/                          cross-section drawing, part thumbnails
 vendor/                       three.js r160 and KaTeX (both MIT), copied from npm, no CDN
-tools/                        STL generator, section drawing, thumbnails, vendoring, headless QA
+tools/                        STL generator, extras (DIY plug), numbers and regression tests, section drawing, thumbnails, vendoring, headless QA
 ```
 
 A widget is added by writing `js/widgets/<name>.js` with `export default function init(el) {…}` and dropping `<div data-widget="<name>"></div>` into a page. It loads when it scrolls into view.
@@ -84,9 +97,16 @@ A widget is added by writing `js/widgets/<name>.js` with `export default functio
 ```sh
 node tools/qa.mjs index.html 07-run.html --full           # scroll through, screenshot
 node tools/qa.mjs 08-improve.html --widgets               # one screenshot per widget
+node tools/test-sim.mjs                                   # regression tests of the simulator scenarios
+node tools/numbers.mjs                                    # print the model's headline numbers (keep the text in step with them)
+node tools/build-extras.mjs                               # regenerate models/extras (home-made spark plug STLs)
 ```
 
 It needs Playwright and `http-server` to be installed globally.
+
+## Rocket chapters: scope
+
+Chapters 12–15 are physics and engineering at textbook level. They contain **no propellant formulations, mixing ratios or manufacturing steps**; the widgets work with generic burn-rate numbers, not ingredients. Readers who want to fly rockets are directed to the water rocket (chapter 12) and to certified motors through a club (NAR, Tripoli, UKRA).
 
 ## Safety and honesty
 

@@ -20,11 +20,11 @@
 <section class="hero">
   <div class="hero-text">
     <div>
-      <span class="eyebrow">An interactive guide · 9 chapters · 45+ widgets · 14 STL parts</span>
+      <span class="eyebrow">An interactive guide · 15 chapters · 75+ widgets · 14 STL parts + a spark plug</span>
       <h1>Jet engines<br>for <span>dummies</span></h1>
     </div>
     <div>
-      <p class="lede" style="font-size:1.1rem">Start with a breath of air. Finish with a working turbojet built around a <strong>Coke can</strong>. Every idea comes with a plot or widget you can play with, and every part exists as a real 3D model you can spin, cut open, download and run.</p>
+      <p class="lede" style="font-size:1.1rem">Start with a breath of air. Finish with a working turbojet built around a <strong>Coke can</strong>. Every idea comes with a plot or widget you can play with, and every part exists as a real 3D model you can spin, cut open, download and run. Then keep going: fire and ignition, and from the jet to the rocket and the ion thruster.</p>
       <div class="btn-row" style="margin-top:12px">
         <a class="btn fire" href="01-air.html">Start with the air →</a>
         <a class="btn" href="06-build.html">Jump to the 3D build</a>
@@ -50,12 +50,22 @@
 </div>
 <p class="prose">That is the <strong>Brayton cycle</strong>. Everything in this guide is a closer look at one of those four steps, and at the physics (Newton, gas laws, aerodynamics, chemistry, materials) that makes each step work.</p>
 
+<h2 id="thread">The red thread: one engine, one number</h2>
+<p class="prose">The whole guide follows a single question: <strong>how does a fist-sized machine turn 0.15 kg of air and 3 g of propane per second into 58 newtons?</strong> Every chapter adds one link to that chain, and every chapter opens with a strip that tells you which link it adds, with the live numbers (<em>the ledger</em>) from the same model that runs the simulator.</p>
+<div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(190px,1fr))">
+  <div class="card"><span class="num">I · THE SCIENCE</span><h3>What are we pushing?</h3><p>Air, force and energy, the gas laws and the cycle, wings and turbines. Chapters 1–4.</p></div>
+  <div class="card"><span class="num">II · THE ENGINE</span><h3>The machine</h3><p>The whole engine on a page, built layer by layer in 3D, then started and run. Chapters 5–7.</p></div>
+  <div class="card"><span class="num">III · LEVEL UP</span><h3>Better and tougher</h3><p>Where the fuel goes, the cheapest upgrades, and the metals that decide how hot you can go. Chapters 8–9.</p></div>
+  <div class="card"><span class="num">IV · FIRE &amp; IGNITION</span><h3>What is burning?</h3><p>Exo- and endothermic reactions, runaway and how to prevent it, then spark plugs and a home-made igniter. Chapters 10–11.</p></div>
+  <div class="card"><span class="num">V · ROCKETS</span><h3>Carry your own air</h3><p>The rocket equation and the nozzle, solid, hybrid and liquid motors, electric engines, and one map of them all. Chapters 12–15.</p></div>
+</div>
+
 <h2 id="path">Your path through the guide</h2>
 <div class="cards" id="path-cards"></div>
 
 <h2 id="how">How this guide works</h2>
 <div class="wgrid even">
-  <div class="callout"><span class="ct">Layer by layer</span>We never dump the whole engine on you. Chapters 1–4 give you the science. Chapter 5 shows the finished machine on one page. Chapter 6 then rebuilds it <em>one component at a time</em> in 3D, each new layer sitting on the last, each with the physics, the numbers and the cheap way to make it.</div>
+  <div class="callout"><span class="ct">Layer by layer</span>We never dump the whole engine on you. Chapters 1–4 give you the science. Chapter 5 shows the finished machine on one page. Chapter 6 then rebuilds it <em>one component at a time</em> in 3D, each new layer sitting on the last, each with the physics, the numbers and the cheap way to make it. A <em>thread strip</em> at the top of every chapter tells you where you are in the story.</div>
   <div class="callout fire"><span class="ct">Everything is live</span>The sliders are not decoration. The same small physics model drives the cycle calculators, the compressor map, the thrust numbers and the 3D simulator, so every number in this guide agrees with every other.</div>
 </div>
 <div class="callout violet"><span class="ct">What is “the Coke-can jet motor”?</span>
@@ -65,7 +75,8 @@
 <div class="cards">
   <a class="card" href="06-build.html"><span class="num">3D</span><h3>Layer-by-layer builder</h3><p>Scroll, and the engine assembles itself part by part. Explode it, slice it, x-ray it.</p></a>
   <a class="card" href="07-run.html"><span class="num">SIM</span><h3>Running engine simulator</h3><p>Start it, throttle up, watch the air, flame and glowing metal. Cause a surge on purpose.</p></a>
-  <a class="card" href="models.html"><span class="num">STL</span><h3>Download the parts</h3><p>14 watertight STL files + the full assembly + a one-click ZIP.</p></a>
+  <a class="card" href="models.html"><span class="num">STL</span><h3>Download the parts</h3><p>14 watertight STL files, the full assembly, a one-click ZIP, and a printable home-made spark plug.</p></a>
+  <a class="card" href="13-solid.html#grain"><span class="num">BENCH</span><h3>Rocket benches</h3><p>Design a solid grain, fly a hybrid, tune an ion thruster. Concept level, safe on a screen.</p></a>
   <a class="card" href="reference.html"><span class="num">REF</span><h3>Formulas &amp; glossary</h3><p>Every equation in one place, plus sources and further reading.</p></a>
 </div>
 
@@ -84,6 +95,12 @@ const desc = {
   '07-run.html': ['Start, run, break, learn', ['simulator']],
   '08-improve.html': ['Cheap upgrades ranked by thrust per dollar', ['bearings', 'balance', 'turbofan']],
   '09-materials.html': ['Why the can melts and what doesn’t', ['alloys', 'creep']],
+  '10-chemistry.html': ['Heat in and heat out: bonds, Arrhenius, runaway', ['exothermic', 'Semenov', 'control']],
+  '11-ignition.html': ['Sparks, plugs, heat range, a home-made igniter', ['Paschen', 'MIE', 'DIY plug']],
+  '12-rockets.html': ['Rocket equation, de Laval nozzle, a water rocket', ['Isp', 'Tsiolkovsky', 'nozzle']],
+  '13-solid.html': ['Burn rate, pressure balance, grains (concept level)', ['solid', 'stability', 'CATO']],
+  '14-hybrid.html': ['Hybrid, liquid and air-breathing engines', ['O/F shift', 'hard start', 'ramjet']],
+  '15-electric.html': ['Ducted fans, ion thrusters, ion wind, one map', ['EDF', 'ion', 'power']],
   'models.html': ['3D gallery and downloads', ['STL']],
   'reference.html': ['Formulas, glossary, sources', ['reference']],
   'safety.html': ['Energy, fire, noise and a checklist', ['safety']],

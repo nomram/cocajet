@@ -86,6 +86,18 @@
 <p>Molten metal and a damp mould can explode. Casting is a skill to learn from someone who does it, not from a paragraph. For the turbine wheel, order the casting from a foundry.</p>
 </div></details>
 
+<h2 id="extras" data-short="Extras: spark plug">Extras: the home-made spark plug (chapter 11)</h2>
+<p>Chapter 11 designs a simple igniter from hardware-store parts (an M10×1 bolt, a ceramic tube, a nickel-wire electrode) and shows a 3D model you can spin and cut open. The same parts are here as STL files, with the gap set to 0.8 mm. As with the engine parts, they are <strong>patterns and fit-checks</strong>: a printed plastic plug would melt, so print them to test your drilling and your jigs, then make the real parts from the materials in the table.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Part</th><th>Real material</th><th class="num">Mass</th><th>STL file</th></tr>
+<tr><td>Body: M10×1 stainless bolt, drilled Ø5</td><td>Stainless A2 (304)</td><td class="num">15.9 g</td><td><a href="models/extras/diy-plug-shell.stl" download>diy-plug-shell.stl</a></td></tr>
+<tr><td>Copper crush washer</td><td>Copper</td><td class="num">0.7 g</td><td><a href="models/extras/diy-plug-washer.stl" download>diy-plug-washer.stl</a></td></tr>
+<tr><td>Insulator: alumina tube Ø4.8 × Ø1.7</td><td>Alumina 96–99 %</td><td class="num">2.9 g</td><td><a href="models/extras/diy-plug-insulator.stl" download>diy-plug-insulator.stl</a></td></tr>
+<tr><td>Centre electrode: Ø1.6 Kanthal / tungsten wire</td><td>Kanthal A1 / tungsten / Inconel 600</td><td class="num">1.0 g</td><td><a href="models/extras/diy-plug-electrode.stl" download>diy-plug-electrode.stl</a></td></tr>
+<tr><td>Ground strap: 1×3 mm nichrome / stainless</td><td>Nichrome 80/20 or stainless</td><td class="num">0.2 g</td><td><a href="models/extras/diy-plug-strap.stl" download>diy-plug-strap.stl</a></td></tr>
+</table></div>
+<p><a class="btn small" href="11-ignition.html#diy">Open chapter 11, “the home-made plug” →</a></p>
+
 <h2 id="modify" data-short="Change the design">Change the design yourself</h2>
 <p>The files come from a script, not from a CAD session. Every dimension lives in one table at the top of <code>tools/build-stl.mjs</code>: impeller diameter, blade counts and angles, can diameter, hole sizes, nozzle area, and so on. To make your own variant:</p>
 <pre><code>git clone https://github.com/nomram/cocajet.git
