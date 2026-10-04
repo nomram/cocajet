@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>12 · Rockets: the other way to push — Jet Engines for Dummies</title>
+<meta name="description" content="How a rocket differs from a jet: carrying your own oxygen, specific impulse, the Tsiolkovsky rocket equation and staging, the converging-diverging (venturi / de Laval) nozzle, and a water rocket you can build safely.">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="vendor/katex/katex.min.css">
+<script type="importmap">{"imports":{"three":"./vendor/three/three.module.js","three/addons/":"./vendor/three/"}}</script>
+<script type="module" src="js/site.js"></script>
+</head>
+<body>
+<header id="topbar"></header>
+<div class="layout">
+<nav class="sidenav" id="sidenav" aria-label="Chapters"></nav>
+<main id="main">
+<article class="chapter">
+
+<span class="eyebrow">Chapter 12 · Rockets</span>
+<h1>Rockets: the other way to push</h1>
+<div class="meta"><span>~50 min</span><span>5 widgets</span><span>build a water rocket</span></div>
+<p class="lede">Everything you have learned so far still applies: thrust is still momentum thrown backwards, and the nozzle is still where the hot gas turns its heat into speed. One thing changes. A jet engine gets its oxygen from the air it flies through; a rocket carries its own. That single difference makes a rocket work in space, makes it independent of speed and altitude, and makes it burn through propellant eight times faster. This chapter shows why, and builds up the one tool every rocket needs: the nozzle.</p>
+
+<h2 id="same" data-short="Same equation">The same equation, one term fewer</h2>
+<p>Recall the thrust equation from chapter 2:</p>
+<div class="eq">$$F=\underbrace{\dot m\,(V_e-V_0)}_{\text{jet: pays for the air it swallows}}+(P_e-P_0)A_e\qquad\text{rocket: }\ F=\dot m_p\,V_e+(P_e-P_0)A_e$$</div>
+<p>The jet’s $\dot m$ is mostly air that it picks up from the free stream moving at $V_0$ and must accelerate to $V_e$. The rocket’s $\dot m_p$ is propellant that was <em>already on board</em> and at rest: no incoming momentum, so no $-\dot m V_0$ drag term. Three consequences:</p>
+<ul>
+<li><strong>Thrust doesn’t depend on speed.</strong> A jet’s thrust sags as you fly faster (the $V_0$ is subtracted) and as the air thins (less $\dot m$).</li>
+<li><strong>It works in a vacuum,</strong> where there is no air to push on <em>or</em> to breathe.</li>
+<li><strong>You pay for the oxygen.</strong> A jet’s propane is 2 % of the mass flow; a rocket’s propellant is 100 % of it, and about three-quarters of that mass is oxidiser.</li>
+</ul>
+<div data-widget="thrust-vs-speed"></div>
+
+<h2 id="isp" data-short="Specific impulse">Specific impulse: miles per gallon for rockets</h2>
+<p>To compare engines of any size and any type, divide the thrust by the weight-rate of propellant used. The result, in seconds, is the <strong>specific impulse</strong>:</p>
+<div class="eq">$$I_{sp}=\frac{F}{\dot m_p\,g_0}=\frac{V_{e,\text{effective}}}{g_0}\quad[\text{s}]$$</div>
+<p>It is the number of seconds one kilogram of propellant can produce one kilogram-force of thrust. Higher is more efficient. For the CJ-1: $58\ \text{N}\ /\ (0.00286\ \text{kg/s}\times9.81)=$ <strong>2 070 s</strong>, because only fuel counts (the air is free). A kerosene–oxygen rocket manages about 330 s.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Engine</th><th class="num">I<sub>sp</sub> (s)</th><th>Why</th></tr>
+<tr><td>Water rocket</td><td class="num">3 – 10</td><td>exhaust is water at 30–60 m/s: no heat energy at all, only stored pressure</td></tr>
+<tr><td>Cold-gas thruster (compressed nitrogen)</td><td class="num">50 – 70</td><td>no combustion, a light gas at room temperature</td></tr>
+<tr><td>Hot-water / steam rocket</td><td class="num">90 – 190</td><td>heated by a flame or electricity first</td></tr>
+<tr><td>Solid rocket (composite)</td><td class="num">240 – 280</td><td>hot, heavy exhaust (aluminium oxide particles)</td></tr>
+<tr><td>Kerosene + liquid oxygen</td><td class="num">300 – 350</td><td>3 600 K flame, mean molar mass 23</td></tr>
+<tr><td>Hydrogen + liquid oxygen</td><td class="num">380 – 460</td><td>the same flame temperature but a light exhaust (molar mass 12)</td></tr>
+<tr><td>Our turbojet (CJ-1)</td><td class="num">≈ 2 070</td><td>the oxygen is free: only fuel is counted</td></tr>
+<tr><td>Airliner turbofan</td><td class="num">8 000 – 12 000</td><td>bypass air makes most of the thrust</td></tr>
+<tr><td>Ion thruster</td><td class="num">2 000 – 10 000</td><td>charged atoms accelerated by 1 000+ volts (chapter 15)</td></tr>
+</table></div>
+
+<h2 id="tsiolkovsky" data-short="The rocket equation">The rocket equation, and why we use stages</h2>
+<p>A rocket has to accelerate the propellant it has not yet burned. Konstantin Tsiolkovsky worked out in 1903 what that does to the speed gained:</p>
+<div class="eq">$$\Delta v=I_{sp}\,g_0\,\ln\frac{m_0}{m_f}$$</div>
+<p>$m_0$ is the starting mass, $m_f$ what is left when the propellant is gone. The speed grows only with the <em>logarithm</em> of the mass ratio: to double your $\Delta v$ you must <em>square</em> the mass ratio. Low Earth orbit needs about 9.4 km/s once gravity and drag are paid. With $I_{sp}=330$ s that is a mass ratio of $e^{9400/(330\times9.81)}=18$: 94 % of the rocket must be propellant, and the tanks, engines, and payload share the remaining 6 %. A rocket whose structure alone is 9 % of its propellant mass simply cannot do it in one piece.</p>
+<p><strong>Staging</strong> fixes this: throw away tanks and engines as soon as they are empty. For $n$ identical stages with structure fraction $\varepsilon$ and an overall payload fraction $\pi$:</p>
+<div class="eq">$$\lambda=\pi^{1/n},\quad R=\frac{1}{\lambda+\varepsilon(1-\lambda)},\quad \Delta v_{\text{total}}=n\,I_{sp}\,g_0\ln R$$</div>
+<p><strong>Worked example.</strong> Kerosene–oxygen ($I_{sp}=350$ s), $\varepsilon=0.10$, payload 2 % of liftoff mass. <em>One stage:</em> $R=1/(0.02+0.098)=8.5$, $\Delta v=350\times9.81\times\ln8.5=7.3$ km/s: <strong>short of orbit</strong>. <em>Two stages:</em> $\lambda=0.141$, $R=1/(0.141+0.1\times0.859)=4.4$, $\Delta v=2\times350\times9.81\times\ln4.4=10.2$ km/s: <strong>orbit, with margin</strong>. Try it:</p>
+<div data-widget="rocket-equation"></div>
+
+<h2 id="nozzle" data-short="The nozzle">The nozzle: the venturi that makes the thrust</h2>
+<p>Whatever makes the hot gas, the thrust comes from the nozzle, and the idea is as old as the steam turbine. A <strong>venturi</strong> is a duct that narrows and widens again. In a liquid, narrowing speeds the flow up and drops the pressure (Bernoulli). A carburettor sucks fuel through exactly that effect; a venturi flow-meter measures flow with it. In a <em>gas</em> something extra happens. The throat speed can rise only until it reaches the speed of sound. At that point the flow is <strong>choked</strong>: lowering the pressure downstream no longer changes the flow through the throat. The throat has become a valve whose opening alone decides the mass flow, and the gas downstream is free to expand without “telling” the chamber.</p>
+<div data-widget="venturi"></div>
+<p>Carl Gustaf de Laval, building steam turbines in 1888, realised that if the duct <em>widens</em> after the throat, the supersonic gas goes on accelerating: in supersonic flow a larger area means higher speed, the opposite of what we know from water in a hose. That is the <strong>converging–diverging (de Laval) nozzle</strong>, the shape of every rocket bell. It converts the heat of the chamber into speed:</p>
+<div class="eq">$$V_e=\sqrt{\frac{2\gamma}{\gamma-1}\,\frac{R_u T_c}{\mathcal M}\left[1-\left(\frac{P_e}{P_c}\right)^{\frac{\gamma-1}{\gamma}}\right]}\qquad c^*=\frac{\sqrt{R T_c}}{\sqrt{\gamma}\,\big(\tfrac{2}{\gamma+1}\big)^{\frac{\gamma+1}{2(\gamma-1)}}}\qquad F=C_F\,P_c\,A_t,\quad I_{sp}=\frac{C_F\,c^*}{g_0}$$</div>
+<p>Look at what controls the speed: a <em>hot</em> chamber ($T_c$), a <em>light</em> exhaust gas (small molar mass $\mathcal M$), and a big pressure ratio $P_c/P_e$. That is why hydrogen (molar mass 2, exhaust 12) beats kerosene (exhaust 23) by 100 s of Isp at the same flame temperature. Play with the nozzle: the red line of Mach number rises smoothly through 1 at the throat; add area and the exhaust speed rises; fly higher and the same nozzle gains thrust, but a fixed bell is never perfect everywhere.</p>
+<div data-widget="rocket-nozzle"></div>
+<div class="callout"><span class="ct">Why the turbojet has no bell</span>The CJ-1’s nozzle sees a pressure ratio of only 1.3, below the critical 1.85 (for hot gas), so the flow leaves at Mach 0.63 and is <em>never choked</em>: a plain convergent pipe is already optimal, and a diverging section would just slow it down. A rocket chamber at 7 MPa is 70 times the ambient pressure: choked in the throat, supersonic in the bell, Mach 3 to 5 at the exit.</div>
+<h3>Over- and under-expansion</h3>
+<p>The thrust equation has a pressure term $(P_e-P_a)A_e$. A nozzle designed for sea level (exit pressure ≈ 1 atm) is <strong>over-expanded</strong> at low altitude if its bell is too big (exit pressure below ambient, losing thrust, and if $P_e/P_a<0.4$ the flow <em>separates</em> from the wall with violent side loads), and <strong>under-expanded</strong> as it climbs (exit pressure above ambient: the bell is too short to extract everything). Real rockets use a compromise bell on the first stage and a huge one (ε of 100–200) on the vacuum stage. Dual-bell and aerospike nozzles change shape or let the exhaust find its own boundary to avoid the problem.</p>
+
+<h2 id="water" data-short="A water rocket">Your first rocket: a water rocket</h2>
+<p>You can experience all of this with a plastic soda bottle, water and a bicycle pump. It is the safest <em>real</em> rocket: the “propellant” is water pushed out by compressed air. The water leaves at $v=\sqrt{2\Delta P/\rho}$, the thrust is $F=\dot m\,v=2C_dA_n(P-P_a)$, and the pressure falls as the air expands to fill the space the water leaves. Notice the optimum: about a third of the bottle full.</p>
+<div data-widget="water-rocket"></div>
+<h3>Build and fly it safely</h3>
+<ul>
+<li><strong>Use PET soda bottles only</strong> (carbonated-drink bottles are made for 6–8 bar). Never glass, never a bottle with scratches or dents, never old, sun-damaged plastic.</li>
+<li><strong>Stay at or below ~7 bar (100 psi) gauge</strong> and use a pump with a pressure gauge. Never use anything but air or water: no combustible gas, no CO₂ cartridges, no “just a bit more”.</li>
+<li><strong>Launch from a launcher</strong> (a tube or a quick-release coupling) that you can trigger from a distance with a string or a cable. Nobody ever leans over a pressurised bottle.</li>
+<li><strong>Safe distance:</strong> at least 5–10 m from the launcher to people, eye protection on, in an open field, with nothing overhead and no aircraft, power lines or buildings downrange.</li>
+<li><strong>Wait for the pressure to be released</strong> (and for the rocket to be clearly on the ground) before approaching a misfire. A bottle that failed to launch is still a pressure vessel.</li>
+<li><strong>Fins and a nose cone</strong> make it stable: the centre of gravity must be well ahead of the centre of drag. A bottle flies backwards if it is nose-light.</li>
+</ul>
+<p>Try the widget with the nozzle diameter: a smaller nozzle burns longer at lower thrust, a larger one burns out almost instantly. That trade-off, thrust against burn time at the same total impulse, is the heart of every rocket design.</p>
+
+<h2 id="family" data-short="The family of rockets">Where the next chapters go</h2>
+<div class="table-wrap"><table class="data">
+<tr><th>Family</th><th>Where the energy comes from</th><th>Isp (s)</th><th>Chapter</th></tr>
+<tr><td><strong>Solid</strong></td><td>fuel and oxidiser pre-mixed in one block that burns from the surface</td><td>240–280</td><td><a href="13-solid.html">13</a></td></tr>
+<tr><td><strong>Hybrid</strong></td><td>solid fuel + liquid or gas oxidiser: switch off by closing a valve</td><td>250–320</td><td><a href="14-hybrid.html">14</a></td></tr>
+<tr><td><strong>Liquid</strong></td><td>fuel and oxidiser pumped to the chamber from tanks</td><td>280–460</td><td><a href="14-hybrid.html">14</a></td></tr>
+<tr><td><strong>Air-breathing hybrids</strong></td><td>ramjet, scramjet, rocket-ramjet: use air when there is some</td><td>1 000–4 000</td><td><a href="14-hybrid.html">14</a></td></tr>
+<tr><td><strong>Electric</strong></td><td>electricity (solar panels or a reactor) accelerates the propellant</td><td>300–10 000</td><td><a href="15-electric.html">15</a></td></tr>
+</table></div>
+<div class="callout danger"><span class="ct">A word on safety and law</span>Chapters 13 and 14 explain how solid, hybrid and liquid rockets work, in the way an engineering textbook does: physics, chemistry and stability. They do not give formulations or manufacturing instructions for propellants, and nothing here should be read as a guide to making them. Propellants and motors are regulated in most countries; they are made safely in specialised plants. If you want to fly real rockets, join a model-rocketry club (the National Association of Rocketry, Tripoli, UKRA and their equivalents) and use certified motors.</div>
+
+<h2 id="takeaways" data-short="What you learned">What you now know</h2>
+<ul>
+<li>A rocket’s thrust is $\dot m_pV_e+(P_e-P_a)A_e$: no incoming-air term, so it works at any speed or altitude, and in a vacuum. It pays by carrying the oxidiser: 8× more propellant per newton-second than a turbojet.</li>
+<li>Specific impulse $I_{sp}=F/(\dot m g_0)$ in seconds is the efficiency measure: 3–10 s (water rocket) to 450 s (hydrogen/oxygen) for chemical rockets; 2 000 s for our jet; thousands for electric thrusters.</li>
+<li>$\Delta v=I_{sp}g_0\ln(m_0/m_f)$: logarithmic, so structure fraction and staging decide whether a rocket reaches orbit.</li>
+<li>The converging–diverging nozzle chokes at the throat (Mach 1) and accelerates the gas to Mach 3–5 in the bell. Exhaust speed rises with chamber temperature and falls with exhaust molar mass.</li>
+<li>A fixed nozzle is only perfect at one altitude; over- and under-expansion cost thrust.</li>
+<li>A water rocket is the safe laboratory: thrust = 2C<sub>d</sub>A(P − P<sub>a</sub>), best with about 1/3 water.</li>
+</ul>
+
+<div data-widget="quiz">
+<script type="application/json">[
+ {"q":"Why does a rocket’s thrust not drop as it flies faster, unlike a turbojet’s?","o":["Its engine is more powerful","It carries all its propellant, so there is no incoming air momentum ṁV₀ to subtract","It flies above the atmosphere","Its nozzle is bigger"],"a":1,"why":"F = ṁ_pV_e + (P_e − P_a)A_e. A jet pays ṁV₀ for the air it swallows; a rocket takes nothing from the free stream."},
+ {"q":"A rocket needs Δv = 9.4 km/s with Isp = 330 s. What mass ratio m₀/m_f (single ideal stage)?","o":["≈ 3","≈ 9","≈ 18","≈ 100"],"a":2,"why":"R = e^(Δv/(Isp g₀)) = e^(9400/3237) = e^2.9 = 18. That is why it takes stages: 94 % of the vehicle would have to be propellant."},
+ {"q":"What happens in a converging-diverging nozzle once the throat is choked?","o":["Reducing the back-pressure keeps raising the mass flow","The flow through the throat is fixed; the diverging part accelerates the gas to supersonic speed","The gas stops","The nozzle becomes a diffuser"],"a":1,"why":"At Mach 1 in the throat the mass flow is fixed by the chamber conditions and throat area. Supersonic flow speeds up as the area increases."},
+ {"q":"Why does hydrogen–oxygen give a higher Isp than kerosene–oxygen at the same flame temperature?","o":["Hydrogen burns hotter","Its exhaust is lighter (lower molar mass), so it reaches a higher speed at the same temperature","Hydrogen is denser","Kerosene is cheaper"],"a":1,"why":"Exhaust speed ∝ √(T_c/𝓜): the molar mass in the denominator. Water vapour (and leftover H₂) is much lighter than the CO₂-rich kerosene exhaust."},
+ {"q":"A water rocket flies highest with about…","o":["10 % water","a third of the bottle full of water","90 % water","no water, just air"],"a":1,"why":"Too little water: little to throw. Too much: heavy, and the air has less room to push the water out. The optimum is around 25–40 %."}
+]</script>
+</div>
+
+</article>
+</main>
+</div>
+</body>
+</html>
