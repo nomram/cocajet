@@ -141,7 +141,11 @@
     <li><strong>Throttle:</strong> the controller targets a speed between idle and 115 000 rpm and adds/removes fuel to chase it, limited by EGT and by acceleration rate so the compressor never surges.</li>
     <li><strong>Cool-down.</strong> Fuel off. The starter keeps spinning (at ≤ 22 000 rpm) until the hot section is under 125 °C, then everything stops.</li>
   </ol>
-  <div class="callout violet"><span class="ct">Go deeper</span>Two ideas from later chapters sit behind this start sequence. Chapter 11 explains why the igniter must be running <em>before</em> the fuel flows (the ignition window and the minimum ignition energy), and chapter 14 shows the same lesson in rocket engines: propellant before flame is a “hard start”.</div>
+  <h3>Why the controller ramps the fuel</h3>
+<p>The first time you open the throttle in the simulator you will notice that the engine does not leap to full power. That is the controller doing its job. Try the experiment below with a fuel ramp of 0.2 s and then 3 s, and read the temperature plot.</p>
+<div data-widget="spool-response"></div>
+
+<div class="callout violet"><span class="ct">Go deeper</span>Two ideas from later chapters sit behind this start sequence. Chapter 11 explains why the igniter must be running <em>before</em> the fuel flows (the ignition window and the minimum ignition energy), and chapter 14 shows the same lesson in rocket engines: propellant before flame is a “hard start”.</div>
 
 <h2 id="read" data-short="What the gauges mean">What the gauges mean</h2>
   <div class="table-wrap"><table class="data">
@@ -153,7 +157,11 @@
   <tr><td><strong>Pressure ratio</strong></td><td>Compressor exit ÷ ambient</td><td>Dropping suddenly at high rpm = surge/stall</td></tr>
   <tr><td><strong>Liner damage</strong></td><td>How close the flame tube is to burning through</td><td>100 %: hole, flame on the casing</td></tr>
   </table></div>
-  <h2 id="trouble" data-short="Troubleshooting">Troubleshooting table</h2>
+  <h3>The fuel bottle is part of the engine</h3>
+<p>If the engine surges or sags after a few minutes at full power with a healthy rotor and a clean combustor, look at the propane bottle: it may be frosting over. The widget below runs the same bottle model as the simulator’s <em>freeze-off</em> scenario.</p>
+<div data-widget="fuel-bottle"></div>
+
+<h2 id="trouble" data-short="Troubleshooting">Troubleshooting table</h2>
   <div class="table-wrap"><table class="data">
   <tr><th>Symptom</th><th>Cause</th><th>Cure</th></tr>
   <tr><td>Hot start</td><td>Too much fuel while rpm is still low and airflow weak</td><td>Lower the light-off fuel; start the starter longer before fuel</td></tr>

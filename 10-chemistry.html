@@ -19,7 +19,7 @@
 
 <span class="eyebrow">Chapter 10 · Fire and ignition</span>
 <h1>The chemistry of heat</h1>
-<div class="meta"><span>~50 min</span><span>7 widgets</span><span>from a hand-warmer to a rocket</span></div>
+<div class="meta"><span>~50 min</span><span>8 widgets</span><span>from a hand-warmer to a rocket</span></div>
 <p class="lede">Every newton of thrust in this guide ultimately comes from one thing: atoms swapping partners and the energy difference leaving as heat. This chapter starts from the very beginning (why does anything get hot? why does a cold pack get cold?) and builds up to the problem every engine designer lives with: <em>a reaction that releases heat speeds itself up, so how do you stop it running away?</em></p>
 
 <h2 id="bonds" data-short="Bonds make heat">Heat is atoms changing partners</h2>
@@ -99,6 +99,8 @@
 <h2 id="flame" data-short="A flame is held in check">A flame is a runaway that is held in check</h2>
 <p>A combustor <em>wants</em> the reaction to run away, up to the flame temperature, and keeps it there. It does this with a trick: the gas flows through. Fresh cold mixture enters, burns, and leaves, carrying the heat out. In a simple model (a <strong>well-stirred reactor</strong>) the balance gives an S-shaped curve. If the gas lingers (long residence time $\tau$) the mixture burns completely. If the gas rushes through too fast, the reaction doesn’t have time to finish, the temperature falls, the reaction slows further, and the flame <strong>blows out</strong>: the same runaway, in reverse. In between is a region where both a lit and an unlit state exist: <strong>hysteresis</strong>. That is why lighting needs a spark but, once lit, the flame survives conditions that would never have ignited by themselves.</p>
 <div data-widget="stirred-reactor"></div>
+<p><strong>In the engine.</strong> The same two ideas (finite reaction time and a flammable window) decide how the CJ-1’s combustor behaves. Efficiency is lowest at idle and at altitude, where pressure and flow are low, and the primary zone, which receives about a quarter of the air, must hold its fuel/air ratio between lean and rich blow-out. The simulator’s <em>lean</em> and <em>wet</em> scenarios (chapter 7) are exactly this chart.</p>
+<div data-widget="combustor-loading"></div>
 <p>Look at where the CJ-1 sits: the primary zone gives the mixture about 0.75 ms at full power and 1.5 ms at idle, roughly twice the blow-out limit at φ ≈ 1.1. That <em>margin</em> is what the swirl and the recirculating gas in the primary zone buy: they keep gas in the flame zone longer than the throughflow alone would. It also explains the lean-blow-out limit of the engine simulator: below φ ≈ 0.4 in the primary zone the curve’s upper branch disappears and the flame goes out. And it explains why we need a spark at all (next chapter).</p>
 
 <h2 id="surface" data-short="Surface area">Controlling the rate by the size of the pieces</h2>

@@ -19,7 +19,7 @@
 
 <span class="eyebrow">Chapter 5 · The engine</span>
 <h1>The whole engine on one page</h1>
-<div class="meta"><span>~35 min</span><span>true cross-section</span><span>4 calculators</span></div>
+<div class="meta"><span>~35 min</span><span>true cross-section</span><span>6 calculators</span></div>
 <p class="lede">You have the science. Here is the machine, complete, before we build it piece by piece in chapter 6. Think of it as the map you look at before you start walking.</p>
 
 <h2 id="section" data-short="The cross-section">A true cross-section</h2>
@@ -55,6 +55,10 @@
 <h2 id="curves" data-short="Performance curves">Performance curves</h2>
 <p>Real engines come with a data sheet like this. Four things to notice: <strong>(1)</strong> thrust grows much faster than rpm; <strong>(2)</strong> fuel flow climbs steeply near the top; <strong>(3)</strong> at idle the exhaust gas is about as hot as at full power, because the engine runs <em>lean</em> and is limited by what can sustain combustion, not by power; <strong>(4)</strong> the compressor’s pressure ratio goes as (speed)².</p>
 <div data-widget="engine-curves"></div>
+
+<h2 id="weather" data-short="Weather and altitude">The same engine on a different day</h2>
+<p>The 58 N figure belongs to a standard day: 15 °C at sea level. Thrust follows the <em>density</em> of the air, so a hot afternoon or a mountain launch costs real newtons. The ledger above and every number in the book are standard-day values; this widget shows how far they move.</p>
+<div data-widget="density-altitude"></div>
 
 <h2 id="balance" data-short="Power balance">The power balance that fixes the speed</h2>
 <p>There is no “speed knob” on a jet engine. You give it a fuel flow and it finds its own speed: the one where the turbine exactly pays the compressor’s bill. If the turbine makes more than the compressor needs the surplus accelerates the rotor (rotor inertia $I\approx 340\ \text{g·cm}^2$): </p>

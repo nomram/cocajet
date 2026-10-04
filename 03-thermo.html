@@ -19,7 +19,7 @@
 
 <span class="eyebrow">Chapter 3 · The science</span>
 <h1>Pressure, heat &amp; the Brayton cycle</h1>
-<div class="meta"><span>~35 min</span><span>3 big widgets</span><span>the most important chapter in the guide</span></div>
+<div class="meta"><span>~35 min</span><span>4 widgets</span><span>the most important chapter in the guide</span></div>
 <p class="lede">What happens to a gas when you squeeze it, heat it, and let it expand? Answer that and you understand every jet engine ever built. The answer is a nearly rectangular loop on a graph.</p>
 
 <h2 id="laws" data-short="The gas laws">The gas laws: three observations, one equation</h2>
@@ -50,6 +50,9 @@
 <div class="eq">$$P\,v^{\gamma}=\text{const}\quad\Longrightarrow\quad\frac{T_2}{T_1}=\left(\frac{P_2}{P_1}\right)^{\frac{\gamma-1}{\gamma}}=r^{0.286}$$</div>
 <p>Take our engine, $r=1.95$, $T_1=288$ K: $T_2=288\times1.95^{0.286}=348$ K, +60 K if ideal. A real wheel is only ~78 % efficient (some work churns the air into extra heat) so the true outlet is 365 K. The work per kg is $c_p\Delta T=1005\times 78\approx 78$ kJ/kg and at 0.151 kg/s that is <strong>12 kW</strong> of shaft power, as much as 6 electric kettles. The turbine has to deliver all of it.</p>
 <div data-widget="compression-heat"></div>
+<h3>A caution about “γ = 1.4”</h3>
+<p>The numbers $c_p=1005$ J/(kg·K) and $\gamma=1.4$ are true for cold air only. Hot, burnt gas is another substance: its molecules include CO₂ and H₂O, which can store energy in more ways, so its specific heat is higher (about 1 150 J/(kg·K) at the turbine) and its $\gamma$ lower (about 1.33). That matters for every energy calculation from here on. The simulator uses the full curves below, not constants, and that is what makes its numbers (and the ledger at the top of each chapter) trustworthy to a few percent.</p>
+<div data-widget="gas-properties"></div>
 
 <h2 id="cycle" data-short="The Brayton cycle">The Brayton cycle: the curved rectangle</h2>
 <p>Now chain four processes together and make a loop. A parcel of air, followed through the engine:</p>
