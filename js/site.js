@@ -175,6 +175,7 @@ function boot() {
   buildTopbar();
   buildSidenav();
   buildPrevNext();
+  import('./thread.js').then(m => m.buildThread({ pages: PAGES, current })).then(() => renderMath(document.querySelector('main'))).catch(e => console.error('thread', e));
   renderMath(document.querySelector('main') || document.body);
   initWidgets();
   if (location.hash) setTimeout(() => document.getElementById(location.hash.slice(1))?.scrollIntoView(), 50);

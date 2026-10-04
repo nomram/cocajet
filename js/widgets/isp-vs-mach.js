@@ -14,7 +14,7 @@ export default function init(el) {
   const sF = select({ label: 'Fuel', options: Object.entries(FUELS).map(([k, v]) => [k, v.n]), value: 'hc', onChange: upd });
   const sR = slider({ label: 'Realism factor (real engine ÷ ideal cycle)', min: 0.4, max: 1, step: 0.01, value: 0.62, fmt: v => v.toFixed(2), onInput: upd });
   const ro = { a: readout('Speed of sound at this altitude', 'm/s', 'cool'), tj: readout('Turbojet works up to', 'Mach', 'fuel'), rj: readout('Ramjet ideal peak Isp near', 'Mach', 'cool') };
-  body.append(h('div', { class: 'wgrid even' }, cvA, cvB), legend([['var(--ok)', 'turbofan, Ve ≈ 350 m/s'], ['var(--fire)', 'turbojet (CJ-1), Ve ≈ 570 m/s'], ['var(--air)', 'chemical rocket, Ve ≈ 3 000 m/s'], ['var(--violet)', 'ion thruster, Ve ≈ 30 000 m/s']]), h('div', { class: 'wgrid', style: { marginTop: '12px' } }, h('div', { class: 'ctls' }, sAl.el, sT.el, sPi.el, sTc.el, sF.el, sR.el), h('div', { class: 'readouts' }, ...Object.values(ro).map(r => r.el))));
+  body.append(h('div', { class: 'wgrid even' }, cvA, cvB), legend([['var(--ok)', 'high-bypass fan, Ve ≈ 250 m/s'], ['var(--fire)', 'turbojet (CJ-1), Ve ≈ 380 m/s'], ['var(--air)', 'chemical rocket, Ve ≈ 3 000 m/s'], ['var(--violet)', 'ion thruster, Ve ≈ 30 000 m/s']]), h('div', { class: 'wgrid', style: { marginTop: '12px' } }, h('div', { class: 'ctls' }, sAl.el, sT.el, sPi.el, sTc.el, sF.el, sR.el), h('div', { class: 'readouts' }, ...Object.values(ro).map(r => r.el))));
   const pA = new Plot(cvA, { xmin: 0, xmax: 12, ymin: 100, ymax: 20000, ylog: true, aspect: 1.45, xlabel: 'flight Mach number', ylabel: 'specific impulse Isp (s)', title: 'Isp vs Mach number', margin: { l: 54, r: 12, t: 28, b: 40 }, xticks: [0, 2, 4, 6, 8, 10, 12] });
   const pB = new Plot(cvB, { xmin: 20, xmax: 20000, xlog: true, ymin: 0, ymax: 1.05, aspect: 1.45, xlabel: 'flight speed (m/s, log scale)', ylabel: 'propulsive efficiency', title: 'Propulsive efficiency vs speed', margin: { l: 52, r: 12, t: 28, b: 40 }, ytickFmt: v => Math.round(v * 100) + '%', xtickFmt: v => v >= 1000 ? (v / 1000) + 'k' : String(v) });
   function jetIsp(M, T0, o) {
@@ -43,7 +43,7 @@ export default function init(el) {
     if (tjMax > 0 && tjMax < 11.5) pA.vline(tjMax, { color: c.muted, label: 'compressor limit', alpha: .7 });
     // propulsive efficiency
     c = pB.begin().col; pB.axes();
-    const lines = [['turbofan (Ve ≈ 350 m/s)', 350, 'air', c.ok], ['turbojet (CJ-1: Ve ≈ 570 m/s)', 570, 'air', c.fire], ['chemical rocket (Ve ≈ 3 000 m/s)', 3000, 'rocket', c.air], ['ion thruster (Ve ≈ 30 000 m/s)', 30000, 'rocket', c.violet]];
+    const lines = [['high-bypass fan (Ve ≈ 250 m/s)', 250, 'air', c.ok], ['turbojet (CJ-1: Ve ≈ 380 m/s)', 380, 'air', c.fire], ['chemical rocket (Ve ≈ 3 000 m/s)', 3000, 'rocket', c.air], ['ion thruster (Ve ≈ 30 000 m/s)', 30000, 'rocket', c.violet]];
     for (const [nm, Ve, kind, col] of lines) {
       const xs = [], ys = [];
       for (let V = 20; V <= 20000; V *= 1.05) { const r = V / Ve; if (kind === 'air' && r > 1) break; xs.push(V); ys.push(kind === 'air' ? 2 * r / (1 + r) : 2 * r / (1 + r * r)); }

@@ -333,3 +333,26 @@ body.wide-page main { padding-inline: clamp(14px, 2.5vw, 40px); }
 .viewer .vhud .q1 { color: #b9c6d4; margin-top: 3px; } .viewer .vhud .q2 { font-family: var(--mono); font-size: .7rem; color: #dce6f0; font-variant-numeric: tabular-nums; margin-top: 2px; } .viewer .vhud .q3 { color: #8ea0b3; margin-top: 2px; font-size: .68rem; }
 .viewer .vhud sub { font-size: .65em; }
 @media (max-width: 700px) { .viewer .vhud { min-width: 0; padding: 6px 9px; } .viewer .vhud .q1, .viewer .vhud .q2, .viewer .vhud .q3 { display: none; } .viewer .vhud .v { font-size: 1.35rem; } }
+
+/* ---------- the red thread: chapter rail, question, running ledger, bridge ---------- */
+.thread { --c: var(--fire); margin: 22px 0 8px; padding: 14px 18px 14px; border-radius: var(--radius); border: 1px solid color-mix(in srgb, var(--c) 40%, var(--line)); border-left: 5px solid var(--c); background: color-mix(in srgb, var(--c) 6%, var(--panel)); max-width: 78ch; }
+.thread p { margin: .5em 0; font-size: .95rem; }
+.thread-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 4px; }
+.thread-tag { font-size: .72rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; color: var(--c); }
+.rail { display: flex; flex-wrap: wrap; gap: 4px 10px; }
+.rail-group { display: inline-flex; gap: 3px; padding: 2px 5px; border-radius: 999px; background: color-mix(in srgb, var(--text) 5%, transparent); }
+.rail .dot { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; font-size: .68rem; font-weight: 700; color: var(--muted); border: 1px solid var(--line-2); background: var(--panel); text-decoration: none; }
+.rail .dot:hover { border-color: var(--c); color: var(--text); text-decoration: none; }
+.rail .dot.done { color: var(--text-2); border-color: color-mix(in srgb, var(--c) 45%, var(--line-2)); }
+.rail .dot.now { background: var(--c); border-color: var(--c); color: #fff; box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 28%, transparent); }
+.ledger { margin-top: 8px; }
+.ledger summary { cursor: pointer; font-weight: 700; font-size: .92rem; color: var(--text); }
+.ledger summary small { font-weight: 500; color: var(--muted); }
+.ledger-table td { vertical-align: top; }
+.ledger-table td.chs a { margin: 0 1px; }
+.ledger-table tr.on td { background: color-mix(in srgb, var(--fire) 12%, transparent); font-weight: 600; }
+.ledger-table tr.on td:first-child { box-shadow: inset 4px 0 0 var(--fire); }
+.muted { color: var(--muted); font-size: .88rem; }
+.bridge { --c: var(--fire); max-width: 78ch; margin: 36px auto 0; padding: 12px 18px; border-radius: var(--radius); border: 1px dashed color-mix(in srgb, var(--c) 55%, var(--line)); background: color-mix(in srgb, var(--c) 5%, transparent); font-size: .95rem; }
+.bridge .thread-tag { margin-right: 8px; }
+@media (max-width: 640px) { .rail .dot { width: 20px; height: 20px; } .thread { padding: 12px 12px; } }
