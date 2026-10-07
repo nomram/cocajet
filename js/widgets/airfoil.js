@@ -32,7 +32,7 @@ export default function init(el) {
   // ---- layer chips ----
   const on = {}, chips = [];
   const chip = (key, label, color, checked, tip) => {
-    const t = toggle({ label, checked, onChange: v => { on[key] = v; paintChips(); if (key === 'wt' || key === 'cp') setup(); } }); on[key] = checked;
+    const t = toggle({ label, checked, onChange: v => { on[key] = v; paintChips(); if (Mt) infoText(); if (key === 'wt') setup(); if (key === 'cp') drawCp(); } }); on[key] = checked;
     Object.assign(t.el.style, { border: '1px solid var(--line-2)', borderRadius: '999px', padding: '4px 11px 4px 8px', background: 'var(--panel-2)', fontSize: '.76rem', gap: '6px' }); t.el.title = tip;
     t.el.insertBefore(h('i', { style: { width: '9px', height: '9px', borderRadius: '50%', background: color, display: 'inline-block', flex: 'none' } }), t.input.nextSibling);
     chips.push([t, key, color]); return t;
@@ -168,6 +168,10 @@ export default function init(el) {
   function infoText() {
     const M = Mt, s = [`<b>Lift from circulation</b> (Kutta–Joukowski): L′ = ρ · V · Γ = ${RHO} × ${P.V.toFixed(0)} × ${fN(M.Gam)} m²/s = <b>${fN(M.L)} N/m</b> of span`];
     if (on.wt) s.push(M.L > 0 ? `<b>Level flight:</b> weight = lift, so each metre of this wing carries <b>${fN(M.L / G0)} kg</b> (wing loading ${fN(M.L / G0 / P.ch)} kg/m²)` : '<b>Level flight:</b> the lift is negative here, so the weight cannot be balanced (try a bigger angle).');
+    if (on.drag) s.push(`<b>Drag</b> D′ = ${fN(M.D)} N/m = friction ${fN(M.CDf * M.k)} + form (pressure) ${fN(M.CDp * M.k)}${P.fin ? ' + induced ' + fN(M.CDi * M.k) : ''} (drawn ×${DM})`);
+    if (on.comp) s.push(`<b>Along / across the chord:</b> normal N′ = ${fN(M.k * M.CN)} N/m, axial A′ = ${fN(M.k * M.CA)} N/m${M.CA < 0 ? ' (negative: it points forward, the leading-edge suction)' : ''}`);
+    if (on.cp) s.push(Number.isFinite(M.xcp) ? `<b>Centre of pressure</b> at x/c = ${nf(M.xcp)} from the nose; the quarter-chord aerodynamic centre feels a moment M = ${fN(M.M)} N·m/m (${M.Cm < 0 ? 'nose down' : 'nose up'})` : '<b>Centre of pressure:</b> with almost no lift it runs far off the wing, leaving a pure moment of ' + fN(M.M) + ' N·m/m.');
+    if (on.circ || on.bound) s.push(`<b>Circulation:</b> Γ = L′ ÷ (ρV) = ${fN(M.Gam)} m²/s, ${M.Gam >= 0 ? 'clockwise' : 'counter-clockwise'} around the wing`);
     const sv = vort.find(v => v.k === 's' && v.age < 3 && Math.abs(v.G) > 0.03 && v.live);
     if (sv) s.push(`<b>Kelvin:</b> ${sv.G < 0 ? 'starting' : 'stopping'} vortex ${fN(-sv.G * P.V * P.ch)} + bound change ${fN(sv.G * P.V * P.ch)} m²/s = 0: the total circulation stays zero`);
     info.innerHTML = s.join('<br>');
@@ -265,7 +269,7 @@ export default function init(el) {
   function seed() { for (let i = 0; i < NP; i++) spawn(i, true); }
   function sizeFlow() {
     const w = Math.round(flowCv.clientWidth), d = Math.min(2, devicePixelRatio || 1); if (!w) return false; if (w === W && d === dpr) return true;
-    W = w; dpr = d; H = Math.round(w / (w < 520 ? 1.1 : 1.8)); flowCv.style.height = H + 'px'; flowCv.width = Math.round(W * dpr); flowCv.height = Math.round(H * dpr);
+    W = w; dpr = d; H = Math.round(w / (w < 520 ? 0.95 : 1.8)); flowCv.style.height = H + 'px'; flowCv.width = Math.round(W * dpr); flowCv.height = Math.round(H * dpr);
     S = W < 520 ? W / 3.7 : W / 4.7; px0 = W * (W < 520 ? 0.33 : 0.34); py0 = H * 0.5; vx0 = -px0 / S; vx1 = (W - px0) / S; vy0 = -(H - py0) / S; vy1 = py0 / S; seed(); return true;
   }
   const ctx = flowCv.getContext('2d'), tctx = tipCv.getContext('2d');
@@ -289,19 +293,24 @@ export default function init(el) {
   const occSeg = (x0, y0, x1, y1) => { const n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) / 10)); for (let i = 0; i <= n; i++) occ.push([x0 + (x1 - x0) * i / n - 5, y0 + (y1 - y0) * i / n - 5, 10, 10]); };
   function flushLabels() {
     const fs = W < 520 ? 10.5 : 12; ctx.font = `700 ${fs}px ui-sans-serif, system-ui, sans-serif`; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-    LQ.sort((a, b) => a.pr - b.pr);
+    LQ.sort((a, b) => a.pr - b.pr); const placed = [];
     for (const lb of LQ) {
-      const ls = lb.t.split('\n'), tw = Math.max(...ls.map(s => ctx.measureText(s).width)) + 8, th = ls.length * (fs + 3) + 3, b = Math.atan2(lb.dy, lb.dx); let pos = null;
-      outer: for (const dd of [5, 14, 26, 42, 62]) for (const da of [0, 0.5, -0.5, 1, -1, 1.6, -1.6, 2.4, -2.4, Math.PI]) {
+      const ls = lb.t.split('\n'), tw = Math.max(...ls.map(s => ctx.measureText(s).width)) + 8, th = ls.length * (fs + 3) + 3, b = Math.atan2(lb.dy, lb.dx); let pos = null, best = null;
+      outer: for (const dd of [5, 14, 26, 42, 62, 90]) for (const da of [0, 0.4, -0.4, 0.8, -0.8, 1.2, -1.2, 1.6, -1.6, 2, -2, 2.4, -2.4, 2.8, Math.PI]) {
         const ux = Math.cos(b + da), uy = Math.sin(b + da), r = [lb.ax + ux * dd + (ux * 0.5 - 0.5) * tw, lb.ay + uy * dd + (uy * 0.5 - 0.5) * th, tw, th];
-        if (r[0] < 2 || r[1] < 2 || r[0] + tw > W - 2 || r[1] + th > H - 2 || hit(r)) continue; pos = { r, dd }; break outer;
+        if (r[0] < 2 || r[1] < 2 || r[0] + tw > W - 2 || r[1] + th > H - 2) continue;
+        const ov = occ.reduce((s_, o) => s_ + Math.max(0, Math.min(r[0] + tw, o[0] + o[2]) - Math.max(r[0], o[0])) * Math.max(0, Math.min(r[1] + th, o[1] + o[3]) - Math.max(r[1], o[1])), 0);
+        if (!ov) { pos = { r, dd }; break outer; } if (!best || ov < best.ov) best = { r, dd, ov };
       }
+      if (!pos && best && lb.pr <= 2) pos = best;
+      if (!pos && lb.pr > 2) continue;
       if (!pos) { if (lb.opt) continue; pos = { r: [clamp(lb.ax + 5, 2, W - tw - 2), clamp(lb.ay - th / 2, 2, H - th - 2), tw, th], dd: 0 }; }
+      if (pos.ov && lb.opt) continue;
       const [l, t] = pos.r; ctx.globalAlpha = 0.8; ctx.fillStyle = C.bg; ctx.fillRect(l, t, tw, th); ctx.globalAlpha = 1;
       if (pos.dd > 12) { ctx.strokeStyle = lb.c; ctx.globalAlpha = 0.55; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(lb.ax, lb.ay); ctx.lineTo(clamp(lb.ax, l, l + tw), clamp(lb.ay, t, t + th)); ctx.stroke(); ctx.globalAlpha = 1; }
-      ctx.fillStyle = lb.c; ls.forEach((s, k) => ctx.fillText(s, l + 4, t + 3 + (fs + 3) * (k + 0.5))); occ.push(pos.r);
+      ctx.fillStyle = lb.c; ls.forEach((s, k) => ctx.fillText(s, l + 4, t + 3 + (fs + 3) * (k + 0.5))); occ.push(pos.r); placed.push({ t: lb.t, r: pos.r, ov: pos.ov || 0 });
     }
-    LQ = [];
+    LQ = []; el.__labels = placed;
   }
 
   function drawPlane(x, y, w, hgt, pitch) {
@@ -377,7 +386,7 @@ export default function init(el) {
     }
 
     // --- draw ---
-    occ = []; LQ = [];
+    const cm = W < 520; occ = []; LQ = [];
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); ctx.fillStyle = C.bg; ctx.fillRect(0, 0, W, H);
     ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.lineWidth = 1.7;
     for (let b = 0; b < NB; b++) {
@@ -401,9 +410,9 @@ export default function init(el) {
     const cp = cpEff(Mf);
     const surf = (spacing, fn) => { let lx = -1e9, ly = -1e9; for (let i = 0; i < NV; i++) { const x = XC[i] + 0.25; if (x > 0.985) continue; const [X, Y] = rot(thv, XC[i], YC[i]); if (Math.hypot(X - lx, Y - ly) < spacing) continue; lx = X; ly = Y; fn(i, X, Y); } };
     if (on.press) {
-      const kp = 0.06 * S, cap = 0.45 * S; ctx.lineWidth = 1.3;
+      const kp = 0.12 * S, cap = 0.5 * S; ctx.lineWidth = 1.4;
       surf(W < 520 ? 8 : 9, (i, X, Y) => {
-        const nxw = Math.cos(thv) * VNX[i] - Math.sin(thv) * VNY[i], nyw = Math.sin(thv) * VNX[i] + Math.cos(thv) * VNY[i], len = Math.min(cap, Math.abs(cp[i]) * kp); if (len < 3) return;
+        const nxw = Math.cos(thv) * VNX[i] - Math.sin(thv) * VNY[i], nyw = Math.sin(thv) * VNX[i] + Math.cos(thv) * VNY[i], len = Math.min(cap, Math.abs(cp[i]) * kp); if (len < 4) return;
         const ox = nxw * len, oy = -nyw * len; if (cp[i] < 0) arrowPx(ctx, X + nxw * 1.5, Y - nyw * 1.5, X + ox, Y + oy, C.air, 1.3, 5); else arrowPx(ctx, X + ox, Y + oy, X + nxw * 1.5, Y - nyw * 1.5, C.fire, 1.3, 5);
       });
     }
@@ -416,11 +425,11 @@ export default function init(el) {
     }
     // wing
     wingPath(thv); ctx.fillStyle = C.metal; ctx.globalAlpha = 0.6; ctx.fill(); ctx.globalAlpha = 1; ctx.strokeStyle = C.text; ctx.lineWidth = 1.8; ctx.stroke();
-    const [leX, leY] = rot(thv, -0.25, 0), [teX, teY] = rot(thv, 0.75, 0); const wbx = [Math.min(leX, teX) - 4, Math.min(leY, teY) - 0.1 * S, Math.abs(teX - leX) + 8, Math.abs(teY - leY) + 0.2 * S]; occ.push(wbx);
+    const [leX, leY] = rot(thv, -0.25, 0), [teX, teY] = rot(thv, 0.75, 0); const wbx = [Math.min(leX, teX) - 4, Math.min(leY, teY) - 0.1 * S, Math.abs(teX - leX) + 8, Math.abs(teY - leY) + 0.2 * S]; occ.push(wbx); el.__wing = wbx;
     // chord line + angle arc
     const ra = S * 0.62, aLE = Math.PI + thv, aW = Math.PI + phw;
     ctx.strokeStyle = C.warn; ctx.lineWidth = 1.5; ctx.setLineDash([5, 3]); ctx.beginPath(); ctx.moveTo(px0 + (ra + 10) * -ec[0], py0 + (ra + 10) * ec[1]); ctx.lineTo(teX, teY); ctx.stroke(); ctx.setLineDash([]);
-    ctx.lineWidth = 2; ctx.beginPath(); for (let j = 0; j <= 20; j++) { const a_ = aW + (aLE - aW) * j / 20, X = px0 + ra * Math.cos(a_), Y = py0 - ra * Math.sin(a_); j ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); } ctx.stroke();
+    ctx.lineWidth = 2.2; ctx.beginPath(); ctx.moveTo(px0, py0); for (let j = 0; j <= 20; j++) { const a_ = aW + (aLE - aW) * j / 20, X = px0 + ra * Math.cos(a_), Y = py0 - ra * Math.sin(a_); ctx.lineTo(X, Y); } ctx.closePath(); ctx.globalAlpha = 0.22; ctx.fillStyle = C.warn; ctx.fill(); ctx.globalAlpha = 1; ctx.beginPath(); for (let j = 0; j <= 20; j++) { const a_ = aW + (aLE - aW) * j / 20, X = px0 + ra * Math.cos(a_), Y = py0 - ra * Math.sin(a_); j ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); } ctx.stroke();
     { const am = (aW + aLE) / 2; lab(`α = ${nf(aa, 1)}°`, px0 + (ra + 3) * Math.cos(am), py0 - (ra + 3) * Math.sin(am), -1, 0, C.warn, false, 1); }
     // circulation loop
     const Gc = Mf.CL / 2;
@@ -428,12 +437,12 @@ export default function init(el) {
       ctx.save(); ctx.strokeStyle = C.violet; ctx.lineWidth = 1.8; ctx.setLineDash([7, 6]); ctx.lineDashOffset = -T * 40 * Math.sign(Gc || 1); ctx.beginPath();
       for (let j = 0; j <= 60; j++) { const t = j / 60 * TAU, [X, Y] = rot(thv, 0.25 + 0.7 * Math.cos(t), 0.36 * Math.sin(t)); j ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); } ctx.stroke(); ctx.restore();
       for (const t of [0.5 * Math.PI, 1.5 * Math.PI]) { const s_ = Math.sign(Gc || 1), [X, Y] = rot(thv, 0.25 + 0.7 * Math.cos(t), 0.36 * Math.sin(t)), [X2, Y2] = rot(thv, 0.25 + 0.7 * Math.cos(t - s_ * 0.12), 0.36 * Math.sin(t - s_ * 0.12)); arrowPx(ctx, X2, Y2, X, Y, C.violet, 1.8, 7); }
-      const [Xt, Yt] = rot(thv, 0.25, 0.36); lab(`Γ = ${fN(Mf.Gam)} m²/s`, Xt, Yt, 0, -1, C.violet, false, 4);
+      const [Xt, Yt] = rot(thv, 0.25, 0.36); lab(cm ? `Γ ${fN(Mf.Gam)}` : `Γ = ${fN(Mf.Gam)} m²/s`, Xt, Yt, 0, -1, C.violet, false, 4);
     }
     // vortices
     if (on.bound && Math.abs(Gc) > 0.01) {
       const rb = S * (0.07 + 0.3 * Math.abs(Gc)), cw = Gc > 0; swirl(ctx, px0, py0, rb, T * (cw ? 1 : -1) * (3 + 6 * Math.abs(Gc)), cw, C.violet, 0.95);
-      lab('bound vortex', px0 - rb * 0.7, py0 - rb * 0.7, -1, -1, C.violet, false, 4);
+      lab(cm ? 'bound' : 'bound vortex', px0 - rb * 0.7, py0 - rb * 0.7, -1, -1, C.violet, false, 4);
     }
     let bigS = null;
     for (const v of vort) {
@@ -442,32 +451,31 @@ export default function init(el) {
       swirl(ctx, sx(v.x), sy(v.y), r, T * (cw ? 1 : -1) * (4 + 10 * Math.sqrt(Math.abs(v.G))) + v.ph, cw, cw ? C.violet : C.fuel, fade);
       if (v.k === 's' && Math.abs(v.G) > 0.04 && (!bigS || Math.abs(v.G) > Math.abs(bigS.G)) && v.age < 3.2) bigS = v;
     }
-    if (bigS) lab(`${bigS.G < 0 ? 'starting' : 'stopping'} vortex\n${fN(-bigS.G * P.V * P.ch)} m²/s`, sx(bigS.x), sy(bigS.y), 0.3, bigS.G < 0 ? -1 : 1, bigS.G < 0 ? C.fuel : C.violet, false, 2);
+    if (bigS) lab(`${bigS.G < 0 ? 'starting' : 'stopping'} vortex${cm ? '' : '\n' + fN(-bigS.G * P.V * P.ch) + ' m²/s'}`, sx(bigS.x), sy(bigS.y), 0.3, bigS.G < 0 ? -1 : 1, bigS.G < 0 ? C.fuel : C.violet, false, 2);
     if (Mf.st) {
-      const xs_ = Mf.xs - 0.25, ys_ = yAt(yUp, xs_), [X, Y] = rot(thv, xs_, ys_); ctx.strokeStyle = C.bad; ctx.lineWidth = 2.2; ctx.fillStyle = C.bg; ctx.beginPath(); ctx.arc(X, Y, 5, 0, TAU); ctx.fill(); ctx.stroke(); lab('separation point\nSTALL', X, Y - 6, 0, -1, C.bad, false, 1);
-      if (on.street) lab('shed vortex street', sx(1.6 * ec[0]), sy(1.6 * ec[1] + 0.25), 1, -0.2, C.fuel, true, 5);
+      const xs_ = Mf.xs - 0.25, ys_ = yAt(yUp, xs_), [X, Y] = rot(thv, xs_, ys_); ctx.strokeStyle = C.bad; ctx.lineWidth = 2.2; ctx.fillStyle = C.bg; ctx.beginPath(); ctx.arc(X, Y, 5, 0, TAU); ctx.fill(); ctx.stroke(); lab(cm ? 'STALL' : 'separation point\nSTALL', X, Y - 6, 0, -1, C.bad, false, 1);
+      if (on.street) lab(cm ? 'street' : 'shed vortex street', sx(1.6 * ec[0]), sy(1.6 * ec[1] + 0.25), 1, -0.2, C.fuel, true, 5);
     }
     // forces
     const xa = Number.isFinite(Mf.xcp) ? clamp(Mf.xcp, 0.03, 0.97) : 0.25, cpX = px0 + S * ec[0] * (xa - 0.25), cpY = py0 - S * ec[1] * (xa - 0.25);
     const Lv = [el_[0] * Mf.CL * kF, -el_[1] * Mf.CL * kF], Dv = [ew[0] * Mf.CD * kF, -ew[1] * Mf.CD * kF], Rv = [Lv[0] + Dv[0], Lv[1] + Dv[1]];
     const farrow = (v, c, w, text, dir, dsh, pr) => { arrowPx(ctx, cpX, cpY, cpX + v[0], cpY + v[1], c, w, 9, dsh); occSeg(cpX, cpY, cpX + v[0], cpY + v[1]); if (text && Math.hypot(v[0], v[1]) > 2) lab(text, cpX + v[0], cpY + v[1], dir[0], dir[1], c, false, pr); };
-    if (on.wt && Mf.CL > 0) { const gx = Math.sin(phw), gy = Math.cos(phw), m = Mf.CL * kF; arrowPx(ctx, px0, py0, px0 + gx * m, py0 + gy * m, C.metal, 3.2, 9); occSeg(px0, py0, px0 + gx * m, py0 + gy * m); lab(`Weight ${fN(Mf.L)} N/m\n= lift = ${fN(Mf.L / G0)} kg per m`, px0 + gx * m, py0 + gy * m, 0, 1, C.metal, false, 2); }
+    if (on.wt && Mf.CL > 0) { const gx = Math.sin(phw), gy = Math.cos(phw), m = Mf.CL * kF; arrowPx(ctx, px0, py0, px0 + gx * m, py0 + gy * m, C.metal, 3.2, 9); occSeg(px0, py0, px0 + gx * m, py0 + gy * m); lab(cm ? `Weight ${fN(Mf.L)}` : `Weight ${fN(Mf.L)} N/m\n= lift = ${fN(Mf.L / G0)} kg per m`, px0 + gx * m, py0 + gy * m, 0, 1, C.metal, false, 2); }
     if (on.comp) {
       const Nn = Mf.CN * kF, Aa = Mf.CA * kF, nv = [en[0] * Nn, -en[1] * Nn], av = [ec[0] * Aa, -ec[1] * Aa], tp = [cpX + nv[0] + av[0], cpY + nv[1] + av[1]];
       ctx.save(); ctx.strokeStyle = C.fuel; ctx.globalAlpha = 0.6; ctx.lineWidth = 1; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(cpX + nv[0], cpY + nv[1]); ctx.lineTo(tp[0], tp[1]); ctx.lineTo(cpX + av[0], cpY + av[1]); ctx.stroke(); ctx.restore();
-      farrow(nv, C.fuel, 2.2, `Normal ${fN(Mf.k * Mf.CN)} N/m`, [-1, 0], null, 3); farrow(av, C.fuel, 2.2, `Axial ${fN(Mf.k * Mf.CA)} N/m${Mf.CA < 0 ? '\n(points forward)' : ''}`, [ec[0] * Math.sign(Mf.CA || 1), 0.6], null, 3);
+      farrow(nv, C.fuel, 2.2, cm ? `Normal ${fN(Mf.k * Mf.CN)}` : `Normal ${fN(Mf.k * Mf.CN)} N/m`, [-1, 0], null, 3); farrow(av, C.fuel, 2.2, cm ? `Axial ${fN(Mf.k * Mf.CA)}` : `Axial ${fN(Mf.k * Mf.CA)} N/m${Mf.CA < 0 ? '\n(points forward)' : ''}`, [ec[0] * Math.sign(Mf.CA || 1), 0.6], null, 3);
     }
-    if (on.res) farrow(Rv, C.text, 2.2, `Resultant ${fN(Math.hypot(Mf.L, Mf.D))} N/m`, [-0.7, Rv[1] < 0 ? -0.7 : 0.7], [6, 4], 2);
-    if (on.lift) farrow(Lv, C.ok, 3.6, `Lift ${fN(Mf.L)} N/m`, [0.8, Lv[1] < 0 ? -0.6 : 0.6], null, 1);
-    if (on.drag) { const dv = [Dv[0] * DM, Dv[1] * DM], dl = [Mf.CDf, Mf.CDp, Mf.CDi].map(x => fN(x * Mf.k)); farrow(dv, C.bad, 3.2, `Drag ${fN(Mf.D)} N/m (arrow ×${DM})\nfriction ${dl[0]} + form ${dl[1]}${P.fin ? ' + induced ' + dl[2] : ''}`, [1, 0.5], null, 1); }
+    if (on.res) farrow(Rv, C.text, 2.2, cm ? `Resultant ${fN(Math.hypot(Mf.L, Mf.D))}` : `Resultant ${fN(Math.hypot(Mf.L, Mf.D))} N/m`, [-0.7, Rv[1] < 0 ? -0.7 : 0.7], [6, 4], 2);
+    if (on.lift) farrow(Lv, C.ok, 3.6, cm ? `Lift ${fN(Mf.L)}` : `Lift ${fN(Mf.L)} N/m`, [0.8, Lv[1] < 0 ? -0.6 : 0.6], null, 1);
+    if (on.drag) { const dv = [Dv[0] * DM, Dv[1] * DM], dl = [Mf.CDf, Mf.CDp, Mf.CDi].map(x => fN(x * Mf.k)); farrow(dv, C.bad, 3.2, cm ? `Drag ${fN(Mf.D)} (×${DM})` : `Drag ${fN(Mf.D)} N/m (arrow ×${DM})\nfriction ${dl[0]} + form ${dl[1]}${P.fin ? ' + induced ' + dl[2] : ''}`, [1, 0.5], null, 1); }
     if (on.cp) {
       const [aX, aY] = [px0, py0]; ctx.strokeStyle = C.warn; ctx.fillStyle = C.bg; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(aX, aY, 5, 0, TAU); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(aX - 3, aY); ctx.lineTo(aX + 3, aY); ctx.moveTo(aX, aY - 3); ctx.lineTo(aX, aY + 3); ctx.stroke();
-      lab('aerodynamic centre\n(¼ chord)', aX, aY + 5, -0.5, 1, C.warn, false, 4);
-      if (Number.isFinite(Mf.xcp)) { ctx.fillStyle = C.warn; ctx.strokeStyle = C.text; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cpX, cpY - 7); ctx.lineTo(cpX + 6, cpY); ctx.lineTo(cpX, cpY + 7); ctx.lineTo(cpX - 6, cpY); ctx.closePath(); ctx.fill(); ctx.stroke(); lab(`centre of pressure\nx/c = ${nf(Mf.xcp)}`, cpX, cpY + 7, 0.5, 1, C.warn, false, 3); } else lab('no lift: the centre of pressure\nruns off the wing', aX, aY - 8, 0, -1, C.warn, false, 3);
+      lab(cm ? `AC ¼ c\nM ${fN(Mf.M)}` : `aerodynamic centre (¼ c)\nmoment ${fN(Mf.M)} N·m/m, ${Mf.Cm < 0 ? 'nose down' : 'nose up'}`, aX, aY + 5, -0.5, 1, C.warn, false, 4);
+      if (Number.isFinite(Mf.xcp)) { ctx.fillStyle = C.warn; ctx.strokeStyle = C.text; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cpX, cpY - 7); ctx.lineTo(cpX + 6, cpY); ctx.lineTo(cpX, cpY + 7); ctx.lineTo(cpX - 6, cpY); ctx.closePath(); ctx.fill(); ctx.stroke(); lab(cm ? `CP ${nf(Mf.xcp)}` : `centre of pressure\nx/c = ${nf(Mf.xcp)}`, cpX, cpY + 7, 0.5, 1, C.warn, false, 3); } else lab(cm ? 'CP off wing' : 'no lift: the centre of pressure\nruns off the wing', aX, aY - 8, 0, -1, C.warn, false, 3);
       const mr = S * 0.3, sg_ = Mf.Cm > 0 ? -1 : 1, ac = thv + Math.PI / 2, m1 = ac + sg_ * 0.9; ctx.strokeStyle = C.warn; ctx.lineWidth = 2; ctx.beginPath();
       for (let j = 0; j <= 14; j++) { const m = ac - sg_ * 0.9 + sg_ * 1.8 * j / 14; j ? ctx.lineTo(aX + mr * Math.cos(m), aY - mr * Math.sin(m)) : ctx.moveTo(aX + mr * Math.cos(m), aY - mr * Math.sin(m)); } ctx.stroke();
       { const Xe = aX + mr * Math.cos(m1), Ye = aY - mr * Math.sin(m1), tx = -Math.sin(m1) * sg_, ty = -Math.cos(m1) * sg_; arrowPx(ctx, Xe - tx * 10, Ye - ty * 10, Xe, Ye, C.warn, 2, 8); }
-      lab(`moment ${fN(Mf.M)} N·m/m\n${Mf.Cm < 0 ? '(nose down)' : '(nose up)'}`, aX + mr * Math.cos(thv + Math.PI * 0.5), aY - mr * Math.sin(thv + Math.PI * 0.5), 0, -1, C.warn, false, 4);
     }
     // wind arrow, scale bar, colour key, plane
     const fs = W < 520 ? 10.5 : 12; ctx.font = `700 ${fs}px ui-sans-serif, system-ui, sans-serif`; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
