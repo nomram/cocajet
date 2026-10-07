@@ -20,7 +20,7 @@ export default function init(el) {
   const sAR = slider({ label: 'Aspect ratio  AR = span ÷ chord', min: 1, max: 20, step: 0.5, value: 8, fmt: v => v.toFixed(1), onInput: setup });
   const real = toggle({ label: 'Real-world air: friction, stall, flow separation', checked: true, onChange: setup });
   const fin = toggle({ label: 'Finite wing: add induced drag to the total', checked: true, onChange: setup });
-  const selV = select({ label: 'View', options: [['air', 'Air frame: wind fixed, the wing tilts'], ['wing', 'Wing frame: wing fixed, the wind tilts']], value: 'air', onChange: v => { view = v; } });
+  const selV = select({ label: 'View', options: [['air', 'Air frame (wind fixed, wing tilts)'], ['wing', 'Wing frame (wing fixed, wind tilts)']], value: 'air', onChange: v => { view = v; } });
   const selC = select({ label: 'Streak colour', options: [['speed', 'by speed'], ['pressure', 'by pressure']], value: 'speed', onChange: v => { colMode = v; buildPal(); } });
   [selV.el, selC.el].forEach(e => { e.style.flex = '1 1 200px'; });
   const bPause = button('Pause', () => { paused = !paused; bPause.textContent = paused ? 'Resume' : 'Pause'; bPause.classList.toggle('on', paused); }, 'small');
@@ -32,7 +32,7 @@ export default function init(el) {
   // ---- layer chips ----
   const on = {}, chips = [];
   const chip = (key, label, color, checked, tip) => {
-    const t = toggle({ label, checked, onChange: v => { on[key] = v; paintChips(); } }); on[key] = checked;
+    const t = toggle({ label, checked, onChange: v => { on[key] = v; paintChips(); if (key === 'wt' || key === 'cp') setup(); } }); on[key] = checked;
     Object.assign(t.el.style, { border: '1px solid var(--line-2)', borderRadius: '999px', padding: '4px 11px 4px 8px', background: 'var(--panel-2)', fontSize: '.76rem', gap: '6px' }); t.el.title = tip;
     t.el.insertBefore(h('i', { style: { width: '9px', height: '9px', borderRadius: '50%', background: color, display: 'inline-block', flex: 'none' } }), t.input.nextSibling);
     chips.push([t, key, color]); return t;
@@ -190,23 +190,23 @@ export default function init(el) {
     const st = lo.reduce((b, q) => (q[1] > b[1] ? q : b), lo[0]); pCp.dot(st[0], st[1], { color: col.warn, r: 4, ring: false });
     pCp.text(Math.min(0.9, st[0] + 0.04), st[1], 'stagnation', { color: col.warn, size: 10.5, bg: true });
     if (on.cp && Number.isFinite(M.xcp)) pCp.vline(clamp(M.xcp, 0, 1), { color: col.warn, label: 'CP' });
-    pCp.legend([[col.air, 'top surface'], [col.fire, 'bottom surface'], [col.ok, 'lift = area between']], { pos: 'br' });
+    pCp.legend([[col.air, 'top surface'], [col.fire, 'bottom surface'], [col.ok, 'lift = area between']], { pos: 'tr' });
   }
-  const pPol = new Plot(polCv, { xmin: -6, xmax: 22, ymin: -0.8, ymax: 2.2, xlabel: 'angle of attack α (degrees)', ylabel: 'lift coefficient CL', aspect: 1.75 });
+  const pPol = new Plot(polCv, { xmin: -6, xmax: 22, ymin: -0.8, ymax: 2.2, xlabel: 'angle of attack α (degrees)', ylabel: 'lift coefficient CL', aspect: 1.45 });
   function drawPol() {
     if (!Mt || !curves) return;
-    const M = Mt, cu = curves, a = pPol, ymax = Math.max(2.2, Math.ceil(Math.max(...cu.CLp) * 5) / 5 + 0.1);
+    const M = Mt, cu = curves, a = pPol, ymax = Math.max(1.8, Math.ceil(Math.max(...(P.real ? cu.CL : cu.CLp)) * 5) / 5 + 0.2);
     if (tab === 'cl') {
       a.set({ xmin: -6, xmax: 22, ymin: -0.8, ymax, xlabel: 'angle of attack α (degrees)', ylabel: 'lift coefficient CL', title: 'CL vs α: linear, then stall', yticks: null });
       const c = a.begin().col; a.axes();
-      if (P.real) a.band(aS, 22, { color: c.bad, alpha: 0.08, label: 'stalled' });
+      if (P.real) a.band(aS, 22, { color: c.bad, alpha: 0.08 });
       a.hline(0, { color: c.muted }); a.clip(true);
       a.line(cu.al, cu.CLp, { color: c.air, width: 2, dash: [5, 4] }); if (P.real) a.line(cu.al, cu.CL, { color: c.fire, width: 3 });
       a.clip(false);
       if (P.real) a.vline(aS, { color: c.bad, label: '≈ ' + aS.toFixed(0) + '°' });
       const a0 = -(beta + gc) / DEG; a.dot(a0, 0, { color: c.muted, r: 3.5, ring: false }); a.text(a0 + 0.6, 0.14, 'α₀ = ' + a0.toFixed(1) + '°', { color: c.muted, size: 10.5 });
       a.dot(aT, M.CL, { color: c.fuel, r: 6 });
-      a.legend([[c.air, 'ideal flow (never stalls)', [5, 4]], [c.fire, 'real wing']], { pos: 'br' });
+      a.legend([[c.air, 'ideal flow (never stalls)', [5, 4]], [c.fire, 'real wing']], { pos: 'tl' });
     } else if (tab === 'drag') {
       const lim = Math.min(22, aS + 3), idx = cu.al.map((_, i) => i).filter(i => cu.al[i] <= lim), xm = nice(Math.max(...idx.map(i => cu.CD[i])) * 1.15);
       a.set({ xmin: 0, xmax: Math.min(0.4, Math.max(0.06, xm)), ymin: -0.8, ymax, xlabel: 'drag coefficient CD', ylabel: 'lift coefficient CL', title: 'Drag polar: CL vs CD' });
@@ -217,7 +217,7 @@ export default function init(el) {
       a.clip(false);
       if (bv > 0) { a.text(cu.CD[bi] * 1.9, cu.CL[bi] * 1.9, 'best L/D ≈ ' + bv.toFixed(0), { color: c.ok, size: 10.5, align: 'right', bg: true }); a.dot(cu.CD[bi], cu.CL[bi], { color: c.ok, r: 3.5, ring: false }); }
       a.dot(Math.min(M.CD, a.o.xmax), M.CL, { color: c.fuel, r: 6 });
-      a.legend([[c.air, 'section alone (2-D)', [5, 4]], [c.fire, P.fin ? 'whole wing, AR ' + P.AR.toFixed(1) : 'real wing']], { pos: 'br' });
+      a.legend([[c.air, 'section alone (2-D)', [5, 4]], [c.fire, P.fin ? 'whole wing, AR ' + P.AR.toFixed(1) : 'real wing']], { pos: 'tl' });
     } else {
       a.set({ xmin: -6, xmax: 22, ymin: -0.2, ymax: 1.2, xlabel: 'angle of attack α (degrees)', ylabel: 'centre of pressure  x / c', title: 'Where the lift acts', yticks: [0, 0.25, 0.5, 0.75, 1] });
       const c = a.begin().col; a.axes(); a.hline(0.25, { color: c.warn, label: 'aerodynamic centre ¼ c' }); a.hline(0, { color: c.muted }); a.hline(1, { color: c.muted });
@@ -226,14 +226,14 @@ export default function init(el) {
       a.clip(true); a.line(cu.al, cu.xcp, { color: c.fire, width: 3 }); a.clip(false);
       if (Number.isFinite(M.xcp) && M.xcp > -0.2 && M.xcp < 1.2) a.dot(aT, M.xcp, { color: c.fuel, r: 6 });
       else a.text(aT, 0.6, 'CP off the wing', { color: c.fuel, size: 10.5, align: 'center', bg: true });
-      a.text(8, 0.5, 'low α: CP far aft, lift tiny', { color: c.muted, size: 10.5, bg: true });
+      a.text(-5.5, 0.5, 'low α: CP far aft', { color: c.muted, size: 10.5 });
     }
   }
   pCp.onDraw(() => { drawCp(); }); pPol.onDraw(() => { drawPol(); });
 
   // ---- flow field: world = chord frame rotated by thv (origin = quarter chord, unit = chord) ----
   let W = 0, H = 0, S = 100, px0 = 0, py0 = 0, dpr = 1, rho = 0, cr = 1, sr = 0, fcA = 1, fsA = 0, fg = 0, vx0, vx1, vy0, vy1;
-  const NP = matchMedia('(max-width: 600px)').matches ? 700 : 1000, hx = new Float32Array(NP * HL), hy = new Float32Array(NP * HL), pb = new Uint8Array(NP), pAge = new Float32Array(NP), bins = Array.from({ length: NB }, () => []);
+  const NP = matchMedia('(max-width: 600px)').matches ? 700 : 1000, hx = new Float32Array(NP * HL), hy = new Float32Array(NP * HL), pAge = new Float32Array(NP), bins = Array.from({ length: NB }, () => []);
   const px = new Float32Array(NP), py = new Float32Array(NP);
   let hd = 0; const vort = []; const tmp = { x: 0, y: 0 };
   function flowAt(wx, wy, o) { // velocity (world frame) of the potential flow at a world point; false if inside the body
@@ -285,13 +285,14 @@ export default function init(el) {
   // label placement that avoids earlier labels, the wing and fixed overlays
   let occ = [], LQ = [];
   const hit = (r) => occ.some(o => r[0] < o[0] + o[2] && r[0] + r[2] > o[0] && r[1] < o[1] + o[3] && r[1] + r[3] > o[1]);
-  const lab = (t, ax, ay, dx, dy, c, opt) => LQ.push({ t, ax, ay, dx, dy, c, opt });
+  const lab = (t, ax, ay, dx, dy, c, opt, pr = 3) => LQ.push({ t, ax, ay, dx, dy, c, opt, pr });
   const occSeg = (x0, y0, x1, y1) => { const n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) / 10)); for (let i = 0; i <= n; i++) occ.push([x0 + (x1 - x0) * i / n - 5, y0 + (y1 - y0) * i / n - 5, 10, 10]); };
   function flushLabels() {
     const fs = W < 520 ? 10.5 : 12; ctx.font = `700 ${fs}px ui-sans-serif, system-ui, sans-serif`; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+    LQ.sort((a, b) => a.pr - b.pr);
     for (const lb of LQ) {
       const ls = lb.t.split('\n'), tw = Math.max(...ls.map(s => ctx.measureText(s).width)) + 8, th = ls.length * (fs + 3) + 3, b = Math.atan2(lb.dy, lb.dx); let pos = null;
-      outer: for (const dd of [5, 15, 28, 44]) for (const da of [0, 0.5, -0.5, 1, -1, 1.6, -1.6, 2.4, -2.4, Math.PI]) {
+      outer: for (const dd of [5, 14, 26, 42, 62]) for (const da of [0, 0.5, -0.5, 1, -1, 1.6, -1.6, 2.4, -2.4, Math.PI]) {
         const ux = Math.cos(b + da), uy = Math.sin(b + da), r = [lb.ax + ux * dd + (ux * 0.5 - 0.5) * tw, lb.ay + uy * dd + (uy * 0.5 - 0.5) * th, tw, th];
         if (r[0] < 2 || r[1] < 2 || r[0] + tw > W - 2 || r[1] + th > H - 2 || hit(r)) continue; pos = { r, dd }; break outer;
       }
@@ -420,19 +421,19 @@ export default function init(el) {
     const ra = S * 0.62, aLE = Math.PI + thv, aW = Math.PI + phw;
     ctx.strokeStyle = C.warn; ctx.lineWidth = 1.5; ctx.setLineDash([5, 3]); ctx.beginPath(); ctx.moveTo(px0 + (ra + 10) * -ec[0], py0 + (ra + 10) * ec[1]); ctx.lineTo(teX, teY); ctx.stroke(); ctx.setLineDash([]);
     ctx.lineWidth = 2; ctx.beginPath(); for (let j = 0; j <= 20; j++) { const a_ = aW + (aLE - aW) * j / 20, X = px0 + ra * Math.cos(a_), Y = py0 - ra * Math.sin(a_); j ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); } ctx.stroke();
-    { const am = (aW + aLE) / 2; lab(`α = ${nf(aa, 1)}°`, px0 + (ra + 3) * Math.cos(am), py0 - (ra + 3) * Math.sin(am), -1, 0, C.warn); }
+    { const am = (aW + aLE) / 2; lab(`α = ${nf(aa, 1)}°`, px0 + (ra + 3) * Math.cos(am), py0 - (ra + 3) * Math.sin(am), -1, 0, C.warn, false, 1); }
     // circulation loop
     const Gc = Mf.CL / 2;
     if (on.circ) {
       ctx.save(); ctx.strokeStyle = C.violet; ctx.lineWidth = 1.8; ctx.setLineDash([7, 6]); ctx.lineDashOffset = -T * 40 * Math.sign(Gc || 1); ctx.beginPath();
       for (let j = 0; j <= 60; j++) { const t = j / 60 * TAU, [X, Y] = rot(thv, 0.25 + 0.7 * Math.cos(t), 0.36 * Math.sin(t)); j ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); } ctx.stroke(); ctx.restore();
       for (const t of [0.5 * Math.PI, 1.5 * Math.PI]) { const s_ = Math.sign(Gc || 1), [X, Y] = rot(thv, 0.25 + 0.7 * Math.cos(t), 0.36 * Math.sin(t)), [X2, Y2] = rot(thv, 0.25 + 0.7 * Math.cos(t - s_ * 0.12), 0.36 * Math.sin(t - s_ * 0.12)); arrowPx(ctx, X2, Y2, X, Y, C.violet, 1.8, 7); }
-      const [Xt, Yt] = rot(thv, 0.25, 0.36); lab(`Γ = ∮V·dl = ${fN(Mf.Gam)} m²/s`, Xt, Yt, 0, -1, C.violet);
+      const [Xt, Yt] = rot(thv, 0.25, 0.36); lab(`Γ = ${fN(Mf.Gam)} m²/s`, Xt, Yt, 0, -1, C.violet, false, 4);
     }
     // vortices
     if (on.bound && Math.abs(Gc) > 0.01) {
       const rb = S * (0.07 + 0.3 * Math.abs(Gc)), cw = Gc > 0; swirl(ctx, px0, py0, rb, T * (cw ? 1 : -1) * (3 + 6 * Math.abs(Gc)), cw, C.violet, 0.95);
-      lab(`bound vortex  Γ = ${fN(Mf.Gam)} m²/s`, px0 - rb * 0.7, py0 - rb * 0.7, -1, -1, C.violet);
+      lab('bound vortex', px0 - rb * 0.7, py0 - rb * 0.7, -1, -1, C.violet, false, 4);
     }
     let bigS = null;
     for (const v of vort) {
@@ -441,32 +442,32 @@ export default function init(el) {
       swirl(ctx, sx(v.x), sy(v.y), r, T * (cw ? 1 : -1) * (4 + 10 * Math.sqrt(Math.abs(v.G))) + v.ph, cw, cw ? C.violet : C.fuel, fade);
       if (v.k === 's' && Math.abs(v.G) > 0.04 && (!bigS || Math.abs(v.G) > Math.abs(bigS.G)) && v.age < 3.2) bigS = v;
     }
-    if (bigS) lab(`${bigS.G < 0 ? 'starting' : 'stopping'} vortex\n${fN(-bigS.G * P.V * P.ch)} m²/s`, sx(bigS.x), sy(bigS.y), 0.3, bigS.G < 0 ? -1 : 1, bigS.G < 0 ? C.fuel : C.violet);
+    if (bigS) lab(`${bigS.G < 0 ? 'starting' : 'stopping'} vortex\n${fN(-bigS.G * P.V * P.ch)} m²/s`, sx(bigS.x), sy(bigS.y), 0.3, bigS.G < 0 ? -1 : 1, bigS.G < 0 ? C.fuel : C.violet, false, 2);
     if (Mf.st) {
-      const xs_ = Mf.xs - 0.25, ys_ = yAt(yUp, xs_), [X, Y] = rot(thv, xs_, ys_); ctx.strokeStyle = C.bad; ctx.lineWidth = 2.2; ctx.fillStyle = C.bg; ctx.beginPath(); ctx.arc(X, Y, 5, 0, TAU); ctx.fill(); ctx.stroke(); lab('separation point\nSTALL', X, Y - 6, 0, -1, C.bad);
-      if (on.street) lab('shed vortex street', sx(1.6 * ec[0]), sy(1.6 * ec[1] + 0.25), 1, -0.2, C.fuel, true);
+      const xs_ = Mf.xs - 0.25, ys_ = yAt(yUp, xs_), [X, Y] = rot(thv, xs_, ys_); ctx.strokeStyle = C.bad; ctx.lineWidth = 2.2; ctx.fillStyle = C.bg; ctx.beginPath(); ctx.arc(X, Y, 5, 0, TAU); ctx.fill(); ctx.stroke(); lab('separation point\nSTALL', X, Y - 6, 0, -1, C.bad, false, 1);
+      if (on.street) lab('shed vortex street', sx(1.6 * ec[0]), sy(1.6 * ec[1] + 0.25), 1, -0.2, C.fuel, true, 5);
     }
     // forces
     const xa = Number.isFinite(Mf.xcp) ? clamp(Mf.xcp, 0.03, 0.97) : 0.25, cpX = px0 + S * ec[0] * (xa - 0.25), cpY = py0 - S * ec[1] * (xa - 0.25);
     const Lv = [el_[0] * Mf.CL * kF, -el_[1] * Mf.CL * kF], Dv = [ew[0] * Mf.CD * kF, -ew[1] * Mf.CD * kF], Rv = [Lv[0] + Dv[0], Lv[1] + Dv[1]];
-    const farrow = (v, c, w, text, dir, dsh) => { arrowPx(ctx, cpX, cpY, cpX + v[0], cpY + v[1], c, w, 9, dsh); occSeg(cpX, cpY, cpX + v[0], cpY + v[1]); if (text && Math.hypot(v[0], v[1]) > 2) lab(text, cpX + v[0], cpY + v[1], dir[0], dir[1], c); };
-    if (on.wt && Mf.CL > 0) { const gx = Math.sin(phw), gy = Math.cos(phw), m = Mf.CL * kF; arrowPx(ctx, px0, py0, px0 + gx * m, py0 + gy * m, C.metal, 3.2, 9); occSeg(px0, py0, px0 + gx * m, py0 + gy * m); lab(`Weight W′ = ${fN(Mf.L)} N/m\n(= lift: ${fN(Mf.L / G0)} kg per m)`, px0 + gx * m, py0 + gy * m, 0, 1, C.metal); }
+    const farrow = (v, c, w, text, dir, dsh, pr) => { arrowPx(ctx, cpX, cpY, cpX + v[0], cpY + v[1], c, w, 9, dsh); occSeg(cpX, cpY, cpX + v[0], cpY + v[1]); if (text && Math.hypot(v[0], v[1]) > 2) lab(text, cpX + v[0], cpY + v[1], dir[0], dir[1], c, false, pr); };
+    if (on.wt && Mf.CL > 0) { const gx = Math.sin(phw), gy = Math.cos(phw), m = Mf.CL * kF; arrowPx(ctx, px0, py0, px0 + gx * m, py0 + gy * m, C.metal, 3.2, 9); occSeg(px0, py0, px0 + gx * m, py0 + gy * m); lab(`Weight ${fN(Mf.L)} N/m\n= lift = ${fN(Mf.L / G0)} kg per m`, px0 + gx * m, py0 + gy * m, 0, 1, C.metal, false, 2); }
     if (on.comp) {
       const Nn = Mf.CN * kF, Aa = Mf.CA * kF, nv = [en[0] * Nn, -en[1] * Nn], av = [ec[0] * Aa, -ec[1] * Aa], tp = [cpX + nv[0] + av[0], cpY + nv[1] + av[1]];
       ctx.save(); ctx.strokeStyle = C.fuel; ctx.globalAlpha = 0.6; ctx.lineWidth = 1; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(cpX + nv[0], cpY + nv[1]); ctx.lineTo(tp[0], tp[1]); ctx.lineTo(cpX + av[0], cpY + av[1]); ctx.stroke(); ctx.restore();
-      farrow(nv, C.fuel, 2.2, `Normal N′ = ${fN(Mf.k * Mf.CN)} N/m`, [-1, 0]); farrow(av, C.fuel, 2.2, `Axial A′ = ${fN(Mf.k * Mf.CA)} N/m${Mf.CA < 0 ? '\n(points forward)' : ''}`, [ec[0] * Math.sign(Mf.CA || 1), 0.6]);
+      farrow(nv, C.fuel, 2.2, `Normal ${fN(Mf.k * Mf.CN)} N/m`, [-1, 0], null, 3); farrow(av, C.fuel, 2.2, `Axial ${fN(Mf.k * Mf.CA)} N/m${Mf.CA < 0 ? '\n(points forward)' : ''}`, [ec[0] * Math.sign(Mf.CA || 1), 0.6], null, 3);
     }
-    if (on.res) farrow(Rv, C.text, 2.2, `Resultant R′ = ${fN(Math.hypot(Mf.L, Mf.D))} N/m`, [-0.7, Rv[1] < 0 ? -0.7 : 0.7], [6, 4]);
-    if (on.lift) farrow(Lv, C.ok, 3.6, `Lift L′ = ${fN(Mf.L)} N/m`, [0.8, Lv[1] < 0 ? -0.6 : 0.6]);
-    if (on.drag) { const dv = [Dv[0] * DM, Dv[1] * DM], dl = [Mf.CDf, Mf.CDp, Mf.CDi].map(x => fN(x * Mf.k)); farrow(dv, C.bad, 3.2, `Drag D′ = ${fN(Mf.D)} N/m (arrow ×${DM})\nfriction ${dl[0]} + form ${dl[1]}${P.fin ? ' + induced ' + dl[2] : ''}`, [1, 0.5]); }
+    if (on.res) farrow(Rv, C.text, 2.2, `Resultant ${fN(Math.hypot(Mf.L, Mf.D))} N/m`, [-0.7, Rv[1] < 0 ? -0.7 : 0.7], [6, 4], 2);
+    if (on.lift) farrow(Lv, C.ok, 3.6, `Lift ${fN(Mf.L)} N/m`, [0.8, Lv[1] < 0 ? -0.6 : 0.6], null, 1);
+    if (on.drag) { const dv = [Dv[0] * DM, Dv[1] * DM], dl = [Mf.CDf, Mf.CDp, Mf.CDi].map(x => fN(x * Mf.k)); farrow(dv, C.bad, 3.2, `Drag ${fN(Mf.D)} N/m (arrow ×${DM})\nfriction ${dl[0]} + form ${dl[1]}${P.fin ? ' + induced ' + dl[2] : ''}`, [1, 0.5], null, 1); }
     if (on.cp) {
       const [aX, aY] = [px0, py0]; ctx.strokeStyle = C.warn; ctx.fillStyle = C.bg; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(aX, aY, 5, 0, TAU); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(aX - 3, aY); ctx.lineTo(aX + 3, aY); ctx.moveTo(aX, aY - 3); ctx.lineTo(aX, aY + 3); ctx.stroke();
-      lab('aerodynamic centre\n(¼ chord)', aX, aY + 5, -0.5, 1, C.warn);
-      if (Number.isFinite(Mf.xcp)) { ctx.fillStyle = C.warn; ctx.strokeStyle = C.text; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cpX, cpY - 7); ctx.lineTo(cpX + 6, cpY); ctx.lineTo(cpX, cpY + 7); ctx.lineTo(cpX - 6, cpY); ctx.closePath(); ctx.fill(); ctx.stroke(); lab(`centre of pressure\nx/c = ${nf(Mf.xcp)}`, cpX, cpY + 7, 0.5, 1, C.warn); } else lab('no lift: the centre of pressure\nruns off the wing', aX, aY - 8, 0, -1, C.warn);
+      lab('aerodynamic centre\n(¼ chord)', aX, aY + 5, -0.5, 1, C.warn, false, 4);
+      if (Number.isFinite(Mf.xcp)) { ctx.fillStyle = C.warn; ctx.strokeStyle = C.text; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cpX, cpY - 7); ctx.lineTo(cpX + 6, cpY); ctx.lineTo(cpX, cpY + 7); ctx.lineTo(cpX - 6, cpY); ctx.closePath(); ctx.fill(); ctx.stroke(); lab(`centre of pressure\nx/c = ${nf(Mf.xcp)}`, cpX, cpY + 7, 0.5, 1, C.warn, false, 3); } else lab('no lift: the centre of pressure\nruns off the wing', aX, aY - 8, 0, -1, C.warn, false, 3);
       const mr = S * 0.3, sg_ = Mf.Cm > 0 ? -1 : 1, ac = thv + Math.PI / 2, m1 = ac + sg_ * 0.9; ctx.strokeStyle = C.warn; ctx.lineWidth = 2; ctx.beginPath();
       for (let j = 0; j <= 14; j++) { const m = ac - sg_ * 0.9 + sg_ * 1.8 * j / 14; j ? ctx.lineTo(aX + mr * Math.cos(m), aY - mr * Math.sin(m)) : ctx.moveTo(aX + mr * Math.cos(m), aY - mr * Math.sin(m)); } ctx.stroke();
       { const Xe = aX + mr * Math.cos(m1), Ye = aY - mr * Math.sin(m1), tx = -Math.sin(m1) * sg_, ty = -Math.cos(m1) * sg_; arrowPx(ctx, Xe - tx * 10, Ye - ty * 10, Xe, Ye, C.warn, 2, 8); }
-      lab(`moment M = ${fN(Mf.M)} N·m/m\n${Mf.Cm < 0 ? '(nose down)' : '(nose up)'}`, aX + mr * Math.cos(thv + Math.PI * 0.5), aY - mr * Math.sin(thv + Math.PI * 0.5), 0, -1, C.warn);
+      lab(`moment ${fN(Mf.M)} N·m/m\n${Mf.Cm < 0 ? '(nose down)' : '(nose up)'}`, aX + mr * Math.cos(thv + Math.PI * 0.5), aY - mr * Math.sin(thv + Math.PI * 0.5), 0, -1, C.warn, false, 4);
     }
     // wind arrow, scale bar, colour key, plane
     const fs = W < 520 ? 10.5 : 12; ctx.font = `700 ${fs}px ui-sans-serif, system-ui, sans-serif`; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
@@ -494,17 +495,18 @@ export default function init(el) {
     const txt = (t, x, y, c, al = 'left', sz = 11) => { g.font = `700 ${sz}px ui-sans-serif, system-ui, sans-serif`; g.fillStyle = c; g.textAlign = al; g.fillText(t, x, y); };
     // rear view
     txt('Rear view: looking along the flight path', A.x + 10, A.y + 14, C.text2);
-    const cx = A.x + A.w / 2, cy = A.y + A.h * 0.36, bW = A.w * 0.64, vy = cy + A.h * 0.16, rv = clamp(7 + 11 * Math.sqrt(Math.abs(CL)), 7, 21), vxo = 0.39 * bW;
+    const cx = A.x + A.w / 2, cy = A.y + A.h * 0.3, bW = A.w * 0.56, vy = cy + A.h * 0.2, rv = clamp(7 + 9 * Math.sqrt(Math.abs(CL)), 7, 17), vxo = 0.39 * bW;
     g.strokeStyle = C.metal; g.lineWidth = 6; g.lineCap = 'round'; g.beginPath(); g.moveTo(cx - bW / 2, cy); g.lineTo(cx + bW / 2, cy); g.stroke();
-    const ln = clamp(6 + Math.abs(aiD) * 4.5, 6, A.h * 0.32);
-    for (const f of [-0.7, -0.35, 0, 0.35, 0.7]) arrowPx(g, cx + vxo * f, cy + 10 * s, cx + vxo * f, cy + (10 + ln) * s, C.air, 2.2, 7);
-    for (const sd of [-1, 1]) arrowPx(g, cx + sd * (vxo + rv + 18), cy + 20 * s, cx + sd * (vxo + rv + 18), cy + (20 - ln * 0.6) * s, C.air, 1.8, 6);
+    const ln = clamp(6 + Math.abs(aiD) * 4.5, 6, A.h * 0.26);
+    for (const f of [-0.6, -0.3, 0, 0.3, 0.6]) arrowPx(g, cx + vxo * f, cy + 10 * s, cx + vxo * f, cy + (10 + ln) * s, C.air, 2.2, 7);
+    for (const sd of [-1, 1]) arrowPx(g, cx + sd * (bW / 2 + 34), cy + 18 * s, cx + sd * (bW / 2 + 34), cy + (18 - ln * 0.6) * s, C.air, 1.8, 6);
     if (on_) {
       swirl(g, cx - vxo, vy, rv, T * 5 * s, s > 0, s > 0 ? C.violet : C.fuel, 1); swirl(g, cx + vxo, vy, rv, -T * 5 * s, s < 0, s > 0 ? C.fuel : C.violet, 1);
       g.strokeStyle = C.air; g.lineWidth = 1.5; for (const sd of [-1, 1]) { g.beginPath(); g.arc(cx + sd * bW / 2, cy, 12, Math.PI / 2, sd > 0 ? -Math.PI / 2 : Math.PI * 1.5, sd > 0); g.stroke(); arrowPx(g, cx + sd * bW / 2 + sd * 6, cy - 12, cx + sd * bW / 2 - sd * 1, cy - 12, C.air, 1.5, 6); }
-      txt('tip vortex', cx + vxo, vy + rv + 12, s > 0 ? C.fuel : C.violet, 'center'); txt('tip vortex', cx - vxo, vy + rv + 12, s > 0 ? C.violet : C.fuel, 'center');
+      txt('tip vortex', cx + vxo, vy + rv + 13, s > 0 ? C.fuel : C.violet, 'center'); txt('tip vortex', cx - vxo, vy + rv + 13, s > 0 ? C.violet : C.fuel, 'center');
     }
-    txt(`downwash  w = ${fN(wv)} m/s`, cx, cy + (10 + ln) * s + 13 * s + (s < 0 ? -3 : 0), C.air, 'center', 10.5); txt('upwash', cx + vxo + rv + 18, cy + 20 * s - ln * 0.6 * s - 8 * s, C.air, 'center', 10);
+    { const yb = cy + (10 + ln) * s + 12 * s; txt('downwash', cx, yb, C.air, 'center', 10.5); txt(`w = ${fN(wv)} m/s`, cx, yb + 12, C.air, 'center', 10.5); }
+    txt('upwash', cx + bW / 2 + 34, cy + (18 - ln * 0.6) * s - 10 * s, C.air, 'center', 10);
     txt(`air leaks round the tips: αi = ${nf(aiD, 1)}°`, A.x + 10, A.y + A.h - 10, C.muted, 'left', 10.5);
     // plan view
     txt(`Plan view from above: AR = b ÷ c = ${nf(P.AR, 1)}`, B.x + 10, B.y + 14, C.text2);
