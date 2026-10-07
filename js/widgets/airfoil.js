@@ -9,7 +9,7 @@ const nice = (x) => { const m = 10 ** Math.floor(Math.log10(x)), f = x / m; retu
 const mix = (st, t) => { const f = clamp(t, 0, 1) * (st.length - 1), i = Math.min(st.length - 2, Math.floor(f)), u = f - i; return st[i].map((v, k) => v + (st[i + 1][k] - v) * u); };
 
 export default function init(el) {
-  const { body } = shell(el, { title: 'Wing lab: angle of attack, circulation, vortices and forces', note: 'Streaks follow the exact inviscid flow (Joukowski aerofoil, Kutta condition): <span style="color:var(--air)">slow</span> to <span style="color:var(--fire)">fast</span> air, and fast air means low pressure. Friction, form drag, the stall (lift shrinks, drag soars, flow separates) and the finite-wing induced drag are simple models (lifting-line theory, elliptic loading, e = 0.85). The vortex strengths obey Kelvin’s theorem (starting vortex = minus the change of bound circulation); their exact paths are illustrative.' });
+  const { body } = shell(el, { title: 'Wing lab: angle of attack, circulation, vortices and forces', note: 'Drag the angle of attack and watch the wing tilt against the fixed wind and horizon (the little aircraft shows the same angle as its nose-up pitch); press “Replay” to see the starting vortex. Streaks follow the exact inviscid flow (Joukowski aerofoil, Kutta condition): <span style="color:var(--air)">slow</span> to <span style="color:var(--fire)">fast</span> air, and fast air means low pressure. Friction, form drag, the stall (lift shrinks, drag soars, flow separates) and the finite-wing induced drag are simple models (lifting-line theory, elliptic loading, e = 0.85). The vortex strengths obey Kelvin’s theorem (starting vortex = minus the change of bound circulation); their exact paths are illustrative.' });
   const flowCv = h('canvas', { class: 'plot', style: { height: '340px' } }), tipCv = h('canvas', { class: 'plot', style: { height: '260px' } });
   const cpCv = h('canvas', { class: 'plot' }), polCv = h('canvas', { class: 'plot' });
   const sA = slider({ label: 'Angle of attack  α  (wind ↔ chord)', min: -6, max: 22, step: 0.5, value: 5, unit: '°', fmt: v => v.toFixed(1), onInput: setup });
@@ -64,8 +64,8 @@ export default function init(el) {
   let C = {}, light = false, pal = [];
   function readCols() { const g = cssVar; C = { text: g('--text'), text2: g('--text-2'), muted: g('--muted'), line: g('--line-2'), bg: g('--bg-2'), air: g('--air'), fire: g('--fire'), fuel: g('--fuel'), ok: g('--ok'), bad: g('--bad'), warn: g('--warn'), violet: g('--violet'), metal: g('--metal') }; light = document.documentElement.getAttribute('data-theme') === 'light'; buildPal(); }
   function buildPal() {
-    const st = colMode === 'speed' ? [[60, 180, 240], [150, 150, 150], [255, 120, 50]] : [[170, 120, 255], [160, 140, 215], [165, 165, 170], [255, 150, 40]], k = light ? 0.78 : 1;
-    pal = Array.from({ length: NB }, (_, b) => { const c = mix(st, b / (NB - 1)).map(v => Math.round(v * k)); return `rgb(${c[0]},${c[1]},${c[2]})`; });
+    const st = colMode === 'speed' ? (light ? [[30, 135, 205], [120, 135, 150], [220, 80, 25]] : [[60, 180, 240], [150, 150, 150], [255, 120, 50]]) : (light ? [[120, 70, 220], [135, 120, 190], [140, 145, 150], [225, 105, 20]] : [[170, 120, 255], [160, 140, 215], [165, 165, 170], [255, 150, 40]]);
+    pal = Array.from({ length: NB }, (_, b) => { const c = mix(st, b / (NB - 1)).map(v => Math.round(v)); return `rgb(${c[0]},${c[1]},${c[2]})`; });
   }
 
   // ---- Joukowski geometry (parameter c = 1; chord ~ 4) ----
@@ -168,7 +168,7 @@ export default function init(el) {
   function infoText() {
     const M = Mt, s = [`<b>Lift from circulation</b> (Kutta–Joukowski): L′ = ρ · V · Γ = ${RHO} × ${P.V.toFixed(0)} × ${fN(M.Gam)} m²/s = <b>${fN(M.L)} N/m</b> of span`];
     if (on.wt) s.push(M.L > 0 ? `<b>Level flight:</b> weight = lift, so each metre of this wing carries <b>${fN(M.L / G0)} kg</b> (wing loading ${fN(M.L / G0 / P.ch)} kg/m²)` : '<b>Level flight:</b> the lift is negative here, so the weight cannot be balanced (try a bigger angle).');
-    if (on.drag) s.push(`<b>Drag</b> D′ = ${fN(M.D)} N/m = friction ${fN(M.CDf * M.k)} + form (pressure) ${fN(M.CDp * M.k)}${P.fin ? ' + induced ' + fN(M.CDi * M.k) : ''} (drawn ×${DM})`);
+    if (on.drag) s.push(`<b>Drag</b> D′ = ${fN(M.D)} N/m = friction ${fN(M.CDf * M.k)} + form (pressure) ${fN(M.CDp * M.k)}${P.fin ? ' + induced ' + fN(M.CDi * M.k) : ''} (arrow drawn exaggerated)`);
     if (on.comp) s.push(`<b>Along / across the chord:</b> normal N′ = ${fN(M.k * M.CN)} N/m, axial A′ = ${fN(M.k * M.CA)} N/m${M.CA < 0 ? ' (negative: it points forward, the leading-edge suction)' : ''}`);
     if (on.cp) s.push(Number.isFinite(M.xcp) ? `<b>Centre of pressure</b> at x/c = ${nf(M.xcp)} from the nose; the quarter-chord aerodynamic centre feels a moment M = ${fN(M.M)} N·m/m (${M.Cm < 0 ? 'nose down' : 'nose up'})` : '<b>Centre of pressure:</b> with almost no lift it runs far off the wing, leaving a pure moment of ' + fN(M.M) + ' N·m/m.');
     if (on.circ || on.bound) s.push(`<b>Circulation:</b> Γ = L′ ÷ (ρV) = ${fN(M.Gam)} m²/s, ${M.Gam >= 0 ? 'clockwise' : 'counter-clockwise'} around the wing`);
@@ -176,7 +176,7 @@ export default function init(el) {
     if (sv) s.push(`<b>Kelvin:</b> ${sv.G < 0 ? 'starting' : 'stopping'} vortex ${fN(-sv.G * P.V * P.ch)} + bound change ${fN(sv.G * P.V * P.ch)} m²/s = 0: the total circulation stays zero`);
     info.innerHTML = s.join('<br>');
   }
-  const pCp = new Plot(cpCv, { xmin: 0, xmax: 1, ymin: 1.5, ymax: -3, xlabel: 'position along the chord  x / c', ylabel: 'pressure coefficient Cp (suction up)', aspect: 1.2, title: 'Pressure distribution' });
+  const pCp = new Plot(cpCv, { xmin: 0, xmax: 1, ymin: 1.5, ymax: -3, xlabel: 'position along the chord  x / c', ylabel: 'Cp  (suction up)', aspect: 1.2, title: 'Pressure distribution' });
   function drawCp() {
     if (!Mt) return;
     const M = Mt, cp = cpEff(M), up = [], lo = [];
@@ -185,15 +185,15 @@ export default function init(el) {
     const grid = Array.from({ length: 90 }, (_, k) => (1 - Math.cos(k / 89 * Math.PI)) / 2);
     const itp = (arr, x) => { let j = 0; while (j < arr.length - 2 && arr[j + 1][0] < x) j++; const a = arr[j], b = arr[j + 1], f = b[0] > a[0] ? clamp((x - a[0]) / (b[0] - a[0]), 0, 1) : 0; return a[1] + (b[1] - a[1]) * f; };
     const gu = grid.map(x => itp(up, x)), gl = grid.map(x => itp(lo, x)), peak = Math.min(...gu);
-    pCp.set({ ymin: 1.5, ymax: -Math.max(3, Math.min(9, -peak * 1.12)) });
+    const ym = Math.max(3, Math.min(9, -peak * 1.12)), stp = ym > 6 ? 2 : 1; pCp.set({ ymin: 1.5, ymax: -ym, yticks: [1, ...Array.from({ length: Math.floor(ym / stp) + 1 }, (_, k) => -k * stp)] });
     const col = pCp.begin().col; pCp.axes();
-    if (M.st) pCp.band(M.xs, 1, { color: col.bad, alpha: 0.1, label: 'separated' });
-    pCp.area(grid, gu, gl, { color: col.ok, alpha: 0.2 });
+    if (M.st) { pCp.band(M.xs, 1, { color: col.bad, alpha: 0.1 }); pCp.text((M.xs + 1) / 2, 1.2, 'separated', { color: col.bad, size: 10.5, align: 'center' }); }
+    pCp.clip(true); pCp.area(grid, gu, gl, { color: col.ok, alpha: 0.2 });
     pCp.hline(0, { color: col.muted });
-    pCp.line(grid, gu, { color: col.air, width: 2.4 }); pCp.line(grid, gl, { color: col.fire, width: 2.4 });
+    pCp.line(grid, gu, { color: col.air, width: 2.4 }); pCp.line(grid, gl, { color: col.fire, width: 2.4 }); pCp.clip(false);
     const st = lo.reduce((b, q) => (q[1] > b[1] ? q : b), lo[0]); pCp.dot(st[0], st[1], { color: col.warn, r: 4, ring: false });
     pCp.text(Math.min(0.9, st[0] + 0.04), st[1], 'stagnation', { color: col.warn, size: 10.5, bg: true });
-    if (on.cp && Number.isFinite(M.xcp)) pCp.vline(clamp(M.xcp, 0, 1), { color: col.warn, label: 'CP' });
+    if (on.cp && Number.isFinite(M.xcp)) { pCp.vline(clamp(M.xcp, 0, 1), { color: col.warn }); pCp.text(clamp(M.xcp, 0, 1) + 0.02, 1.2, 'CP', { color: col.warn, size: 11 }); }
     pCp.legend([[col.air, 'top surface'], [col.fire, 'bottom surface'], [col.ok, 'lift = area between']], { pos: 'tr' });
   }
   const pPol = new Plot(polCv, { xmin: -6, xmax: 22, ymin: -0.8, ymax: 2.2, xlabel: 'angle of attack α (degrees)', ylabel: 'lift coefficient CL', aspect: 1.45 });
@@ -207,10 +207,10 @@ export default function init(el) {
       a.hline(0, { color: c.muted }); a.clip(true);
       a.line(cu.al, cu.CLp, { color: c.air, width: 2, dash: [5, 4] }); if (P.real) a.line(cu.al, cu.CL, { color: c.fire, width: 3 });
       a.clip(false);
-      if (P.real) a.vline(aS, { color: c.bad, label: '≈ ' + aS.toFixed(0) + '°' });
-      const a0 = -(beta + gc) / DEG; a.dot(a0, 0, { color: c.muted, r: 3.5, ring: false }); a.text(a0 + 0.6, 0.14, 'α₀ = ' + a0.toFixed(1) + '°', { color: c.muted, size: 10.5 });
+      if (P.real) a.vline(aS, { color: c.bad, label: 'stall ' + aS.toFixed(0) + '°' });
+      const a0 = -(beta + gc) / DEG; a.dot(a0, 0, { color: c.muted, r: 3.5, ring: false }); a.text(-5.8, -0.55, 'α₀ = ' + a0.toFixed(1) + '° (zero lift)', { color: c.muted, size: 10.5 });
       a.dot(aT, M.CL, { color: c.fuel, r: 6 });
-      a.legend([[c.air, 'ideal flow (never stalls)', [5, 4]], [c.fire, 'real wing']], { pos: 'tl' });
+      a.legend([[c.air, 'ideal flow (never stalls)', [5, 4]], [c.fire, 'real wing']], { pos: 'br' });
     } else if (tab === 'drag') {
       const lim = Math.min(22, aS + 3), idx = cu.al.map((_, i) => i).filter(i => cu.al[i] <= lim), xm = nice(Math.max(...idx.map(i => cu.CD[i])) * 1.15);
       a.set({ xmin: 0, xmax: Math.min(0.4, Math.max(0.06, xm)), ymin: -0.8, ymax, xlabel: 'drag coefficient CD', ylabel: 'lift coefficient CL', title: 'Drag polar: CL vs CD' });
@@ -269,8 +269,8 @@ export default function init(el) {
   function seed() { for (let i = 0; i < NP; i++) spawn(i, true); }
   function sizeFlow() {
     const w = Math.round(flowCv.clientWidth), d = Math.min(2, devicePixelRatio || 1); if (!w) return false; if (w === W && d === dpr) return true;
-    W = w; dpr = d; H = Math.round(w / (w < 520 ? 0.95 : 1.8)); flowCv.style.height = H + 'px'; flowCv.width = Math.round(W * dpr); flowCv.height = Math.round(H * dpr);
-    S = W < 520 ? W / 3.7 : W / 4.7; px0 = W * (W < 520 ? 0.33 : 0.34); py0 = H * 0.5; vx0 = -px0 / S; vx1 = (W - px0) / S; vy0 = -(H - py0) / S; vy1 = py0 / S; seed(); return true;
+    W = w; dpr = d; H = Math.round(w / (w < 520 ? 0.95 : 1.65)); flowCv.style.height = H + 'px'; flowCv.width = Math.round(W * dpr); flowCv.height = Math.round(H * dpr);
+    S = W < 520 ? W / 3.7 : W / 4.3; px0 = W * (W < 520 ? 0.33 : 0.34); py0 = H * 0.5; vx0 = -px0 / S; vx1 = (W - px0) / S; vy0 = -(H - py0) / S; vy1 = py0 / S; seed(); return true;
   }
   const ctx = flowCv.getContext('2d'), tctx = tipCv.getContext('2d');
   const sx = (x) => px0 + S * x, sy = (y) => py0 - S * y;
@@ -289,28 +289,32 @@ export default function init(el) {
   // label placement that avoids earlier labels, the wing and fixed overlays
   let occ = [], LQ = [];
   const hit = (r) => occ.some(o => r[0] < o[0] + o[2] && r[0] + r[2] > o[0] && r[1] < o[1] + o[3] && r[1] + r[3] > o[1]);
-  const lab = (t, ax, ay, dx, dy, c, opt, pr = 3) => LQ.push({ t, ax, ay, dx, dy, c, opt, pr });
+  const lab = (t, ax, ay, dx, dy, c, opt, pr = 3, alt = null) => LQ.push({ t, ax, ay, dx, dy, c, opt, pr, alt });
   const occSeg = (x0, y0, x1, y1) => { const n = Math.max(1, Math.ceil(Math.hypot(x1 - x0, y1 - y0) / 10)); for (let i = 0; i <= n; i++) occ.push([x0 + (x1 - x0) * i / n - 5, y0 + (y1 - y0) * i / n - 5, 10, 10]); };
   function flushLabels() {
     const fs = W < 520 ? 10.5 : 12; ctx.font = `700 ${fs}px ui-sans-serif, system-ui, sans-serif`; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-    LQ.sort((a, b) => a.pr - b.pr); const placed = [];
+    LQ.sort((a, b) => a.pr - b.pr);
     for (const lb of LQ) {
-      const ls = lb.t.split('\n'), tw = Math.max(...ls.map(s => ctx.measureText(s).width)) + 8, th = ls.length * (fs + 3) + 3, b = Math.atan2(lb.dy, lb.dx); let pos = null, best = null;
-      outer: for (const dd of [5, 14, 26, 42, 62, 90]) for (const da of [0, 0.4, -0.4, 0.8, -0.8, 1.2, -1.2, 1.6, -1.6, 2, -2, 2.4, -2.4, 2.8, Math.PI]) {
-        const ux = Math.cos(b + da), uy = Math.sin(b + da), r = [lb.ax + ux * dd + (ux * 0.5 - 0.5) * tw, lb.ay + uy * dd + (uy * 0.5 - 0.5) * th, tw, th];
-        if (r[0] < 2 || r[1] < 2 || r[0] + tw > W - 2 || r[1] + th > H - 2) continue;
-        const ov = occ.reduce((s_, o) => s_ + Math.max(0, Math.min(r[0] + tw, o[0] + o[2]) - Math.max(r[0], o[0])) * Math.max(0, Math.min(r[1] + th, o[1] + o[3]) - Math.max(r[1], o[1])), 0);
-        if (!ov) { pos = { r, dd }; break outer; } if (!best || ov < best.ov) best = { r, dd, ov };
+      let pos = null, best = null, ls = lb.t.split('\n'), tw = 0, th = 0; const b = Math.atan2(lb.dy, lb.dx);
+      for (const txt of [lb.t, lb.alt].filter(Boolean)) {
+        ls = txt.split('\n'); tw = Math.max(...ls.map(s => ctx.measureText(s).width)) + 8; th = ls.length * (fs + 3) + 3;
+        outer: for (const dd of [5, 14, 26, 42, 62, 90, 125]) for (const da of [0, 0.4, -0.4, 0.8, -0.8, 1.2, -1.2, 1.6, -1.6, 2, -2, 2.4, -2.4, 2.8, Math.PI]) {
+          const ux = Math.cos(b + da), uy = Math.sin(b + da), r = [lb.ax + ux * dd + (ux * 0.5 - 0.5) * tw, lb.ay + uy * dd + (uy * 0.5 - 0.5) * th, tw, th];
+          if (r[0] < 2 || r[1] < 2 || r[0] + tw > W - 2 || r[1] + th > H - 2) continue;
+          const ov = occ.reduce((s_, o) => s_ + Math.max(0, Math.min(r[0] + tw, o[0] + o[2]) - Math.max(r[0], o[0])) * Math.max(0, Math.min(r[1] + th, o[1] + o[3]) - Math.max(r[1], o[1])), 0);
+          if (!ov) { pos = { r, dd }; break outer; } if (!best || ov < best.ov) best = { r, dd, ov, ls, tw, th };
+        }
+        if (pos) break;
       }
-      if (!pos && best && lb.pr <= 2) pos = best;
+      if (!pos && best && lb.pr <= 2) { pos = best; ls = best.ls; tw = best.tw; th = best.th; }
       if (!pos && lb.pr > 2) continue;
-      if (!pos) { if (lb.opt) continue; pos = { r: [clamp(lb.ax + 5, 2, W - tw - 2), clamp(lb.ay - th / 2, 2, H - th - 2), tw, th], dd: 0 }; }
+      if (!pos) { ls = lb.t.split('\n'); tw = Math.max(...ls.map(s => ctx.measureText(s).width)) + 8; th = ls.length * (fs + 3) + 3; if (lb.opt) continue; pos = { r: [clamp(lb.ax + 5, 2, W - tw - 2), clamp(lb.ay - th / 2, 2, H - th - 2), tw, th], dd: 0 }; }
       if (pos.ov && lb.opt) continue;
       const [l, t] = pos.r; ctx.globalAlpha = 0.8; ctx.fillStyle = C.bg; ctx.fillRect(l, t, tw, th); ctx.globalAlpha = 1;
       if (pos.dd > 12) { ctx.strokeStyle = lb.c; ctx.globalAlpha = 0.55; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(lb.ax, lb.ay); ctx.lineTo(clamp(lb.ax, l, l + tw), clamp(lb.ay, t, t + th)); ctx.stroke(); ctx.globalAlpha = 1; }
-      ctx.fillStyle = lb.c; ls.forEach((s, k) => ctx.fillText(s, l + 4, t + 3 + (fs + 3) * (k + 0.5))); occ.push(pos.r); placed.push({ t: lb.t, r: pos.r, ov: pos.ov || 0 });
+      ctx.fillStyle = lb.c; ls.forEach((s, k) => ctx.fillText(s, l + 4, t + 3 + (fs + 3) * (k + 0.5))); occ.push(pos.r)
     }
-    LQ = []; el.__labels = placed;
+    LQ = [];
   }
 
   function drawPlane(x, y, w, hgt, pitch) {
@@ -392,7 +396,7 @@ export default function init(el) {
     for (let b = 0; b < NB; b++) {
       const lst = bins[b]; if (!lst.length) continue; ctx.strokeStyle = pal[b];
       for (let pass = 0; pass < 3; pass++) {
-        ctx.globalAlpha = [0.9, 0.5, 0.2][pass]; ctx.beginPath();
+        ctx.globalAlpha = [0.9, 0.5, 0.2][pass] * (light ? 0.7 : 1); ctx.beginPath();
         for (const i of lst) {
           const k0 = [0, 4, 9][pass], k1 = [4, 9, HL - 1][pass];
           for (let k = k0; k <= k1; k++) { const id = i * HL + ((hd - k + HL * 2) % HL), X = sx(hx[id]), Y = sy(hy[id]); k === k0 ? ctx.moveTo(X, Y) : ctx.lineTo(X, Y); }
@@ -401,7 +405,7 @@ export default function init(el) {
       }
     }
     ctx.globalAlpha = 1;
-    const kF = 0.7 * S, rot = (ang, x, y) => [px0 + S * (Math.cos(ang) * x - Math.sin(ang) * y), py0 - S * (Math.sin(ang) * x + Math.cos(ang) * y)];
+    const kF = Math.min(0.7 * S, 0.85 * py0 / 2.2), rot = (ang, x, y) => [px0 + S * (Math.cos(ang) * x - Math.sin(ang) * y), py0 - S * (Math.sin(ang) * x + Math.cos(ang) * y)];
     const wingPath = (ang) => { ctx.beginPath(); for (let i = 0; i < NV; i += 2) { const [X, Y] = rot(ang, XC[i], YC[i]); i ? ctx.lineTo(X, Y) : ctx.moveTo(X, Y); } ctx.closePath(); };
     // horizon (wind direction) and ghost of the 0° wing
     ctx.strokeStyle = C.muted; ctx.globalAlpha = 0.5; ctx.lineWidth = 1; ctx.setLineDash([7, 6]); ctx.beginPath(); ctx.moveTo(px0 - 12 * S * ew[0], py0 + 12 * S * ew[1]); ctx.lineTo(px0 + 12 * S * ew[0], py0 - 12 * S * ew[1]); ctx.stroke();
@@ -425,7 +429,7 @@ export default function init(el) {
     }
     // wing
     wingPath(thv); ctx.fillStyle = C.metal; ctx.globalAlpha = 0.6; ctx.fill(); ctx.globalAlpha = 1; ctx.strokeStyle = C.text; ctx.lineWidth = 1.8; ctx.stroke();
-    const [leX, leY] = rot(thv, -0.25, 0), [teX, teY] = rot(thv, 0.75, 0); const wbx = [Math.min(leX, teX) - 4, Math.min(leY, teY) - 0.1 * S, Math.abs(teX - leX) + 8, Math.abs(teY - leY) + 0.2 * S]; occ.push(wbx); el.__wing = wbx;
+    const [leX, leY] = rot(thv, -0.25, 0), [teX, teY] = rot(thv, 0.75, 0); const wbx = [Math.min(leX, teX) - 4, Math.min(leY, teY) - 0.1 * S, Math.abs(teX - leX) + 8, Math.abs(teY - leY) + 0.2 * S]; occ.push(wbx);
     // chord line + angle arc
     const ra = S * 0.62, aLE = Math.PI + thv, aW = Math.PI + phw;
     ctx.strokeStyle = C.warn; ctx.lineWidth = 1.5; ctx.setLineDash([5, 3]); ctx.beginPath(); ctx.moveTo(px0 + (ra + 10) * -ec[0], py0 + (ra + 10) * ec[1]); ctx.lineTo(teX, teY); ctx.stroke(); ctx.setLineDash([]);
@@ -451,7 +455,7 @@ export default function init(el) {
       swirl(ctx, sx(v.x), sy(v.y), r, T * (cw ? 1 : -1) * (4 + 10 * Math.sqrt(Math.abs(v.G))) + v.ph, cw, cw ? C.violet : C.fuel, fade);
       if (v.k === 's' && Math.abs(v.G) > 0.04 && (!bigS || Math.abs(v.G) > Math.abs(bigS.G)) && v.age < 3.2) bigS = v;
     }
-    if (bigS) lab(`${bigS.G < 0 ? 'starting' : 'stopping'} vortex${cm ? '' : '\n' + fN(-bigS.G * P.V * P.ch) + ' m²/s'}`, sx(bigS.x), sy(bigS.y), 0.3, bigS.G < 0 ? -1 : 1, bigS.G < 0 ? C.fuel : C.violet, false, 2);
+    if (bigS) lab(`${bigS.G < 0 ? 'starting' : 'stopping'} vortex${cm ? '' : '\n' + fN(-bigS.G * P.V * P.ch) + ' m²/s'}`, sx(bigS.x), sy(bigS.y), 0.3, bigS.G < 0 ? -1 : 1, bigS.G < 0 ? C.fuel : C.violet, true, 2, `${bigS.G < 0 ? 'starting' : 'stopping'} vortex`);
     if (Mf.st) {
       const xs_ = Mf.xs - 0.25, ys_ = yAt(yUp, xs_), [X, Y] = rot(thv, xs_, ys_); ctx.strokeStyle = C.bad; ctx.lineWidth = 2.2; ctx.fillStyle = C.bg; ctx.beginPath(); ctx.arc(X, Y, 5, 0, TAU); ctx.fill(); ctx.stroke(); lab(cm ? 'STALL' : 'separation point\nSTALL', X, Y - 6, 0, -1, C.bad, false, 1);
       if (on.street) lab(cm ? 'street' : 'shed vortex street', sx(1.6 * ec[0]), sy(1.6 * ec[1] + 0.25), 1, -0.2, C.fuel, true, 5);
@@ -459,7 +463,7 @@ export default function init(el) {
     // forces
     const xa = Number.isFinite(Mf.xcp) ? clamp(Mf.xcp, 0.03, 0.97) : 0.25, cpX = px0 + S * ec[0] * (xa - 0.25), cpY = py0 - S * ec[1] * (xa - 0.25);
     const Lv = [el_[0] * Mf.CL * kF, -el_[1] * Mf.CL * kF], Dv = [ew[0] * Mf.CD * kF, -ew[1] * Mf.CD * kF], Rv = [Lv[0] + Dv[0], Lv[1] + Dv[1]];
-    const farrow = (v, c, w, text, dir, dsh, pr) => { arrowPx(ctx, cpX, cpY, cpX + v[0], cpY + v[1], c, w, 9, dsh); occSeg(cpX, cpY, cpX + v[0], cpY + v[1]); if (text && Math.hypot(v[0], v[1]) > 2) lab(text, cpX + v[0], cpY + v[1], dir[0], dir[1], c, false, pr); };
+    const farrow = (v, c, w, text, dir, dsh, pr, alt) => { arrowPx(ctx, cpX, cpY, cpX + v[0], cpY + v[1], c, w, 9, dsh); occSeg(cpX, cpY, cpX + v[0], cpY + v[1]); if (text && Math.hypot(v[0], v[1]) > 2) lab(text, cpX + v[0], cpY + v[1], dir[0], dir[1], c, pr === 2, pr, alt); };
     if (on.wt && Mf.CL > 0) { const gx = Math.sin(phw), gy = Math.cos(phw), m = Mf.CL * kF; arrowPx(ctx, px0, py0, px0 + gx * m, py0 + gy * m, C.metal, 3.2, 9); occSeg(px0, py0, px0 + gx * m, py0 + gy * m); lab(cm ? `Weight ${fN(Mf.L)}` : `Weight ${fN(Mf.L)} N/m\n= lift = ${fN(Mf.L / G0)} kg per m`, px0 + gx * m, py0 + gy * m, 0, 1, C.metal, false, 2); }
     if (on.comp) {
       const Nn = Mf.CN * kF, Aa = Mf.CA * kF, nv = [en[0] * Nn, -en[1] * Nn], av = [ec[0] * Aa, -ec[1] * Aa], tp = [cpX + nv[0] + av[0], cpY + nv[1] + av[1]];
@@ -468,20 +472,20 @@ export default function init(el) {
     }
     if (on.res) farrow(Rv, C.text, 2.2, cm ? `Resultant ${fN(Math.hypot(Mf.L, Mf.D))}` : `Resultant ${fN(Math.hypot(Mf.L, Mf.D))} N/m`, [-0.7, Rv[1] < 0 ? -0.7 : 0.7], [6, 4], 2);
     if (on.lift) farrow(Lv, C.ok, 3.6, cm ? `Lift ${fN(Mf.L)}` : `Lift ${fN(Mf.L)} N/m`, [0.8, Lv[1] < 0 ? -0.6 : 0.6], null, 1);
-    if (on.drag) { const dv = [Dv[0] * DM, Dv[1] * DM], dl = [Mf.CDf, Mf.CDp, Mf.CDi].map(x => fN(x * Mf.k)); farrow(dv, C.bad, 3.2, cm ? `Drag ${fN(Mf.D)} (×${DM})` : `Drag ${fN(Mf.D)} N/m (arrow ×${DM})\nfriction ${dl[0]} + form ${dl[1]}${P.fin ? ' + induced ' + dl[2] : ''}`, [1, 0.5], null, 1); }
+    if (on.drag) { const dme = Math.max(1, Math.min(DM, 1.1 * S / Math.max(1e-6, Mf.CD * kF))), dv = [Dv[0] * dme, Dv[1] * dme], dl = [Mf.CDf, Mf.CDp, Mf.CDi].map(x => fN(x * Mf.k)); farrow(dv, C.bad, 3.2, cm ? `Drag ${fN(Mf.D)} (×${Math.round(dme)})` : `Drag ${fN(Mf.D)} N/m (arrow ×${Math.round(dme)})\nfriction ${dl[0]} + form ${dl[1]}${P.fin ? ' + induced ' + dl[2] : ''}`, [1, 0.5], null, 1, `Drag ${fN(Mf.D)} N/m (×${Math.round(dme)})`); }
     if (on.cp) {
       const [aX, aY] = [px0, py0]; ctx.strokeStyle = C.warn; ctx.fillStyle = C.bg; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(aX, aY, 5, 0, TAU); ctx.fill(); ctx.stroke(); ctx.beginPath(); ctx.moveTo(aX - 3, aY); ctx.lineTo(aX + 3, aY); ctx.moveTo(aX, aY - 3); ctx.lineTo(aX, aY + 3); ctx.stroke();
       lab(cm ? `AC ¼ c\nM ${fN(Mf.M)}` : `aerodynamic centre (¼ c)\nmoment ${fN(Mf.M)} N·m/m, ${Mf.Cm < 0 ? 'nose down' : 'nose up'}`, aX, aY + 5, -0.5, 1, C.warn, false, 4);
-      if (Number.isFinite(Mf.xcp)) { ctx.fillStyle = C.warn; ctx.strokeStyle = C.text; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cpX, cpY - 7); ctx.lineTo(cpX + 6, cpY); ctx.lineTo(cpX, cpY + 7); ctx.lineTo(cpX - 6, cpY); ctx.closePath(); ctx.fill(); ctx.stroke(); lab(cm ? `CP ${nf(Mf.xcp)}` : `centre of pressure\nx/c = ${nf(Mf.xcp)}`, cpX, cpY + 7, 0.5, 1, C.warn, false, 3); } else lab(cm ? 'CP off wing' : 'no lift: the centre of pressure\nruns off the wing', aX, aY - 8, 0, -1, C.warn, false, 3);
+      if (Number.isFinite(Mf.xcp)) { ctx.fillStyle = C.warn; ctx.strokeStyle = C.text; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(cpX, cpY - 7); ctx.lineTo(cpX + 6, cpY); ctx.lineTo(cpX, cpY + 7); ctx.lineTo(cpX - 6, cpY); ctx.closePath(); ctx.fill(); ctx.stroke(); lab(cm ? `CP ${nf(Mf.xcp)}` : `centre of pressure\nx/c = ${nf(Mf.xcp)}${Mf.xcp < 0 || Mf.xcp > 1 ? ' (off the wing)' : ''}`, cpX, cpY + 7, 0.5, 1, C.warn, false, 3); } else lab(cm ? 'CP off wing' : 'no lift: the centre of pressure\nruns off the wing', aX, aY - 8, 0, -1, C.warn, false, 3);
       const mr = S * 0.3, sg_ = Mf.Cm > 0 ? -1 : 1, ac = thv + Math.PI / 2, m1 = ac + sg_ * 0.9; ctx.strokeStyle = C.warn; ctx.lineWidth = 2; ctx.beginPath();
       for (let j = 0; j <= 14; j++) { const m = ac - sg_ * 0.9 + sg_ * 1.8 * j / 14; j ? ctx.lineTo(aX + mr * Math.cos(m), aY - mr * Math.sin(m)) : ctx.moveTo(aX + mr * Math.cos(m), aY - mr * Math.sin(m)); } ctx.stroke();
       { const Xe = aX + mr * Math.cos(m1), Ye = aY - mr * Math.sin(m1), tx = -Math.sin(m1) * sg_, ty = -Math.cos(m1) * sg_; arrowPx(ctx, Xe - tx * 10, Ye - ty * 10, Xe, Ye, C.warn, 2, 8); }
     }
     // wind arrow, scale bar, colour key, plane
     const fs = W < 520 ? 10.5 : 12; ctx.font = `700 ${fs}px ui-sans-serif, system-ui, sans-serif`; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-    { const wy = 22 + (view === 'air' ? 0 : 12), x0 = 12, ln = 50; arrowPx(ctx, x0, wy, x0 + ln * ew[0], wy - ln * ew[1], C.air, 3.2, 10); ctx.fillStyle = C.air; ctx.fillText('wind (free stream)', x0 + ln + 8, 15); ctx.fillStyle = C.muted; ctx.font = `600 ${fs - 1}px ui-sans-serif, system-ui, sans-serif`; ctx.fillText(view === 'air' ? '= flight direction reversed' : `arrives ${nf(aa, 1)}° off the chord`, x0 + ln + 8, 30); occ.push([4, 2, ln + 14 + Math.max(ctx.measureText('= flight direction reversed').width, 110), 46]); }
-    { const ppn = Mf.k / kF, nb = nice(0.6 * S * ppn), bl = nb / ppn, bx = W - 14 - bl; ctx.strokeStyle = C.text2; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(bx, 22); ctx.lineTo(bx + bl, 22); ctx.moveTo(bx, 17); ctx.lineTo(bx, 27); ctx.moveTo(bx + bl, 17); ctx.lineTo(bx + bl, 27); ctx.stroke(); ctx.fillStyle = C.text2; ctx.textAlign = 'right'; ctx.font = `700 ${fs - 1}px ui-sans-serif, system-ui, sans-serif`; ctx.fillText(`${nb} N/m`, W - 14, 38); ctx.fillText('arrow scale', W - 14, 52); ctx.textAlign = 'left'; occ.push([bx - 8, 8, bl + 22, 52]); }
-    { const g = ctx.createLinearGradient(12, 0, 82, 0); pal.forEach((c_, i) => g.addColorStop(i / (NB - 1), c_)); ctx.fillStyle = g; ctx.fillRect(12, H - 22, 70, 6); ctx.fillStyle = C.muted; ctx.font = `600 ${fs - 2}px ui-sans-serif, system-ui, sans-serif`; ctx.fillText(colMode === 'speed' ? 'slow' : 'suction', 12, H - 8); ctx.textAlign = 'right'; ctx.fillText(colMode === 'speed' ? 'fast' : 'pressure', 82, H - 8); ctx.textAlign = 'left'; occ.push([6, H - 34, 84, 32]); }
+    { const wy = 22 + (view === 'air' ? 0 : 12), x0 = 12, ln = 50; ctx.globalAlpha = 0.75; ctx.fillStyle = C.bg; ctx.fillRect(4, 3, ln + 14 + Math.max(ctx.measureText('= flight direction reversed').width, 110), 40); ctx.globalAlpha = 1; arrowPx(ctx, x0, wy, x0 + ln * ew[0], wy - ln * ew[1], C.air, 3.2, 10); ctx.fillStyle = C.air; ctx.fillText('wind (free stream)', x0 + ln + 8, 15); ctx.fillStyle = C.muted; ctx.font = `600 ${fs - 1}px ui-sans-serif, system-ui, sans-serif`; ctx.fillText(view === 'air' ? '= flight direction reversed' : `arrives ${nf(aa, 1)}° off the chord`, x0 + ln + 8, 30); occ.push([4, 2, ln + 14 + Math.max(ctx.measureText('= flight direction reversed').width, 110), 46]); }
+    { const ppn = Mf.k / kF, nb = nice(0.6 * S * ppn), bl = nb / ppn, bx = W - 14 - bl; ctx.globalAlpha = 0.75; ctx.fillStyle = C.bg; ctx.fillRect(bx - 8, 8, bl + 22, 52); ctx.globalAlpha = 1; ctx.strokeStyle = C.text2; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(bx, 22); ctx.lineTo(bx + bl, 22); ctx.moveTo(bx, 17); ctx.lineTo(bx, 27); ctx.moveTo(bx + bl, 17); ctx.lineTo(bx + bl, 27); ctx.stroke(); ctx.fillStyle = C.text2; ctx.textAlign = 'right'; ctx.font = `700 ${fs - 1}px ui-sans-serif, system-ui, sans-serif`; ctx.fillText(`${nb} N/m`, W - 14, 38); ctx.fillText('arrow scale', W - 14, 52); ctx.textAlign = 'left'; occ.push([bx - 8, 8, bl + 22, 52]); }
+    { ctx.globalAlpha = 0.75; ctx.fillStyle = C.bg; ctx.fillRect(6, H - 34, 84, 32); ctx.globalAlpha = 1; const g = ctx.createLinearGradient(12, 0, 82, 0); pal.forEach((c_, i) => g.addColorStop(i / (NB - 1), c_)); ctx.fillStyle = g; ctx.fillRect(12, H - 22, 70, 6); ctx.fillStyle = C.muted; ctx.font = `600 ${fs - 2}px ui-sans-serif, system-ui, sans-serif`; ctx.fillText(colMode === 'speed' ? 'slow' : 'suction', 12, H - 8); ctx.textAlign = 'right'; ctx.fillText(colMode === 'speed' ? 'fast' : 'pressure', 82, H - 8); ctx.textAlign = 'left'; occ.push([6, H - 34, 84, 32]); }
     { const pw = Math.min(150, W * 0.4), ph = Math.round(pw * 0.56); drawPlane(W - pw - 8, H - ph - 8, pw, ph, aa); occ.push([W - pw - 12, H - ph - 12, pw + 8, ph + 8]); }
     flushLabels();
     flowCv.style.borderColor = Mf.st ? C.bad : '';
@@ -503,27 +507,27 @@ export default function init(el) {
     const txt = (t, x, y, c, al = 'left', sz = 11) => { g.font = `700 ${sz}px ui-sans-serif, system-ui, sans-serif`; g.fillStyle = c; g.textAlign = al; g.fillText(t, x, y); };
     // rear view
     txt('Rear view: looking along the flight path', A.x + 10, A.y + 14, C.text2);
-    const cx = A.x + A.w / 2, cy = A.y + A.h * 0.3, bW = A.w * 0.56, vy = cy + A.h * 0.2, rv = clamp(7 + 9 * Math.sqrt(Math.abs(CL)), 7, 17), vxo = 0.39 * bW;
+    const cx = A.x + A.w / 2, cy = A.y + A.h * 0.3, bW = A.w * (side ? 0.54 : 0.5), vy = cy + A.h * 0.22, rv = clamp(7 + 9 * Math.sqrt(Math.abs(CL)), 7, 17), vxo = 0.45 * bW;
     g.strokeStyle = C.metal; g.lineWidth = 6; g.lineCap = 'round'; g.beginPath(); g.moveTo(cx - bW / 2, cy); g.lineTo(cx + bW / 2, cy); g.stroke();
     const ln = clamp(6 + Math.abs(aiD) * 4.5, 6, A.h * 0.26);
     for (const f of [-0.6, -0.3, 0, 0.3, 0.6]) arrowPx(g, cx + vxo * f, cy + 10 * s, cx + vxo * f, cy + (10 + ln) * s, C.air, 2.2, 7);
-    for (const sd of [-1, 1]) arrowPx(g, cx + sd * (bW / 2 + 34), cy + 18 * s, cx + sd * (bW / 2 + 34), cy + (18 - ln * 0.6) * s, C.air, 1.8, 6);
+    for (const sd of [-1, 1]) arrowPx(g, cx + sd * (bW / 2 + 28), cy + 18 * s, cx + sd * (bW / 2 + 28), cy + (18 - ln * 0.6) * s, C.air, 1.8, 6);
     if (on_) {
       swirl(g, cx - vxo, vy, rv, T * 5 * s, s > 0, s > 0 ? C.violet : C.fuel, 1); swirl(g, cx + vxo, vy, rv, -T * 5 * s, s < 0, s > 0 ? C.fuel : C.violet, 1);
       g.strokeStyle = C.air; g.lineWidth = 1.5; for (const sd of [-1, 1]) { g.beginPath(); g.arc(cx + sd * bW / 2, cy, 12, Math.PI / 2, sd > 0 ? -Math.PI / 2 : Math.PI * 1.5, sd > 0); g.stroke(); arrowPx(g, cx + sd * bW / 2 + sd * 6, cy - 12, cx + sd * bW / 2 - sd * 1, cy - 12, C.air, 1.5, 6); }
       txt('tip vortex', cx + vxo, vy + rv + 13, s > 0 ? C.fuel : C.violet, 'center'); txt('tip vortex', cx - vxo, vy + rv + 13, s > 0 ? C.violet : C.fuel, 'center');
     }
     { const yb = cy + (10 + ln) * s + 12 * s; txt('downwash', cx, yb, C.air, 'center', 10.5); txt(`w = ${fN(wv)} m/s`, cx, yb + 12, C.air, 'center', 10.5); }
-    txt('upwash', cx + bW / 2 + 34, cy + (18 - ln * 0.6) * s - 10 * s, C.air, 'center', 10);
+    txt('upwash', cx + bW / 2 + 28, cy + 31 * s, C.air, 'center', 10);
     txt(`air leaks round the tips: αi = ${nf(aiD, 1)}°`, A.x + 10, A.y + A.h - 10, C.muted, 'left', 10.5);
     // plan view
     txt(`Plan view from above: AR = b ÷ c = ${nf(P.AR, 1)}`, B.x + 10, B.y + 14, C.text2);
-    const bP = Math.min(B.h * 0.6, B.w * 0.4), cP = Math.max(4, bP / P.AR), x0 = B.x + B.w * 0.14, yc = B.y + B.h * 0.56, xE = B.x + B.w - 16, xt = x0 + cP, inw = 0.11 * bP;
+    const bP = Math.min(B.h * 0.5, B.w * 0.4), cP = Math.max(4, bP / P.AR), x0 = B.x + B.w * 0.14, yc = B.y + B.h * 0.56, xE = B.x + B.w - 16, xt = x0 + cP, inw = 0.11 * bP;
     g.fillStyle = C.metal; g.globalAlpha = 0.85; g.fillRect(x0, yc - bP / 2, cP, bP); g.globalAlpha = 1; g.strokeStyle = C.text; g.lineWidth = 1.4; g.strokeRect(x0, yc - bP / 2, cP, bP);
-    arrowPx(g, x0 - 12, yc + bP / 2, x0 - 12, yc - bP / 2, C.muted, 1.2, 5); arrowPx(g, x0 - 12, yc - bP / 2, x0 - 12, yc + bP / 2, C.muted, 1.2, 5); txt(`b = ${nf(P.AR * P.ch, 1)} m`, x0 - 18, yc, C.muted, 'right', 10);
-    txt(`c = ${nf(P.ch, 1)} m`, x0 + cP / 2, yc + bP / 2 + 12, C.muted, 'center', 10);
+    arrowPx(g, x0 - 12, yc + bP / 2, x0 - 12, yc - bP / 2, C.muted, 1.2, 5); arrowPx(g, x0 - 12, yc - bP / 2, x0 - 12, yc + bP / 2, C.muted, 1.2, 5); txt('b', x0 - 18, yc, C.muted, 'right', 11);
+    txt('c', x0 + cP / 2, yc + bP / 2 + 11, C.muted, 'center', 11); txt(`span b = ${nf(P.AR * P.ch, 1)} m, chord c = ${nf(P.ch, 1)} m`, B.x + 10, B.y + 29, C.muted, 'left', 10.5);
     if (on_) {
-      g.lineWidth = 3; g.strokeStyle = C.violet; g.beginPath(); g.moveTo(x0 + cP * 0.25, yc + bP / 2); g.lineTo(x0 + cP * 0.25, yc - bP / 2); g.stroke(); arrowPx(g, x0 + cP * 0.25, yc + bP * 0.1, x0 + cP * 0.25, yc - bP * 0.12, C.violet, 3, 8); txt('bound vortex', x0 + cP * 0.25 - 6, yc - bP / 2 - 10, C.violet, 'center', 10.5);
+      g.lineWidth = 3; g.strokeStyle = C.violet; g.beginPath(); g.moveTo(x0 + cP * 0.25, yc + bP / 2); g.lineTo(x0 + cP * 0.25, yc - bP / 2); g.stroke(); arrowPx(g, x0 + cP * 0.25, yc + bP * 0.1, x0 + cP * 0.25, yc - bP * 0.12, C.violet, 3, 8); txt('bound vortex', B.x + 10, yc - bP / 2 - 9, C.violet, 'left', 10.5);
       const leg = (y0, sd, c) => { g.strokeStyle = c; g.lineWidth = 2.2; g.beginPath(); for (let x = xt; x <= xE; x += 3) { const u = x - xt, y = y0 + sd * inw * (1 - Math.exp(-u / (0.6 * bP))) + Math.sin(u / (0.07 * bP + 5) - T * 5) * (0.025 * bP + 1) * (1 - Math.exp(-u / 30)); x === xt ? g.moveTo(x, y) : g.lineTo(x, y); } g.stroke(); };
       leg(yc - bP / 2, 1, C.fuel); leg(yc + bP / 2, -1, C.violet);
       g.strokeStyle = C.fuel; g.lineWidth = 1.6; g.setLineDash([4, 4]); g.beginPath(); g.moveTo(xE, yc - bP / 2 + inw); g.lineTo(xE, yc + bP / 2 - inw); g.stroke(); g.setLineDash([]);
