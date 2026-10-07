@@ -19,7 +19,7 @@
 
 <span class="eyebrow">Chapter 4 · The science</span>
 <h1>Wings, fans &amp; turbines</h1>
-<div class="meta"><span>~45 min</span><span>7 widgets</span><span>aerodynamics + turbomachinery</span></div>
+<div class="meta"><span>~80 min</span><span>10 widgets</span><span>aerodynamics, turbomachinery, windmills, steam plants and fans</span></div>
 <p class="lede">Our engine has exactly two moving parts that matter: a wheel that pushes air (the compressor) and a wheel that is pushed by air (the turbine). Both are rings of tiny wings. Understand one wing and you understand windmills, dams, power stations and jets.</p>
 
 <h2 id="lift" data-short="How wings work">How a wing makes lift</h2>
@@ -188,6 +188,10 @@
 <li>A rotating blade sees the vector sum of axial speed and blade speed, so it must be twisted.</li>
 <li>Euler: $\Delta h_0=U_2C_{\theta2}$. Energy goes with tip speed squared; slip and backsweep reduce the swirl; ~14 blades at exit is a good compromise.</li>
 <li>Turbines reverse the same physics: wind (Betz ≤ 59 %), hydro ($P=\eta\rho gQH$), steam (Carnot-limited).</li>
+<li>Wind rotors are lift machines: few slender blades at tip-speed ratio $\lambda\approx7$–$9$ reach $C_p\approx0.45$–$0.50$, extra blades gain little, and a drag-type rotor (Savonius) is stuck near $C_p\approx0.2$ because a paddle cannot outrun the wind.</li>
+<li>The load picks the windmill: water pumping wants many wide blades, low $\lambda$ and huge starting torque; a generator wants few blades and a fast shaft.</li>
+<li>A steam plant boils, expands, condenses and pumps (Rankine). The pump moves liquid, so it needs about 1 % of the turbine work against 40–60 % for a gas turbine’s compressor; reheat and supercritical pressure raise efficiency and keep the exit steam above 88 % dry.</li>
+<li>A fan is a compressor with $p_2/p_1\le1.1$: $Q\propto ND^3$, $\Delta p\propto N^2D^2$, $P\propto N^3D^5$, so 20 % less speed saves 49 % of the power. Gas turbine + steam turbine gives $\eta_{cc}=\eta_{gt}+(1-\eta_{gt})\,\varepsilon\,\eta_{st}\approx60$ %.</li>
 <li>CJ-1 pairs a one-stage centrifugal compressor with a one-stage axial turbine.</li>
 </ul>
 
@@ -196,7 +200,12 @@
  {"q":"A wing’s lift increases roughly linearly with angle of attack until…","o":["it reaches the speed of sound","the airflow separates (stall), around 12–16°","the wing is vertical","the air temperature drops"],"a":1,"why":"Beyond the stall angle the boundary layer separates, so lift collapses and drag rises."},
  {"q":"Why is a propeller or fan blade twisted?","o":["It looks nicer","Blade speed rises with radius so the relative wind angle changes along the blade","To make it lighter","To reduce noise only"],"a":1,"why":"The airflow angle β = atan(ωr/Cₐ) increases outward; twist keeps the angle of attack right."},
  {"q":"You double a compressor wheel’s tip speed. The energy per kg added to the air (Euler) becomes about…","o":["2×","4×","8×","unchanged"],"a":1,"why":"ΔH = U₂·Cθ₂ and Cθ₂ ∝ U₂, so ΔH ∝ U₂²."},
- {"q":"What is the Betz limit?","o":["The maximum safe rpm of a turbine","The maximum fraction (59.3 %) of the wind’s power an ideal rotor can extract","The minimum number of blades","The maximum compressor pressure ratio"],"a":1,"why":"Cp ≤ 16/27 from momentum theory."}
+ {"q":"What is the Betz limit?","o":["The maximum safe rpm of a turbine","The maximum fraction (59.3 %) of the wind’s power an ideal rotor can extract","The minimum number of blades","The maximum compressor pressure ratio"],"a":1,"why":"Cp ≤ 16/27 from momentum theory."},
+ {"q":"A drag-type rotor such as a Savonius cannot exceed Cp ≈ 0.2 mainly because…","o":["it is built from cheap materials","its paddles cannot move faster than the wind, so the push (v − u)² fades as they speed up","Betz’s limit is lower for vertical axes","it has too few blades"],"a":1,"why":"For a drag paddle P ∝ (v − u)²u peaks at u = v/3, giving Cp ≤ (4/27)·C_D ≈ 0.2. A lift blade sees w = √(v² + u²), which grows with its own speed."},
+ {"q":"Why does a water-pumping farm windmill have 12–24 wide blades while a modern turbine has three slim ones?","o":["Many blades are needed to reach Betz’s limit","A piston pump needs high torque at low speed (λ ≈ 1, high solidity); a generator wants high shaft speed (λ ≈ 7–9, low solidity)","Three blades are always cheaper","Slim blades make more torque"],"a":1,"why":"Power = torque × speed. Low λ means high torque and slow turning, which takes a lot of blade area; high λ makes the same power at high speed and low torque, so a few slender blades are enough."},
+ {"q":"Why does the pump in a steam plant cost so little compared with a gas turbine’s compressor?","o":["Steam is hotter than air","It compresses a liquid, which is almost incompressible, so w ≈ vΔp is tiny","Pumps are always more efficient","It runs at lower speed"],"a":1,"why":"w = ∫v dp ≈ 10 kJ/kg for 10 MPa, about 1 % of the turbine work, versus 40–60 % for a Brayton cycle."},
+ {"q":"You slow a fan from 1000 to 800 rpm in the same duct. Its shaft power becomes about…","o":["80 %","64 %","51 %","20 %"],"a":2,"why":"Power goes as N³: 0.8³ = 0.51, while flow falls to 80 % and pressure to 64 %."},
+ {"q":"Why can a combined-cycle plant reach ~60 % when a gas turbine alone makes ~38 %?","o":["It burns more fuel per kilowatt","A steam cycle turns part of the hot exhaust heat into extra electricity","It uses a bigger compressor","It runs colder"],"a":1,"why":"η_cc = η_gt + (1 − η_gt)·ε·η_st: the Rankine cycle recovers part of the exhaust heat the Brayton cycle throws away."}
 ]</script>
 </div>
 

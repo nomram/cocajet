@@ -76,6 +76,7 @@ export function hps(p, s) {
   if (p < PC) { const q = sat(p); if (s >= q.sf && s <= q.sg) return q.hf + (s - q.sf) / q.sfg * q.hfg; }
   return gridVal(GR.h, p, s);
 }
+/** temperature at (p, s). Exact inside the dome; elsewhere bilinear, with up to ~2 K error in the first grid cell next to the saturation line */
 export function Tps(p, s) {
   if (p < PC) { const q = sat(p); if (s >= q.sf && s <= q.sg) return q.T; }
   return gridVal(GR.T, p, s);
