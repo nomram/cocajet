@@ -42,7 +42,7 @@ export const VEH = [
       { id: 'bst', nm: 'Strap-on boosters (×4)', sh: 'Boosters', col: 'fire', n: 4, pair: 'lox-rp1', ofr: 2.39, prop: 39.6, dry: 3.8, Fsl: 0.8385, Fvac: 1.0213, ispSl: 263, ispVac: 320, tb: 118, par: true, d: 2.68, hh: 19.6, g: { w: 2.68, h: 19.6, y0: 0, dx: 2.9, nf: 0.3 } },
       { id: 'core', nm: 'Core stage', sh: 'Core', col: 'fuel', pair: 'lox-rp1', ofr: 2.39, prop: 93.0, dry: 6.5, Fsl: 0.792, Fvac: 0.99, ispSl: 255, ispVac: 319, tb: 286, d: 2.95, hh: 27.1, g: { w: 2.95, h: 27.1, y0: 0, nf: 0.02 } },
       { id: 'up', nm: 'Third stage', sh: 'Third', col: 'air', pair: 'lox-rp1', ofr: 2.4, prop: 22.8, dry: 2.4, Fvac: 0.298, ispVac: 326, tb: 240, d: 2.66, hh: 6.7, g: { w: 2.66, h: 6.7, y0: 27.1, nf: 0.02 } }] },
-  { id: 'f9', name: 'Falcon 9', short: 'Falcon 9', H: 70, pl: 17.5, plName: 'Payload', plPub: 17.5, plNote: 'with the booster recovered; ≈ 22 t if it is thrown away', era: 'Block 5, 2018 on',
+  { id: 'f9', name: 'Falcon 9', short: 'Falcon 9', H: 70, pl: 17.5, plName: 'Payload', plPub: 17.5, plNote: 'with the booster recovered; ≈ 23 t if it is thrown away', era: 'Block 5, 2018 on',
     blurb: 'A slim two-stage rocket in serial. The first stage keeps about 25 t of propellant back to fly itself home and land, which is why the payload is smaller when the booster is recovered.',
     drops: [{ nm: 'payload fairing', mass: 1.9, before: 1 }],
     plg: { w: 5.2, h: 13.2, y0: 56.8, nf: 0.5, kind: 'nose' },

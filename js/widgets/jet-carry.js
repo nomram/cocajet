@@ -158,7 +158,7 @@ export default function init(el) {
       const xmax = lv.feasible ? Math.min(lv.a * 0.97, Math.max(lv.Vmax * 1.3, lv.Vs * 2.2)) : Math.min(lv.a * 0.97, lv.Vs * 3), T0 = thrust(E, hm, 0);
       const step = xmax > 400 ? 100 : xmax > 160 ? 50 : xmax > 70 ? 20 : xmax > 30 ? 10 : 5, xm = Math.ceil(xmax / step) * step;
       const idx = lv.V.map((v, i) => i).filter(i => lv.V[i] <= xm), Vs = idx.map(i => lv.V[i]), Ta = idx.map(i => lv.Ta[i]), D = idx.map(i => lv.D[i]);
-      const dmin = lv.Dmin || Math.min(...D), ymax = 1.12 * Math.max(T0, 1.45 * dmin, ...Ta.slice(0, 1));
+      const dmin = lv.Dmin || Math.min(...D), ymax = lv.feasible ? 1.12 * Math.max(T0, 1.45 * dmin) : 3.2 * Math.max(T0, 1);
       p1.set({ xmin: 0, xmax: xm, ymin: 0, ymax, title: p1.W < 480 ? 'Thrust vs speed, ' + (hm / 1000).toFixed(0) + ' km, ' + fmtM(m, 2) : 'Thrust available and thrust required at ' + (hm / 1000).toFixed(1) + ' km, ' + fmtM(m, 2), xlabel: 'airspeed (m/s)', ylabel: 'force (N)' });
       c = p1.begin().col; p1.axes(); p1.clip(true);
       p1.band(0, lv.Vs, { color: c.bad, alpha: 0.12 });
@@ -173,7 +173,7 @@ export default function init(el) {
       if (lv.feasible) {
         p1.dot(lv.Vmax, thrust(E, hm, lv.Vmax), { color: c.fire, r: 5 }); tag(p1, p1.X(lv.Vmax), p1.Y(thrust(E, hm, lv.Vmax)), 'top speed ' + num(lv.Vmax, 3) + ' m/s', { align: 'right', dy: -15 });
         p1.dot(lv.Vbe, lv.Dmin, { color: c.air, r: 5 }); tag(p1, p1.X(lv.Vbe), p1.Y(lv.Dmin), 'min. drag ' + fmtN(lv.Dmin) + ' = weight ÷ ' + num(W / lv.Dmin, 3), { align: 'left', dy: 17 });
-      } else p1.ptext(p1.m.l + p1.iw / 2, p1.m.t + p1.ih * 0.35, 'No level flight possible: the engine never makes enough thrust', { color: c.bad, size: 11.5, weight: 800, align: 'center' });
+      } else p1.ptext(p1.m.l + p1.iw / 2, p1.m.t + p1.ih * 0.35, (p1.W < 480 ? 'No level flight here' : 'No level flight here: thrust is below the drag at every speed'), { color: c.bad, size: 11.5, weight: 800, align: 'center' });
       if (useCJ()) { const xs = [], ys = []; for (let v = 0; v <= Math.min(xm, 100); v += 20) { const t = cjModel(Math.round(hm / 100) * 100, v); if (t != null) { xs.push(v); ys.push(t); } } if (xs.length) p1.points(xs, ys, { color: c.warn, r: 3.5, stroke: c.strong }); }
       leg1.replaceChildren(legend([['var(--fire)', 'thrust available'], ['var(--air)', 'thrust required (drag in level flight)'], ['var(--ok)', 'speeds where it can fly'], ['var(--bad)', 'below stall speed'], ...(useCJ() ? [['var(--warn)', 'dots: the guide’s engine model']] : [])]));
     } else {
@@ -187,7 +187,7 @@ export default function init(el) {
       tag(p1, p1.X(20), p1.Y(Wn), 'weight to hold up ' + fmtN(Wn), { align: 'right', color: c.warn, dx: 4, dy: -12 });
       p1.dot(hm / 1000, Tv(hm), { color: c.fire, r: 5 });
       if (cUp != null && cUp !== Infinity) { p1.dot(cUp / 1000, Wn, { color: c.strong, r: 5 }); tag(p1, p1.X(cUp / 1000), p1.Y(Wn), 'hover ceiling ' + (cUp / 1000).toFixed(1) + ' km', { align: 'left', dy: 16 }); }
-      if (Wn > Tv(0)) p1.ptext(p1.m.l + p1.iw / 2, p1.m.t + p1.ih * 0.45, 'Too heavy: the engine cannot lift it off the ground', { color: c.bad, size: 11.5, weight: 800, align: 'center' });
+      if (Wn > Tv(0)) p1.ptext(p1.m.l + p1.iw / 2, p1.m.t + p1.ih * 0.45, (p1.W < 480 ? 'Too heavy to lift off' : 'Too heavy: the engine cannot lift it off the ground'), { color: c.bad, size: 11.5, weight: 800, align: 'center' });
       if (useCJ()) { const px = [], py = []; for (let a = 0; a <= 12; a += 2) { const t = cjModel(a * 1000, 0); if (t != null) { px.push(a); py.push(t); } } if (px.length) p1.points(px, py, { color: c.warn, r: 3.5, stroke: c.strong }); }
       leg1.replaceChildren(legend([['var(--fire)', 'thrust available'], ['var(--warn)', 'weight to hold up (+ climb)'], ['var(--ok)', 'thrust to spare'], ...(useCJ() ? [['var(--warn)', 'dots: the guide’s engine model']] : [])]));
     }
