@@ -19,7 +19,7 @@
 
 <span class="eyebrow">Chapter 10 · Fire and ignition</span>
 <h1>The chemistry of heat</h1>
-<div class="meta"><span>~115 min</span><span>15 widgets</span><span>from atoms to a rocket</span></div>
+<div class="meta"><span>~135 min</span><span>16 widgets</span><span>from atoms to a rocket</span></div>
 <p class="lede">Every newton of thrust in this guide ultimately comes from one thing: atoms swapping partners and the energy difference leaving as heat. This chapter starts from the very beginning (what is a chemical formula? what does “balancing” mean? how many kilograms of air does one kilogram of fuel need?), then asks why anything gets hot and why a cold pack gets cold, and builds up to the problem every engine designer lives with: <em>a reaction that releases heat speeds itself up, so how do you stop it running away?</em></p>
 
 
@@ -284,16 +284,66 @@
 <h3>From chemistry to specific impulse</h3>
 <p>Chapter 12 showed that the thrust of a rocket is $\dot m V_e$ and that the exhaust speed is largest when the chamber is hot and the exhaust molecules are light. The chemistry in this chapter supplies both numbers, and puts them together as</p>
 <div class="eq">$$V_e\ \propto\ \sqrt{\frac{T_c}{\mathcal M}},\qquad I_{sp}=\frac{V_e}{g_0}$$</div>
-<p>with $T_c$ the chamber (flame) temperature and $\mathcal M$ the average molar mass of the exhaust. The published values below are why the hydrogen engine, with the <em>coolest</em> flame, still has the highest specific impulse: its exhaust is mostly water vapour mixed with spare hydrogen, so $\mathcal M$ is about 10 g/mol instead of 22.</p>
+<p>with $T_c$ the chamber (flame) temperature and $\mathcal M$ the average molar mass of the exhaust. The published values below are why the hydrogen engine, with the <em>coolest</em> flame, still has the highest specific impulse: its exhaust is mostly water vapour mixed with spare hydrogen, so $\mathcal M$ is about 12 g/mol instead of 23.</p>
 <div class="table-wrap"><table class="data">
 <tr><th>Propellant pair (published, rounded)</th><th class="num">T<sub>c</sub> (K)</th><th class="num">Exhaust M (g/mol)</th><th class="num">√(T<sub>c</sub>/M)</th><th class="num">Isp, vacuum (s)</th></tr>
-<tr><td>Liquid hydrogen + liquid oxygen</td><td class="num">≈ 3 250</td><td class="num">≈ 10</td><td class="num">18</td><td class="num">≈ 450</td></tr>
+<tr><td>Liquid hydrogen + liquid oxygen</td><td class="num">≈ 3 250</td><td class="num">≈ 12</td><td class="num">≈ 16.5</td><td class="num">≈ 450</td></tr>
 <tr><td>Methane + liquid oxygen</td><td class="num">≈ 3 550</td><td class="num">≈ 20</td><td class="num">13</td><td class="num">≈ 360</td></tr>
 <tr><td>Kerosene + liquid oxygen</td><td class="num">≈ 3 670</td><td class="num">≈ 23</td><td class="num">13</td><td class="num">≈ 350</td></tr>
 <tr><td>Composite solid</td><td class="num">≈ 3 400</td><td class="num">≈ 28</td><td class="num">11</td><td class="num">≈ 265</td></tr>
 </table></div>
 <p>The ordering follows the ratio, not the flame temperature, and the last column is the number the chart below plots against density: the quantity that finally decides how big the tanks must be.</p>
 <div data-widget="propellant-chart"></div>
+
+<h2 id="families" data-short="Chemical families">The families of energetic chemicals</h2>
+<p>Everything that can store chemical energy and release it quickly falls into a handful of families. Knowing the family tells you most of what to expect: how hot it burns, whether it makes gas, how fast it goes, and how dangerous it is to handle. The names below are textbook ones; this is a map of the territory, not a shopping list.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Family</th><th>What defines it</th><th>Textbook examples</th><th>Its job</th></tr>
+<tr><td><strong>Fuels</strong></td><td>carry the hydrogen and carbon (or a metal) that burn</td><td>hydrogen; methane, propane, kerosene; alcohols; powdered aluminium; rubbery polymers</td><td>the “fuel” half of any burn. Metal powders add heat and density but leave a solid oxide that does not expand</td></tr>
+<tr><td><strong>Oxidisers</strong></td><td>carry or release the oxygen</td><td>air; liquid oxygen; nitrous oxide; peroxide; nitrogen tetroxide; oxygen-rich salts</td><td>the “oxygen” half; see the table above</td></tr>
+<tr><td><strong>Monopropellants</strong></td><td>one liquid that releases energy when it decomposes over a catalyst</td><td>concentrated hydrogen peroxide; hydrazine</td><td>spacecraft thrusters, pump drives: no igniter, no second tank</td></tr>
+<tr><td><strong>Hypergolic pairs</strong></td><td>a storable fuel and oxidiser that ignite on contact</td><td>nitrogen tetroxide with an amine fuel</td><td>engines that must restart after years in space; toxic</td></tr>
+<tr><td><strong>Composite and double-base propellants</strong></td><td>fuel and oxidiser held together in a solid grain that burns from its surface</td><td>oxidiser salt + metal + polymer; or nitrate-ester gels</td><td>boosters and hobby motors (chapter 13)</td></tr>
+<tr><td><strong>High explosives</strong></td><td>molecules or mixtures that decompose by a <em>detonation</em>, a supersonic shock</td><td>the TNT, nitroglycerine and RDX/HMX classes</td><td>mining, quarrying, demolition, munitions</td></tr>
+<tr><td><strong>Metal–oxide reactions</strong></td><td>a metal that takes the oxygen from another metal’s oxide</td><td>thermite</td><td>welding, cutting; extreme heat but no gas</td></tr>
+<tr><td><strong>Gas generators</strong></td><td>a small charge that makes a burst of non-toxic gas, once</td><td>vehicle airbag inflators</td><td>inflate, eject, pressurise</td></tr>
+<tr><td><strong>Pyrotechnic compositions</strong></td><td>mixtures tuned for light, colour, smoke or sound</td><td>fireworks and signal flares</td><td>entertainment and signalling</td></tr>
+<tr><td><strong>Slow oxidation</strong></td><td>the same chemistry as a flame, spread over hours</td><td>rusting; iron-powder hand warmers</td><td>gentle heat on demand</td></tr>
+</table></div>
+<p>The difference between the middle rows is almost all about <strong>speed</strong>. Compare the burn-front speeds: a candle flame advances at a few millimetres per second, a propellant grain at a centimetre per second, a hydrogen–air flame at a few metres per second and a detonation at seven kilometres per second. That is a factor of a million between the slowest and the fastest, with the <em>same sort</em> of chemistry (fuel meets oxidiser, heat comes out). Propulsion lives in the slow-to-medium end of that range, where pressure builds gently and gas can leave through a nozzle.</p>
+
+<h2 id="good" data-short="Good propellant or not?">What makes a reaction desirable for propulsion?</h2>
+<p>Seven questions sort a reaction into “propellant” or “something else”. Each one has a physical reason, and each one can be answered from the chemistry of the earlier sections.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Question</th><th>Why it matters</th><th>A reaction that passes</th><th>One that fails</th></tr>
+<tr><td><strong>1 · Energy per kilogram</strong> of everything you carry</td><td>the heat available to be turned into exhaust speed</td><td>hydrogen + oxygen, 13 MJ/kg</td><td>black powder, 2.8 MJ/kg</td></tr>
+<tr><td><strong>2 · Plenty of gas</strong></td><td>only gas expands through a nozzle; liquid and solid products carry momentum but not pressure</td><td>kerosene + oxygen: 43 mol of gas per kg</td><td>thermite: none at all</td></tr>
+<tr><td><strong>3 · Light exhaust</strong></td><td>$V_e\propto\sqrt{T/\mathcal M}$: for the same heat, light molecules move faster</td><td>hydrogen: M ≈ 12 g/mol</td><td>oxy-acetylene: heavy CO₂, M ≈ 35</td></tr>
+<tr><td><strong>4 · A rate you can steer</strong></td><td>a flame in a vessel with a hole holds its pressure only if the burn is a <em>deflagration</em>; a detonation is a shock, not a flow</td><td>any liquid pair behind valves</td><td>a high explosive at 7 km/s</td></tr>
+<tr><td><strong>5 · Safe to store and handle</strong></td><td>the time between making it and using it is long, and it travels</td><td>kerosene, liquid oxygen with clean hardware</td><td>acetylene above 1.5 bar; touchy powders</td></tr>
+<tr><td><strong>6 · Can be stopped</strong></td><td>an abort, a throttle-down, a restart</td><td>liquid, hybrid and cold-gas systems</td><td>a solid grain, which burns to the end</td></tr>
+<tr><td><strong>7 · Dense</strong></td><td>tank volume is structure; structure is dead mass</td><td>kerosene, 1.0 kg/L; solids, 1.7</td><td>liquid hydrogen, 0.07 kg/L (0.3 as a pair)</td></tr>
+</table></div>
+<p>Pick any reaction in the chart: the dots at the top right (hot and gassy) are the ones that can make thrust, and the checklist shows what else you need. No propellant ticks every box. Hydrogen gives the best exhaust and the worst tanks; solids are simple and dense but cannot be stopped; cold gas is perfectly safe and almost useless. That is the engineering of propellant choice: a trade-off, not a winner.</p>
+<div data-widget="reaction-scorecard"></div>
+<p>Two lessons from the chart. <strong>Energy alone is not enough</strong>: oxy-acetylene releases more heat per kilogram than most rocket propellants (11.8 MJ/kg) and still fails, because acetylene cannot be held under pressure. <strong>Gas is as important as heat</strong>: thermite, with almost twice the energy of black powder, makes no gas and so makes no thrust.</p>
+
+<h2 id="elsewhere" data-short="Powerful, for other jobs">Powerful, but for other jobs</h2>
+<p>Some of the most energetic chemistry known is useless in a rocket or a jet, and for good reasons that follow from the seven questions. They are listed here so that you recognise them, understand why the law treats them differently from fuels, and see why “stronger” does not mean “better propellant”.</p>
+<div class="table-wrap"><table class="data">
+<tr><th>Reaction</th><th>What people love about it</th><th>Why it is wrong for propulsion</th><th>Where it earns its living</th></tr>
+<tr><td><strong>Thermite</strong><br><small>metal + metal oxide</small></td><td>2 800 K from a stable powder; needs no air; burns under water</td><td>no gas: the product is molten iron, so there is nothing to expand through a nozzle</td><td>welding rails, cutting thick steel</td></tr>
+<tr><td><strong>Oxy-acetylene</strong><br><small>a gas torch</small></td><td>the hottest common flame, 3 400 K</td><td>acetylene decomposes explosively above ≈ 1.5 bar even with no oxygen, so it cannot be burnt under pressure; heavy exhaust</td><td>welding and cutting torches</td></tr>
+<tr><td><strong>High explosives</strong><br><small>TNT, nitroglycerine, RDX classes</small></td><td>they release their energy in microseconds; the shock shatters rock</td><td>they detonate (≈ 7 km/s): a pressure spike no vessel survives; they cannot be throttled or stopped</td><td>mining, tunnelling, demolition, munitions</td></tr>
+<tr><td><strong>Ammonium-nitrate blasting agents</strong></td><td>cheap, bulk, and relatively insensitive until a strong primer is fired</td><td>they either do nothing or detonate; there is no steady burn to steer</td><td>quarries and mines</td></tr>
+<tr><td><strong>Detonator-class primary explosives</strong></td><td>a pinch is touch-sensitive and sets off bigger charges reliably</td><td>that same touchiness: friction or a static spark is enough</td><td>blasting caps and initiators</td></tr>
+<tr><td><strong>Gas generators</strong><br><small>airbag inflators</small></td><td>a pellet makes a burst of harmless nitrogen in about 30 ms</td><td>one shot, low energy per kilogram, toxic ingredients in the bulk material</td><td>airbags, ejection seats, tyre sealing</td></tr>
+<tr><td><strong>Pyrotechnic compositions</strong></td><td>colour, light, bangs and smoke on demand</td><td>they are tuned to make glowing solid particles, not expanding gas, and some burn nearly explosively</td><td>fireworks, flares</td></tr>
+<tr><td><strong>Nitromethane</strong><br><small>a drag-racing fuel</small></td><td>it carries its own oxygen, so each kilogram of air burns about eight times as much fuel</td><td>it can detonate under compression or shock, and contamination makes it touchy; an engine spills it instead of using it</td><td>drag racing, model glow engines (diluted)</td></tr>
+<tr><td><strong>Iron hand warmer</strong><br><small>slow oxidation</small></td><td>steady warmth for hours, no flame</td><td>the heat arrives over hours, not milliseconds: no pressure, no thrust</td><td>pocket warmers</td></tr>
+</table></div>
+<div class="callout violet"><span class="ct">The pattern</span>Look at what these have in common: each does one of the seven things superbly and fails another. The torch is hot but cannot be pressurised; thermite is hot but has no gas; the explosive is fast where a rocket needs slow. A good propellant is not the most violent chemistry, it is the one that is <em>hot, gaseous, light, steerable and stable</em> all at the same time. That is why the 19th-century “stronger” explosives did not replace black powder in rockets, and why the best rocket fuels, hydrogen, kerosene and methane, are the same fuels that power cars, kitchens and power stations.</div>
+<p>The regulations make the same distinction: fuels and compressed gases are controlled by fire codes, while the substances in the table above that detonate, or make fireworks, are licensed by explosives law almost everywhere. Reading about them is one thing; making or mixing any of them at home is a crime in most countries, and a fast way to be injured in all of them.</p>
 
 <h2 id="care" data-short="Handling chemicals">Handling the chemistry sensibly</h2>
 <ul>
@@ -321,6 +371,8 @@
 <li>A flame needs a mixture between the lower and upper flammability limits. The CJ-1’s whole air flow (φ ≈ 0.30) is outside the window; only the primary zone (φ ≈ 1.1) is inside it, and the rest of the air comes later.</li>
 <li>Fuel and air are mixed by jets (gas) or atomised droplets and vaporiser tubes (liquid); the droplet evaporation time goes as $d^2$. Fuel and a concentrated oxidiser are a different class of mixture, handled only by professionals; this guide gives no formulations, ratios or procedures for them.</li>
 <li>Exhaust speed goes as $\sqrt{T_c/\mathcal M}$: that is why hydrogen, with the coolest flame, has the highest specific impulse.</li>
+<li>Energetic chemicals fall into families (fuels, oxidisers, monopropellants, solid propellants, high explosives, metal–oxide reactions, gas generators, pyrotechnics); the main difference between them is <em>speed</em>: a flame front moves at millimetres to metres per second, a detonation at about 7 km/s.</li>
+<li>A good propellant is hot <em>and</em> gaseous <em>and</em> light <em>and</em> steerable <em>and</em> stable <em>and</em> dense; none ticks every box. Energy alone is not enough: thermite has no gas, oxy-acetylene cannot be pressurised, a high explosive detonates.</li>
 </ul>
 
 <div data-widget="quiz">
@@ -339,8 +391,11 @@
  {"q":"What does the stirred-reactor model say happens when the gas flows through too fast?","o":["The flame burns hotter","The flame blows out","Nothing changes","The reaction becomes endothermic"],"a":1,"why":"Too short a residence time: the reaction cannot finish, the temperature drops, the rate drops further: blow-out."},
  {"q":"Why can the CJ-1 burn when its overall mixture is φ ≈ 0.30, below propane’s lean limit?","o":["The limit does not apply to turbines","Only the front pocket of the flame tube burns, at φ ≈ 1.1 inside the window; the remaining air is added after the burning is finished","Propane burns at any mixture in a hot engine","The compressor makes the air richer"],"a":1,"why":"The primary zone is held inside the flammability window; dilution air joins downstream, where it only cools the gas."},
  {"q":"Why is petrol a bad fuel for a turbine tank while kerosene is acceptable?","o":["Petrol has less energy","Petrol’s flash point (−43 °C) means its vapour space is always explosive; kerosene’s (38 °C or more) is normally too lean to burn","Petrol is heavier","Kerosene is a gas"],"a":1,"why":"The flash point is the temperature at which the liquid makes an ignitable vapour; petrol is above it at any normal temperature."},
- {"q":"Why does hydrogen/oxygen have a higher specific impulse than kerosene/oxygen even though its flame is cooler?","o":["It is denser","Its exhaust molecules are much lighter (small M), and exhaust speed goes as √(T/M)","It burns slower","It contains more carbon"],"a":1,"why":"Lighter exhaust moves faster for the same heat: M ≈ 10 g/mol against ≈ 23."},
- {"q":"What kind of mixing does this guide leave to licensed professionals?","o":["Fuel with air in a combustor","Turbine oil into kerosene","Fuel with a concentrated oxidiser to make a propellant","Propane with butane"],"a":2,"why":"With no nitrogen to dilute it and no flow to carry heat away, the whole batch is a runaway waiting for friction, static or heat."}
+ {"q":"Why does hydrogen/oxygen have a higher specific impulse than kerosene/oxygen even though its flame is cooler?","o":["It is denser","Its exhaust molecules are much lighter (small M), and exhaust speed goes as √(T/M)","It burns slower","It contains more carbon"],"a":1,"why":"Lighter exhaust moves faster for the same heat: M ≈ 12 g/mol against ≈ 23."},
+ {"q":"What kind of mixing does this guide leave to licensed professionals?","o":["Fuel with air in a combustor","Turbine oil into kerosene","Fuel with a concentrated oxidiser to make a propellant","Propane with butane"],"a":2,"why":"With no nitrogen to dilute it and no flow to carry heat away, the whole batch is a runaway waiting for friction, static or heat."},
+ {"q":"Thermite releases about 3.9 MJ/kg, more than black powder. Why is it useless as a rocket propellant?","o":["It is too cold","It makes no gas: the products are molten metal, so there is nothing to expand through a nozzle","It burns too slowly to measure","It needs too much oxygen"],"a":1,"why":"Thrust needs expanding gas. Thermite’s products are liquid iron and slag; the energy ends up as a puddle of hot metal."},
+ {"q":"What is the main reason a high explosive is unsuitable for a rocket motor?","o":["It has too little energy per kg","It detonates (≈ 7 km/s), producing a pressure spike no chamber can hold, and cannot be throttled or stopped","It is too cold","It makes too much gas"],"a":1,"why":"A rocket needs a deflagration: a flame front at cm/s to m/s that holds a steady pressure. A detonation is a supersonic shock."},
+ {"q":"Oxy-acetylene gives the hottest common flame. Which fact keeps it out of rocket engines?","o":["It contains no carbon","Acetylene can decompose explosively above about 1.5 bar, so it cannot be burnt under chamber pressure","It is too light","It needs a catalyst"],"a":1,"why":"Rocket chambers run at tens of bar. Acetylene’s self-decomposition makes high pressure unsafe, and its CO₂ exhaust is heavy."}
 ]</script>
 </div>
 

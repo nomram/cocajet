@@ -100,7 +100,7 @@
 <tr><td>Hess’s law</td><td>$\Delta H=\sum\Delta H_f(\text{prod})-\sum\Delta H_f(\text{react})$</td><td>3(−393.5) + 4(−241.8) − (−103.8) kJ/mol</td></tr>
 <tr><td>Flammability limit in φ</td><td>$\phi=\dfrac{x/(1-x)}{x_{st}/(1-x_{st})}$, $x_{st}=\dfrac1{1+n_{O_2}/0.2095}$</td><td>propane 2.1 % → φ = 0.51; 9.5 % → 2.5</td></tr>
 <tr><td>Droplet evaporation time</td><td>$t\approx d_0^2/K$, $K\sim1\ \text{mm}^2/\text{s}$ in hot air</td><td>30 µm: ≈ 1 ms; halve the diameter, quarter the time</td></tr>
-<tr><td>Exhaust speed from chemistry</td><td>$V_e\propto\sqrt{T_c/\mathcal M}$</td><td>H₂/O₂: √(3 250/10) = 18; kerosene/O₂: √(3 670/23) = 13</td></tr>
+<tr><td>Exhaust speed from chemistry</td><td>$V_e\propto\sqrt{T_c/\mathcal M}$</td><td>H₂/O₂: √(3 250/12) = 16.5; kerosene/O₂: √(3 670/23) = 12.6</td></tr>
 <tr><td>Fuel heat power</td><td>$\dot Q=\dot m_f\,\text{LHV}$</td><td>2.86 g/s × 46.35 MJ/kg = 132 kW</td></tr>
 <tr><td>Arrhenius rate</td><td>$k=A\,e^{-E_a/RT}$</td><td>$E_a=80$ kJ/mol: the rate doubles about every 6.5 K near 300 K</td></tr>
 <tr><td>Semenov runaway</td><td>runaway if the heat-made curve stays above $h(T-T_a)$; critical rise $\Delta T\approx RT^2/E_a$</td><td>≈ 26 K at 500 K for $E_a=80$ kJ/mol</td></tr>
@@ -387,6 +387,10 @@ const G = [
 ['Atomiser','A nozzle that breaks liquid fuel into a spray of fine droplets (20–50 µm) so it evaporates fast enough to burn in the flame zone.'],
 ['Vaporiser tube','A tube held in the flame in which liquid fuel is heated until it leaves as vapour; simple, but it needs a start on gas fuel.'],
 ['Total-loss lubrication','Feeding a small amount of oil (about 5 % by volume mixed into the fuel) that burns in the engine after lubricating the bearings.'],
+['Thermite','A powdered metal (aluminium) and a metal oxide (iron oxide) that react to give molten metal at about 2 800 K and no gas: superb for welding rails, useless in a nozzle.'],
+['Primary / secondary explosive','A primary explosive is touch-sensitive and used in tiny amounts to start a detonation; a secondary one (the TNT class) is far less sensitive and does the work.'],
+['Gas generator','A small charge that makes a burst of gas once (an airbag inflator, a turbine starter cartridge).'],
+['Brisance','How sharply an explosive shatters what it touches: the shock, not the total energy. Why detonations break rock and propellants push.'],
 ];
 G.sort((a, b) => a[0].localeCompare(b[0], 'en'));
 const dl = document.getElementById('gl'), q = document.getElementById('gq'), cnt = document.getElementById('gcount');
