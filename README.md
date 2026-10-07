@@ -13,24 +13,24 @@ An interactive, from-scratch guide to jet engines, written in plain HTML, CSS an
 | `01-air.html` | Air, gases and chemistry: composition, the gas laws, combustion |
 | `02-forces.html` | Newton's third law, the thrust equation, energy and efficiency, power in fluids |
 | `03-thermo.html` | Pressure, heat and the Brayton cycle (P-V and T-s diagrams, pressure ratio) |
-| `04-blades.html` | Wings, angle of attack, fans, wind, hydro and steam turbines, blade count, Euler work |
+| `04-blades.html` | Wings, angle of attack and vortices, fans and the fan laws, wind turbines and windmill types, hydro, steam (Rankine, combined cycle) and nuclear plants, blade count, Euler work |
 | `05-engine.html` | The finished engine on one page: cross-section, stations, power balance |
 | `06-build.html` | Ten-step, layer-by-layer 3D build, with the physics of every part |
 | `07-run.html` | The engine simulator: start, throttle, air, flame and heat, failures |
 | `08-improve.html` | Cheap upgrades ranked by thrust per dollar, balancing, bearings, turbofan, controller |
 | `09-materials.html` | Strength vs temperature, creep, centrifugal and thermal stress, alloy choice |
-| `10-chemistry.html` | The chemistry of heat: endo/exothermic reactions, bond energies, Hess's law, Arrhenius, Semenov runaway and its control, the stirred reactor, particle size |
+| `10-chemistry.html` | The chemistry of heat: formulas and balancing, moles, endo/exothermic reactions, bond energies, Hess's law, flame temperature, Arrhenius, Semenov runaway and its control, the fuel menu, flammability limits, mixing fuel and air, the oxidiser menu, the families of energetic chemicals and what makes a good propellant |
 | `11-ignition.html` | Ignition and spark plugs: minimum ignition energy, Paschen's law, coil / CDI / piezo, plug anatomy and heat range, igniter placement, a home-made plug with printable parts |
 | `12-rockets.html` | Rockets: the rocket equation and staging, the de Laval (venturi) nozzle, choking, thrust vs speed, a water rocket |
 | `13-solid.html` | Solid rockets at concept level: burn-rate law, chamber-pressure balance and stability, grain geometry bench, motor classes, failure modes |
 | `14-hybrid.html` | Hybrid, liquid and air-breathing engines: O/F shift, propellant choice, hard starts, Isp vs Mach |
 | `15-electric.html` | Electric propulsion: ducted fan vs turbojet, ion thrusters, ion wind, one map of every engine |
-| `16-classes.html` | The rocket zoo: motor classes A–O, hobby certification levels, sounding rockets, small to super-heavy launchers, Δv budgets, thrust-to-weight |
+| `16-classes.html` | The rocket zoo: motor classes A–O, hobby certification levels, sounding rockets, small to super-heavy launchers, Δv budgets, thrust-to-weight, tank and stage sizes of Shuttle / Saturn V / Soyuz / Falcon 9 / Starship, what a jet engine can carry up versus sideways |
 | `17-workbench.html` | The design workbench: pick a can or tin as the flame-tube donor, swap compressor wheel, turbine, bearings and fuel system, choose what to optimise (price, ease, thrust per size, speed, range, life) and see the ranked designs, single-swap suggestions and a trade-off frontier |
 | `models.html` | STL gallery: per-part downloads, whole assembly, one-click ZIP, printing and casting notes |
 | `reference.html` | Formula sheet, searchable glossary, bill of materials, FAQ, sources |
 
-About 85 interactive widgets (plots, calculators, simulators) are shared by the chapters. Every chapter opens with a **thread strip** (`js/thread.js`): the question the chapter answers, what it adds to the running ledger, the ledger itself (live numbers from the engine model, from air to 58 N) and a bridge to the next chapter. A single small physics model (`js/engine-model.js`) drives all the cycle calculators, the compressor map, the thrust numbers and the simulator, so the numbers agree everywhere.
+About 95 interactive widgets (plots, calculators, simulators) are shared by the chapters. Every chapter opens with a **thread strip** (`js/thread.js`): the question the chapter answers, what it adds to the running ledger, the ledger itself (live numbers from the engine model, from air to 58 N) and a bridge to the next chapter. A single small physics model (`js/engine-model.js`) drives all the cycle calculators, the compressor map, the thrust numbers and the simulator, so the numbers agree everywhere.
 
 ## Run it locally
 
@@ -102,6 +102,8 @@ node tools/qa.mjs 08-improve.html --widgets               # one screenshot per w
 node tools/test-sim.mjs                                   # regression tests of the simulator scenarios
 node tools/numbers.mjs                                    # print the model's headline numbers (keep the text in step with them)
 node tools/build-extras.mjs                               # regenerate models/extras (home-made spark plug STLs)
+node tools/build-design-table.mjs                         # regenerate data/design-table.json (workbench performance table; run after changing the engine model or the parts catalogue)
+python3 tools/build-steam-tables.py                       # regenerate data/steam-tables.json (needs the iapws package)
 ```
 
 It needs Playwright and `http-server` to be installed globally.
