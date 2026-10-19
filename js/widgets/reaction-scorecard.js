@@ -25,8 +25,10 @@ const R = [
     good: 'About 2 800 K from a powder that needs no air and is hard to ignite by accident; it burns even under water.', bad: 'Nothing leaves as gas: the products are a puddle of molten iron and slag, so there is nothing to expand through a nozzle.', use: 'Welding rails, cutting thick steel; the powders are controlled because they are also incendiaries.' },
   { id: 'acet', g: 'else', name: 'Acetylene + oxygen', eq: '2 C₂H₂ + 5 O₂ → 4 CO₂ + 2 H₂O', heat: 11.8, gas: 28, M: 35, Tc: 3400, rho: 0.005, rate: 'steer', sens: 4, stop: true,
     good: 'The hottest common flame (about 3 400 K): it melts steel for welding and cutting.', bad: 'Acetylene can decompose violently by itself above about 1.5 bar, even with no oxygen, so it cannot be pressurised in a chamber; the exhaust is heavy CO₂.', use: 'Welding and cutting torches.' },
-  { id: 'tnt', g: 'else', name: 'High explosive (TNT class)', eq: 'a molecule that carries its own fuel and oxidiser and decomposes by a shock wave', heat: 4.2, gas: 33, M: 30, Tc: 3000, rho: 1.65, rate: 'runaway', sens: 3, stop: false,
+  { id: 'tnt', g: 'else', name: 'High explosive (TNT class)', eq: 'a molecule that carries its own fuel and oxidiser and decomposes by a shock wave', heat: 4.2, gas: 33, M: 30, Tc: 3000, rho: 1.65, rate: 'runaway', det: '≈ 6.9 km/s', sens: 3, stop: false,
     good: 'It releases its energy in microseconds: the shock shatters rock and steel, which is exactly what mining and demolition want.', bad: 'The reaction front moves at about 7 km/s, 1 000 times faster than a flame: the pressure spike (tens of GPa) is more than any chamber can hold, and nothing can throttle or stop it.', use: 'Mining, quarrying, tunnelling, demolition (and, outside this guide, weapons).' },
+  { id: 'nitro', g: 'else', name: 'Nitroglycerin (Nobel’s dynamite class)', eq: '4 C₃H₅N₃O₉ → 12 CO₂ + 10 H₂O + 6 N₂ + O₂', heat: 6.3, gas: 32, M: 31, Tc: 4500, rho: 1.6, rate: 'runaway', det: '≈ 7.7 km/s', sens: 4, stop: false,
+    good: 'Fuel and oxidiser in one molecule: four molecules become 29 of gas, so a litre of liquid makes about 1 200 litres of hot gas in microseconds. Soaked into an inert earth (Nobel, 1867) it could be handled and used to cut tunnels.', bad: 'The raw liquid is touchy: a knock can set it off. Even tamed, it detonates at about 7.7 km/s, so there is no steady flow to steer, nothing to throttle and nothing to stop.', use: 'Mining, tunnelling and demolition (as dynamite and its successors); small amounts in some gun and rocket propellants as a gelled nitrate-ester.' },
 ];
 const GROUPS = { prop: ['Good propellants', 'var(--ok)'], mid: ['Workable, with a catch', 'var(--warn)'], else: ['Powerful, but for other jobs', 'var(--bad)'] };
 const CRIT = [
@@ -44,7 +46,7 @@ function rate(r) {
     rate: r.rate === 'steer' ? 2 : r.rate === 'fixed' ? 1 : 0, safe: r.sens <= 2 ? 2 : r.sens === 3 ? 1 : 0, stop: r.stop ? 2 : 0, dense: r.rho >= 1 ? 2 : r.rho >= 0.6 ? 1 : 0,
   };
 }
-const SHORT = { h2: 'H₂ + O₂', ch4: 'CH₄ + O₂', rp1: 'kerosene + O₂', comp: 'composite solid', db: 'double-base', bp: 'black powder', h2o2: 'H₂O₂', n2: 'cold gas', thermite: 'thermite', acet: 'oxy-acetylene', tnt: 'explosive' };
+const SHORT = { h2: 'H₂ + O₂', ch4: 'CH₄ + O₂', rp1: 'kerosene + O₂', comp: 'composite solid', db: 'double-base', bp: 'black powder', h2o2: 'H₂O₂', n2: 'cold gas', thermite: 'thermite', acet: 'oxy-acetylene', tnt: 'explosive', nitro: 'nitroglycerin' };
 const MARK = ['✗', '~', '✓'], COL = ['var(--bad)', 'var(--warn)', 'var(--ok)'];
 
 export default function init(el) {
@@ -67,12 +69,12 @@ export default function init(el) {
     // exhaust-speed contours do not exist for products without gas; shade the "no gas" strip
     p.band(0, 5, { color: c.bad, alpha: 0.08, label: '' }); p.ptext(p.X(2.5), p.m.t + 4, 'no gas', { align: 'center', color: c.bad, size: 10.5, weight: 700 });
     R.forEach(q => { p.ctx.save(); p.ctx.fillStyle = col[q.g]; p.ctx.globalAlpha = q.id === sel ? 1 : 0.62; p.ctx.beginPath(); p.ctx.arc(p.X(q.gas), p.Y(q.heat), q.id === sel ? 9 : 6, 0, 7); p.ctx.fill(); if (q.id === sel) { p.ctx.strokeStyle = c.strong; p.ctx.lineWidth = 2; p.ctx.stroke(); } p.ctx.restore(); });
-    const PL = { h2: [-10, 0, 'right'], ch4: [10, -7, 'left'], rp1: [-10, 5, 'right'], comp: [10, 0, 'left'], db: [10, 0, 'left'], tnt: [-10, 3, 'right'], bp: [10, 0, 'left'], h2o2: [10, 0, 'left'], n2: [10, 0, 'left'], thermite: [13, 0, 'left'], acet: [-10, 0, 'right'] };
+    const PL = { h2: [-10, 0, 'right'], ch4: [10, -7, 'left'], rp1: [-10, 5, 'right'], comp: [10, 0, 'left'], db: [10, 0, 'left'], tnt: [-10, 3, 'right'], nitro: [10, 0, 'left'], bp: [10, 0, 'left'], h2o2: [10, 0, 'left'], n2: [10, 0, 'left'], thermite: [13, 0, 'left'], acet: [-10, 0, 'right'] };
     R.forEach(q => { const [dx, dy, al] = PL[q.id]; p.ptext(p.X(q.gas) + dx, p.Y(q.heat) + dy, SHORT[q.id], { align: al, base: 'middle', size: 10.5, color: q.id === sel ? c.strong : c.text, weight: q.id === sel ? 800 : 600 }); });
     for (const [id, b] of Object.entries(btns)) b.classList.toggle('on', id === sel);
     name.textContent = r.name; eq.textContent = r.eq;
     ro.heat.set(r.heat.toFixed(1)); ro.gas.set(String(r.gas)); ro.Tc.set(String(r.Tc)); ro.ve.set(r.M ? Math.sqrt(r.Tc / r.M).toFixed(1) : 'none', r.M ? 'good' : 'bad');
-    ro.rate.set(r.rate === 'steer' ? 'steered flame' : r.rate === 'fixed' ? 'own rate' : '≈ 7 km/s', r.rate === 'runaway' ? 'bad' : '');
+    ro.rate.set(r.rate === 'steer' ? 'steered flame' : r.rate === 'fixed' ? 'own rate' : r.det, r.rate === 'runaway' ? 'bad' : '');
     const rt = rate(r); crit.innerHTML = '';
     for (const [k, label, tip] of CRIT) crit.append(h('div', { title: tip, style: { display: 'flex', gap: '8px', alignItems: 'baseline', fontSize: '.86rem', color: 'var(--text-2)' } }, h('b', { style: { color: COL[rt[k]], fontSize: '1.05rem', width: '1.1em', textAlign: 'center' } }, MARK[rt[k]]), label));
     txt.innerHTML = '';
